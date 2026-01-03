@@ -110,8 +110,12 @@ a {
     font-weight: 400;
 }
 
-.brand-icon {
+/* .brand-icon {
     font-size: 1.75rem;
+} */
+ .brand-icon {
+    height: 2rem;  /* or whatever size looks good */
+    width: auto;
 }
 
 .brand-text {
