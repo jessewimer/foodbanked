@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title">
+                    Simplify Your<br>
+                    <span class="highlight">Food Bank</span><br>
+                    Record Keeping
+                </h1>
+                <p class="hero-description">
+                    Track visits, manage patrons, and generate meaningful reports. 
+                    Built for food banks that want to focus on serving their community, 
+                    not wrestling with spreadsheets.
+                </p>
+                <div class="hero-actions">
+                    <a href="/demo/" class="btn btn-primary btn-lg">Try Demo</a>
+                    <a href="/accounts/register/" class="btn btn-outline-primary btn-lg">Get Started</a>
+                </div>
+            </div>
+            <div class="col-lg-6 hero-visual">
+                <div class="visual-card">
+                    <div class="card-header">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-row">
+                            <span class="label">Today's Visits</span>
+                            <span class="value">24</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="label">This Month</span>
+                            <span class="value">387</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="label">Active Patrons</span>
+                            <span class="value">156</span>
+                        </div>
+                        <div class="pulse-indicator"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <h2 class="section-title">Everything you need, nothing you don't</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Simple Tracking</h3>
+                    <p>Record visits with or without patron details. Capture what matters: household size, age groups, and zip codes.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>Flexible Patron Management</h3>
+                    <p>Save patron information for regular visitors or keep visits anonymous. Your choice, every time.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Insightful Reports</h3>
+                    <p>Generate the statistics you need for grant applications and board reports. No Excel gymnastics required.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to simplify your operations?</h2>
+            <p>Try our interactive demo or create an account to get started.</p>
+            <div class="cta-actions">
+                <a href="/demo/" class="btn btn-light btn-lg">Explore Demo</a>
+                <a href="/accounts/register/" class="btn btn-primary btn-lg">Sign Up Free</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/landing.js' %}"></script>
+{% endblock %}
