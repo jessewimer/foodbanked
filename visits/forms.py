@@ -75,3 +75,36 @@ class VisitForm(forms.ModelForm):
             )
         
         return cleaned_data
+    
+
+class PatronForm(forms.ModelForm):
+    """Form for creating and editing patrons"""
+    
+    class Meta:
+        model = Patron
+        fields = ['name', 'address', 'zipcode', 'phone']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'First and last name'
+            }),
+            'address': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Street address (optional)'
+            }),
+            'zipcode': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Zip code',
+                'maxlength': '10'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Phone number (optional)'
+            }),
+        }
+        labels = {
+            'name': 'Full Name',
+            'address': 'Address',
+            'zipcode': 'Zip Code',
+            'phone': 'Phone Number',
+        }

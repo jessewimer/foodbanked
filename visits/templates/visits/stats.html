@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/stats.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Stats Dashboard -->
+<section class="stats-section">
+    <div class="container">
+        <!-- Header -->
+        <div class="stats-header">
+            <div>
+                <h1 class="stats-title">Statistics & Reports</h1>
+                <p class="stats-subtitle">{{ foodbank.name }} - Data insights and trends</p>
+            </div>
+            <a href="{% url 'visits:visit_create' %}" class="btn btn-primary">
+                <span class="btn-icon">+</span> New Visit
+            </a>
+        </div>
+        
+        <!-- Quick Stats Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">{{ visits_this_month }}</div>
+                    <div class="stat-label">Visits This Month</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value">{{ unique_households }}</div>
+                    <div class="stat-label">Unique Households</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">👨‍👩‍👧‍👦</div>
+                    <div class="stat-value">{{ people_served }}</div>
+                    <div class="stat-label">People Served</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">🆕</div>
+                    <div class="stat-value">{{ first_time_visitors }}</div>
+                    <div class="stat-label">First-Time This Month</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="row g-4 mb-5">
+            <!-- Visits Over Time Chart -->
+            <div class="col-lg-8">
+                <div class="chart-card">
+                    <h3>Visits Over Time (Last 30 Days)</h3>
+                    <canvas id="visitsChart" height="80"></canvas>
+                </div>
+            </div>
+            
+            <!-- Age Distribution -->
+            <div class="col-lg-4">
+                <div class="chart-card">
+                    <h3>Age Distribution</h3>
+                    <canvas id="ageChart" height="160"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demographics Row -->
+        <div class="row g-4">
+            <!-- Zip Code Breakdown -->
+            <div class="col-lg-6">
+                <div class="data-card">
+                    <h3>Top Zip Codes</h3>
+                    {% if zip_code_data %}
+                        <div class="data-table">
+                            {% for item in zip_code_data %}
+                            <div class="data-row">
+                                <span class="data-label">{{ item.zipcode }}</span>
+                                <div class="data-bar-container">
+                                    <div class="data-bar" style="width: {{ item.percentage }}%"></div>
+                                </div>
+                                <span class="data-value">{{ item.count }} visit{{ item.count|pluralize }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="no-data-message">No data available yet. Start recording visits!</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Household Size Breakdown -->
+            <div class="col-lg-6">
+                <div class="data-card">
+                    <h3>Household Sizes</h3>
+                    {% if household_size_data %}
+                        <div class="data-table">
+                            {% for item in household_size_data %}
+                            <div class="data-row">
+                                <span class="data-label">{{ item.size }} {% if item.size == 1 %}person{% else %}people{% endif %}</span>
+                                <div class="data-bar-container">
+                                    <div class="data-bar" style="width: {{ item.percentage }}%"></div>
+                                </div>
+                                <span class="data-value">{{ item.count }} household{{ item.count|pluralize }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="no-data-message">No data available yet. Start recording visits!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pass data to JavaScript -->
+<script id="visitsData" type="application/json">
+{{ visits_over_time|safe }}
+</script>
+
+<script id="ageData" type="application/json">
+{{ age_distribution|safe }}
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/stats.js' %}"></script>
+{% endblock %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('patrons/', views.patron_list, name='patron_list'),
     path('patrons/new/', views.patron_create, name='patron_create'),
     path('patrons/<int:pk>/', views.patron_detail, name='patron_detail'),
+    path('patrons/<int:pk>/delete/', views.patron_delete, name='patron_delete'),
     
     # Stats
     path('stats/', views.stats_view, name='stats'),

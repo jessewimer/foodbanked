@@ -8,12 +8,45 @@ from .forms import VisitForm
 
 @login_required
 def visit_list(request):
-    """List all visits for this foodbank"""
+    """List all visits for this foodbank with filtering"""
     foodbank = request.user.foodbank
-    visits = Visit.objects.filter(foodbank=foodbank).order_by('-visit_date')
+    
+    # Get filter parameter
+    filter_type = request.GET.get('filter', None)
+    
+    # Base queryset
+    visits = Visit.objects.filter(foodbank=foodbank).select_related('patron')
+    
+    # Apply filters
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    today = timezone.now().date()
+    filter_label = None
+    
+    if filter_type == 'today':
+        visits = visits.filter(visit_date=today)
+        filter_label = "today"
+    elif filter_type == 'week':
+        week_start = today - timedelta(days=today.weekday())  # Monday
+        visits = visits.filter(visit_date__gte=week_start)
+        filter_label = "this week"
+    elif filter_type == 'month':
+        month_start = today.replace(day=1)
+        visits = visits.filter(visit_date__gte=month_start)
+        filter_label = "this month"
+    elif filter_type == 'ytd':
+        year_start = today.replace(month=1, day=1)
+        visits = visits.filter(visit_date__gte=year_start)
+        filter_label = "year to date"
+    
+    # Order by most recent first
+    visits = visits.order_by('-visit_date', '-id')
     
     context = {
         'visits': visits,
+        'filter': filter_type,
+        'filter_label': filter_label,
     }
     return render(request, 'visits/visit_list.html', context)
 
@@ -140,50 +173,244 @@ def visit_delete(request, pk):
 
 @login_required
 def patron_list(request):
-    """List all patrons for this foodbank"""
+    """List all patrons for this foodbank with search and filtering"""
     foodbank = request.user.foodbank
-    patrons = Patron.objects.filter(foodbank=foodbank).order_by('name')
+    
+    # Base queryset
+    patrons = Patron.objects.filter(foodbank=foodbank)
+    
+    # Search functionality
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        from django.db.models import Q
+        patrons = patrons.filter(
+            Q(name__icontains=search_query) |
+            Q(address__icontains=search_query) |
+            Q(zipcode__icontains=search_query) |
+            Q(phone__icontains=search_query)
+        )
+    
+    # Letter filtering
+    letter_filter = request.GET.get('letter', '').strip().upper()
+    if letter_filter and letter_filter.isalpha():
+        patrons = patrons.filter(name__istartswith=letter_filter)
+    
+    # Order alphabetically by name
+    patrons = patrons.order_by('name')
     
     context = {
         'patrons': patrons,
+        'search_query': search_query,
+        'letter_filter': letter_filter,
     }
     return render(request, 'visits/patron_list.html', context)
 
 
 @login_required
-def patron_create(request):
-    """Create a new patron"""
-    if request.method == 'POST':
-        # Handle form submission
-        # TODO: Create form and process
-        messages.success(request, 'Patron added successfully!')
-        return redirect('visits:patron_list')
-    
-    return render(request, 'visits/patron_form.html')
-
-
-@login_required
 def patron_detail(request, pk):
-    """View details of a specific patron and their visit history"""
+    """View/Edit details of a specific patron"""
     foodbank = request.user.foodbank
     patron = get_object_or_404(Patron, pk=pk, foodbank=foodbank)
+    
+    # Get visit history for this patron
     visits = Visit.objects.filter(patron=patron).order_by('-visit_date')
+    
+    # Check if we're in edit mode
+    edit_mode = request.GET.get('edit') == 'true' or request.method == 'POST'
+    
+    if request.method == 'POST':
+        from .forms import PatronForm
+        form = PatronForm(request.POST, instance=patron)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Patron updated successfully!')
+            return redirect('visits:patron_detail', pk=pk)
+    else:
+        from .forms import PatronForm
+        form = PatronForm(instance=patron) if edit_mode else None
     
     context = {
         'patron': patron,
         'visits': visits,
+        'form': form,
+        'edit_mode': edit_mode,
     }
     return render(request, 'visits/patron_detail.html', context)
 
 
 @login_required
-def stats_view(request):
-    """View statistics and reports"""
+def patron_create(request):
+    """Create a new patron"""
     foodbank = request.user.foodbank
     
-    # TODO: Add date range filtering and actual stats
+    if request.method == 'POST':
+        from .forms import PatronForm
+        form = PatronForm(request.POST)
+        if form.is_valid():
+            patron = form.save(commit=False)
+            patron.foodbank = foodbank
+            patron.save()
+            messages.success(request, 'Patron added successfully!')
+            return redirect('visits:patron_detail', pk=patron.pk)
+    else:
+        from .forms import PatronForm
+        form = PatronForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'visits/patron_form.html', context)
+
+
+@login_required
+def patron_delete(request, pk):
+    """Delete a patron"""
+    foodbank = request.user.foodbank
+    patron = get_object_or_404(Patron, pk=pk, foodbank=foodbank)
+    
+    if request.method == 'POST':
+        patron.delete()
+        messages.success(request, f'{patron.name} has been deleted.')
+        return redirect('visits:patron_list')
+    
+    # If GET request, redirect to detail page
+    return redirect('visits:patron_detail', pk=pk)
+
+
+@login_required
+def stats_view(request):
+    """View statistics and reports with real data"""
+    foodbank = request.user.foodbank
+    
+    from django.db.models import Sum, Count, Q
+    from django.utils import timezone
+    from datetime import timedelta
+    import json
+    
+    today = timezone.now().date()
+    month_start = today.replace(day=1)
+    thirty_days_ago = today - timedelta(days=30)
+    
+    # Quick Stats
+    visits_this_month = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start
+    ).count()
+    
+    # Unique households this month (count distinct patrons + anonymous visits)
+    identified_households = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start,
+        patron__isnull=False
+    ).values('patron').distinct().count()
+    
+    anonymous_visits = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start,
+        patron__isnull=True
+    ).count()
+    
+    unique_households = identified_households + anonymous_visits
+    
+    # People served this month (sum of household sizes)
+    people_served = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start
+    ).aggregate(total=Sum('household_size'))['total'] or 0
+    
+    # First-time visitors this month
+    first_time_visitors = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start,
+        first_visit_this_month=True
+    ).count()
+    
+    # Visits Over Time (last 30 days)
+    visits_by_date = {}
+    for i in range(30):
+        date = today - timedelta(days=29-i)
+        visits_by_date[date] = 0
+    
+    visit_counts = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=thirty_days_ago
+    ).values('visit_date').annotate(count=Count('id'))
+    
+    for item in visit_counts:
+        visits_by_date[item['visit_date']] = item['count']
+    
+    visits_over_time = {
+        'labels': [date.strftime('%b %d') for date in sorted(visits_by_date.keys())],
+        'values': [visits_by_date[date] for date in sorted(visits_by_date.keys())]
+    }
+    
+    # Age Distribution
+    age_totals = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start
+    ).aggregate(
+        age_0_17=Sum('age_0_17'),
+        age_18_30=Sum('age_18_30'),
+        age_31_50=Sum('age_31_50'),
+        age_51_plus=Sum('age_51_plus')
+    )
+    
+    age_distribution = {
+        'labels': ['0-17 years', '18-30 years', '31-50 years', '51+ years'],
+        'values': [
+            age_totals['age_0_17'] or 0,
+            age_totals['age_18_30'] or 0,
+            age_totals['age_31_50'] or 0,
+            age_totals['age_51_plus'] or 0
+        ]
+    }
+    
+    # Top Zip Codes
+    zip_codes = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start
+    ).values('zipcode').annotate(
+        count=Count('id')
+    ).order_by('-count')[:5]
+    
+    max_zip_count = zip_codes[0]['count'] if zip_codes else 1
+    zip_code_data = [
+        {
+            'zipcode': item['zipcode'],
+            'count': item['count'],
+            'percentage': (item['count'] / max_zip_count * 100) if max_zip_count > 0 else 0
+        }
+        for item in zip_codes
+    ]
+    
+    # Household Sizes
+    household_sizes = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date__gte=month_start
+    ).values('household_size').annotate(
+        count=Count('id')
+    ).order_by('household_size')
+    
+    max_household_count = max([item['count'] for item in household_sizes], default=1)
+    household_size_data = [
+        {
+            'size': item['household_size'],
+            'count': item['count'],
+            'percentage': (item['count'] / max_household_count * 100) if max_household_count > 0 else 0
+        }
+        for item in household_sizes
+    ]
     
     context = {
         'foodbank': foodbank,
+        'visits_this_month': visits_this_month,
+        'unique_households': unique_households,
+        'people_served': people_served,
+        'first_time_visitors': first_time_visitors,
+        'visits_over_time': json.dumps(visits_over_time),
+        'age_distribution': json.dumps(age_distribution),
+        'zip_code_data': zip_code_data,
+        'household_size_data': household_size_data,
     }
+    
     return render(request, 'visits/stats.html', context)

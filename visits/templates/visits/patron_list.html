@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patron_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="patron-list-section">
+    <div class="container">
+        <!-- Header -->
+        <div class="list-header">
+            <div>
+                <h1 class="list-title">Patrons</h1>
+                <p class="patron-count">
+                    {% if search_query %}
+                        Found <strong>{{ patrons.count }}</strong> patron{{ patrons.count|pluralize }} matching "{{ search_query }}"
+                    {% else %}
+                        <strong>{{ patrons.count }}</strong> total patron{{ patrons.count|pluralize }}
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{% url 'visits:patron_create' %}" class="btn btn-primary">
+                <span class="btn-icon">+</span> Add Patron
+            </a>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-bar">
+            <form method="get" class="search-form">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                    <input type="text" 
+                           name="search" 
+                           class="search-input" 
+                           placeholder="Search by name, address, or zip code..."
+                           value="{{ search_query|default:'' }}">
+                    {% if search_query %}
+                        <a href="{% url 'visits:patron_list' %}" class="clear-search" title="Clear search">×</a>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+
+            <!-- Filter by First Letter -->
+            <div class="letter-filter">
+                <a href="{% url 'visits:patron_list' %}" class="letter-btn {% if not letter_filter %}active{% endif %}">All</a>
+                {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+                    <a href="?letter={{ letter }}" class="letter-btn {% if letter_filter == letter %}active{% endif %}">{{ letter }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Patrons List -->
+        <div class="patrons-container">
+            {% if patrons %}
+                <div class="patrons-list">
+                    {% for patron in patrons %}
+                    <a href="{% url 'visits:patron_detail' patron.pk %}" class="patron-list-item">
+                        <div class="patron-info">
+                            <div class="patron-name">{{ patron.name }}</div>
+                            <div class="patron-details">
+                                {% if patron.address %}
+                                    {{ patron.address }}
+                                    {% if patron.zipcode %} • {% endif %}
+                                {% endif %}
+                                {% if patron.zipcode %}
+                                    {{ patron.zipcode }}
+                                {% endif %}
+                                {% if patron.phone %}
+                                    • {{ patron.phone }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="patron-arrow">→</div>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-patrons">
+                    <div class="no-patrons-icon">👥</div>
+                    <h3>No patrons found</h3>
+                    {% if search_query %}
+                        <p>No patrons match your search "{{ search_query }}".</p>
+                        <a href="{% url 'visits:patron_list' %}" class="btn btn-outline-primary">View All Patrons</a>
+                    {% elif letter_filter %}
+                        <p>No patrons with names starting with "{{ letter_filter }}".</p>
+                        <a href="{% url 'visits:patron_list' %}" class="btn btn-outline-primary">View All Patrons</a>
+                    {% else %}
+                        <p>Start by adding your first patron.</p>
+                        <a href="{% url 'visits:patron_create' %}" class="btn btn-primary">Add Patron</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

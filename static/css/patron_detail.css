@@ -1,7 +1,7 @@
 /* ========================================
-   Visit Detail Section
+   Patron Detail Section
    ======================================== */
-.visit-detail-section {
+.patron-detail-section {
     padding: 3rem 0;
     background-color: #fefef9;
     min-height: calc(100vh - 200px);
@@ -81,53 +81,63 @@
     font-size: 1rem;
 }
 
-/* Badges */
-.badge-yes,
-.badge-no {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    font-weight: 600;
+.text-muted {
+    color: #9ca3af !important;
+    font-style: italic;
 }
 
-.badge-yes {
-    background-color: #d1fae5;
-    color: #065f46;
+/* Visit History */
+.visit-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
-.badge-no {
-    background-color: #f3f4f6;
-    color: #6b7280;
-}
-
-/* Age Breakdown Grid */
-.age-breakdown-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.age-group-item {
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
     background-color: #fefef9;
-    padding: 1rem;
     border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
 }
 
-.age-label {
+.history-item:hover {
+    background-color: #fffbeb;
+    transform: translateX(3px);
+}
+
+.history-date {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.history-details {
     font-size: 0.875rem;
     color: #6b7280;
-    margin-bottom: 0.5rem;
 }
 
-.age-value {
-    font-size: 2rem;
-    font-family: 'DM Serif Display', Georgia, serif;
+.visit-count-summary {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.visit-count-summary strong {
     color: #d97706;
-    font-weight: 400;
+}
+
+.no-data-message {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+    font-style: italic;
+    margin: 0;
 }
 
 /* Action Buttons */
@@ -151,27 +161,63 @@
 }
 
 /* Edit Form Styles */
-.visit-edit-form .form-label {
+.patron-edit-form .form-label {
     font-weight: 600;
     color: #1f2937;
     margin-bottom: 0.5rem;
 }
 
-.visit-edit-form .form-control {
+.patron-edit-form .form-control {
     border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
     padding: 0.75rem;
 }
 
-.visit-edit-form .form-control:focus {
+.patron-edit-form .form-control:focus {
     border-color: #d97706;
     box-shadow: 0 0 0 0.2rem rgba(217, 119, 6, 0.15);
 }
 
-.form-label-sm {
-    font-size: 0.875rem;
+/* Modal Styling */
+.modal-content {
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+}
+
+.modal-title {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+.modal-body {
+    padding: 1rem 1.5rem;
+    color: #6b7280;
+}
+
+.modal-body p:first-child {
+    color: #1f2937;
     font-weight: 500;
-    margin-bottom: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.modal-footer .btn {
+    flex: 1;
 }
 
 /* Responsive */
@@ -194,8 +240,10 @@
         min-width: auto;
     }
     
-    .age-breakdown-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
     }
     
     .detail-actions {

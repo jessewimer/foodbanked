@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/patron_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="patron-detail-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="detail-header">
+                    <a href="{% url 'visits:patron_list' %}" class="back-link">
+                        ← Back to Patrons
+                    </a>
+                    <h1 class="detail-title">Patron Details</h1>
+                </div>
+
+                <!-- Patron Card -->
+                <div class="detail-card">
+                    {% if not edit_mode %}
+                        <!-- View Mode -->
+                        <div class="patron-view-mode">
+                            <!-- Patron Information -->
+                            <div class="detail-section">
+                                <h3 class="section-title">Patron Information</h3>
+                                <div class="detail-row">
+                                    <span class="detail-label">Name:</span>
+                                    <span class="detail-value">{{ patron.name }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Address:</span>
+                                    <span class="detail-value">
+                                        {% if patron.address %}
+                                            {{ patron.address }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Zip Code:</span>
+                                    <span class="detail-value">{{ patron.zipcode }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Phone:</span>
+                                    <span class="detail-value">
+                                        {% if patron.phone %}
+                                            {{ patron.phone }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Added:</span>
+                                    <span class="detail-value">{{ patron.created_date|date:"F d, Y" }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Visit History -->
+                            <div class="detail-section">
+                                <h3 class="section-title">Visit History</h3>
+                                {% if visits %}
+                                    <div class="visit-history-list">
+                                        {% for visit in visits %}
+                                        <a href="{% url 'visits:visit_detail' visit.pk %}" class="history-item">
+                                            <div class="history-date">{{ visit.visit_date|date:"M d, Y" }}</div>
+                                            <div class="history-details">
+                                                {{ visit.household_size }} people • {{ visit.zipcode }}
+                                            </div>
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                    <p class="visit-count-summary">Total visits: <strong>{{ visits.count }}</strong></p>
+                                {% else %}
+                                    <p class="no-data-message">No visits recorded yet.</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="detail-actions">
+                                <a href="?edit=true" class="btn btn-primary">Edit Patron</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    Delete Patron
+                                </button>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Edit Mode -->
+                        <form method="post" class="patron-edit-form">
+                            {% csrf_token %}
+                            
+                            <!-- Form errors -->
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <!-- Patron Information -->
+                            <div class="detail-section">
+                                <h3 class="section-title">Patron Information</h3>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">
+                                        Name <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+                                    {{ form.address }}
+                                    {% if form.address.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.address.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.zipcode.id_for_label }}" class="form-label">
+                                        Zip Code <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.zipcode }}
+                                    {% if form.zipcode.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.zipcode.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.phone.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="detail-actions">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <a href="{% url 'visits:patron_detail' patron.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Patron</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>{{ patron.name }}</strong>?</p>
+                <p class="text-warning mb-0"><strong>Warning:</strong> This will also delete all {{ visits.count }} visit{{ visits.count|pluralize }} associated with this patron. This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="{% url 'visits:patron_delete' patron.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Patron</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
