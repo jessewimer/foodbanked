@@ -13,3 +13,18 @@ class Foodbank(models.Model):
     
     def __str__(self):
         return self.name
+    
+class RegistrationCode(models.Model):
+    """Registration codes for controlling who can sign up"""
+    code = models.CharField(max_length=50, unique=True)
+    is_used = models.BooleanField(default=False)
+    used_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    used_date = models.DateTimeField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True, help_text="Optional notes about who this code is for")
+    
+    def __str__(self):
+        return f"{self.code} ({'Used' if self.is_used else 'Available'})"
+    
+    class Meta:
+        ordering = ['-created_date']

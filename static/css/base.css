@@ -110,9 +110,6 @@ a {
     font-weight: 400;
 }
 
-/* .brand-icon {
-    font-size: 1.75rem;
-} */
  .brand-icon {
     height: 2rem;  /* or whatever size looks good */
     width: auto;
@@ -165,11 +162,26 @@ a {
 }
 
 .navbar-toggler:focus {
+    box-shadow: none;
+}
+
+.navbar-toggler[aria-expanded="true"]:focus {
     box-shadow: 0 0 0 0.2rem rgba(217, 119, 6, 0.25);
 }
 
 .navbar-collapse {
     flex-grow: 0;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+    color: var(--primary);
+    text-decoration: underline;
 }
 
 /* Mobile navbar adjustments */

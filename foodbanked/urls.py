@@ -17,24 +17,41 @@ Including another URLconf
 """
 URL configuration for foodbanked project.
 """
+# from django.contrib import admin
+# from django.urls import path, include
+# from . import views
+
+# urlpatterns = [
+#     # Admin
+#     path('admin/', admin.site.urls),
+    
+#     # Public pages
+#     path('', views.landing_page, name='landing'),
+#     path('demo/', views.demo_page, name='demo'),
+#     path('demo/stats/', views.demo_stats_page, name='demo_stats'),
+    
+#     # App URLs
+#     path('accounts/', include('accounts.urls')),
+#     path('', include('visits.urls')),  
+# ]
+
 from django.contrib import admin
 from django.urls import path, include
-from . import views  # Import views from this file or wherever you put them
+from . import views
+from accounts.views import dashboard
 
 urlpatterns = [
-    # Admin
     path('admin/', admin.site.urls),
     
     # Public pages
     path('', views.landing_page, name='landing'),
     path('demo/', views.demo_page, name='demo'),
+    path('demo/stats/', views.demo_stats_page, name='demo_stats'),
+    
+    # Dashboard
+    path('dashboard/', dashboard, name='dashboard'),
     
     # App URLs
-    path('accounts/', include('accounts.urls')),
-    path('visits/', include('visits.urls')),
-    path('patrons/', include('visits.urls')),  # Patron URLs can be in visits app
-    path('stats/', include('visits.urls')),     # Stats URLs can be in visits app
-    
-    # Alternative: if you create separate URLs for different sections
-    # path('dashboard/', views.dashboard, name='dashboard'),
+    path('accounts/', include('accounts.urls')),  # Just login/register/logout
+    path('', include('visits.urls')),  # visits/, patrons/, stats/ at root
 ]

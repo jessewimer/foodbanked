@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <!-- Auth Card -->
+                <div class="auth-card">
+                    <!-- Logo/Branding -->
+                    <div class="auth-header">
+                        <!-- <a href="/" class="auth-logo">
+                            <span class="logo-text">FoodBanked</span>
+                        </a> -->
+                        <h1 class="auth-title">Welcome back</h1>
+                        <p class="auth-subtitle">Sign in to your food bank account</p>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form method="post" class="auth-form">
+                        {% csrf_token %}
+                        
+                        <!-- Display form errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Display general errors -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                Please correct the errors below.
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Username Field -->
+                        <div class="form-group">
+                            <label for="id_username" class="form-label">Username</label>
+                            <input type="text" 
+                                   name="username" 
+                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                   id="id_username" 
+                                   required 
+                                   autofocus
+                                   placeholder="Enter your username">
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.username.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Password Field -->
+                        <div class="form-group">
+                            <label for="id_password" class="form-label">Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" 
+                                       name="password" 
+                                       class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                       id="id_password" 
+                                       required
+                                       placeholder="Enter your password">
+                                <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                                    <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle class="eye-open" cx="12" cy="12" r="3"></circle>
+                                        <path class="eye-closed" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" style="display: none;"></path>
+                                        <line class="eye-closed" x1="1" y1="1" x2="23" y2="23" style="display: none;"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.password.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="form-options">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" name="remember">
+                                <label class="form-check-label" for="rememberMe">
+                                    Remember me
+                                </label>
+                            </div>
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        
+                        <!-- Redirect to next page if provided -->
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </form>
+                    
+                    <!-- Divider -->
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+                    
+                    <!-- Register Link -->
+                    <div class="auth-footer">
+                        <p>Don't have an account? <a href="{% url 'accounts:register' %}" class="register-link">Sign up</a></p>
+                        <p class="demo-link"><a href="/demo/">Try the demo</a> to see how it works</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Password visibility toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.querySelector('.password-toggle');
+    const passwordInput = document.getElementById('id_password');
+    const eyeOpen = document.querySelectorAll('.eye-open');
+    const eyeClosed = document.querySelectorAll('.eye-closed');
+    
+    if (toggleButton && passwordInput) {
+        toggleButton.addEventListener('click', function() {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            
+            eyeOpen.forEach(el => el.style.display = isPassword ? 'none' : 'block');
+            eyeClosed.forEach(el => el.style.display = isPassword ? 'block' : 'none');
+        });
+    }
+});
+</script>
+{% endblock %}

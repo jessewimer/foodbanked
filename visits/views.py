@@ -2,35 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Visit, Patron
-
-@login_required
-def dashboard(request):
-    """Dashboard view - shows quick stats"""
-    foodbank = request.user.foodbank
-    
-    # Get some basic stats
-    from django.utils import timezone
-    from datetime import timedelta
-    
-    today = timezone.now().date()
-    this_month_start = today.replace(day=1)
-    
-    visits_today = Visit.objects.filter(
-        foodbank=foodbank,
-        visit_date=today
-    ).count()
-    
-    visits_this_month = Visit.objects.filter(
-        foodbank=foodbank,
-        visit_date__gte=this_month_start
-    ).count()
-    
-    context = {
-        'visits_today': visits_today,
-        'visits_this_month': visits_this_month,
-        'foodbank': foodbank,
-    }
-    return render(request, 'visits/dashboard.html', context)
+from .forms import VisitForm
 
 
 @login_required
@@ -48,17 +20,38 @@ def visit_list(request):
 @login_required
 def visit_create(request):
     """Create a new visit"""
-    if request.method == 'POST':
-        # Handle form submission
-        # TODO: Create form and process
-        messages.success(request, 'Visit recorded successfully!')
-        return redirect('visits:visit_list')
-    
     foodbank = request.user.foodbank
-    patrons = Patron.objects.filter(foodbank=foodbank)
+    
+    if request.method == 'POST':
+        form = VisitForm(request.POST)
+        if form.is_valid():
+            visit = form.save(commit=False)
+            visit.foodbank = foodbank
+            
+            # Check if patron was selected
+            patron_id = request.POST.get('patron_id')
+            if patron_id:
+                try:
+                    patron = Patron.objects.get(id=patron_id, foodbank=foodbank)
+                    visit.patron = patron
+                except Patron.DoesNotExist:
+                    pass
+            
+            # visit.save()
+            # messages.success(request, 'Visit recorded successfully!')
+            # return redirect('visits:visit_list')
+            visit.save()
+            messages.success(request, 'Visit recorded successfully!')
+            return redirect('visits:visit_create')  # Stay on same page
+    else:
+        form = VisitForm()
+    
+    # Get all patrons for autocomplete
+    patrons = Patron.objects.filter(foodbank=foodbank).values('id', 'name', 'address', 'zipcode')
     
     context = {
-        'patrons': patrons,
+        'form': form,
+        'patrons': list(patrons),
     }
     return render(request, 'visits/visit_form.html', context)
 

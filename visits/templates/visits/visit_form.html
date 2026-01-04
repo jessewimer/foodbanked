@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/demo.css' %}">
+<link rel="stylesheet" href="{% static 'css/visit_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Main Visit Form Section -->
+<section class="demo-section">
+    <div class="container">
+        <div class="row">
+            <!-- Left Column - Visit Form -->
+            <div class="col-lg-8 mb-4">
+                <div class="form-card">
+                    <h3 class="form-title">Record New Visit</h3>
+
+                    <!-- Display form errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" id="visitForm">
+                        {% csrf_token %}
+                        
+                        <!-- Patron Selection -->
+                        <div class="patron-selection mb-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="visitType" id="returningPatron" value="returning" checked>
+                                <label class="form-check-label" for="returningPatron">
+                                    Returning Patron
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="visitType" id="anonymousVisit" value="anonymous">
+                                <label class="form-check-label" for="anonymousVisit">
+                                    Anonymous Visit
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Patron Search (shown for returning patrons) -->
+                        <div id="patronSearchSection" class="mb-4">
+                            <label for="patronSearch" class="form-label">Search for Patron</label>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="patronSearch" 
+                                       placeholder="Search by name or address..."
+                                       autocomplete="off">
+                                <div id="patronResults" class="autocomplete-results"></div>
+                            </div>
+                            <input type="hidden" name="patron_id" id="selectedPatronId">
+                            <small class="text-muted">Or <a href="{% url 'visits:patron_create' %}">add a new patron</a></small>
+                        </div>
+                        
+                        <!-- Visit Details -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.zipcode.id_for_label }}" class="form-label">
+                                    Zip Code <span class="text-danger">*</span>
+                                </label>
+                                {{ form.zipcode }}
+                                {% if form.zipcode.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.zipcode.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.household_size.id_for_label }}" class="form-label">
+                                    Household Size <span class="text-danger">*</span>
+                                </label>
+                                {{ form.household_size }}
+                                {% if form.household_size.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.household_size.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Age Groups -->
+                        <div class="age-groups mb-4">
+                            <label class="form-label">Number of People by Age Group</label>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <label for="{{ form.age_0_17.id_for_label }}" class="form-label-sm">0-17 years</label>
+                                    {{ form.age_0_17 }}
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="{{ form.age_18_30.id_for_label }}" class="form-label-sm">18-30 years</label>
+                                    {{ form.age_18_30 }}
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="{{ form.age_31_50.id_for_label }}" class="form-label-sm">31-50 years</label>
+                                    {{ form.age_31_50 }}
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="{{ form.age_51_plus.id_for_label }}" class="form-label-sm">51+ years</label>
+                                    {{ form.age_51_plus }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- First Visit Checkbox -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.first_visit_this_month }}
+                                <label class="form-check-label" for="{{ form.first_visit_this_month.id_for_label }}">
+                                    First visit this month
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Record Visit</button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Right Column - Quick Links -->
+            <div class="col-lg-4">
+                <div class="quick-links-card">
+                    <h4>Quick Actions</h4>
+                    
+                    <a href="{% url 'visits:patron_create' %}" class="quick-link-item">
+                        <div class="quick-link-icon">👤</div>
+                        <div class="quick-link-content">
+                            <div class="quick-link-title">Add New Patron</div>
+                            <div class="quick-link-description">Register a new patron in your database</div>
+                        </div>
+                        <div class="quick-link-arrow">→</div>
+                    </a>
+                    
+                    <a href="{% url 'visits:visit_list' %}" class="quick-link-item">
+                        <div class="quick-link-icon">📋</div>
+                        <div class="quick-link-content">
+                            <div class="quick-link-title">View All Visits</div>
+                            <div class="quick-link-description">See complete visit history</div>
+                        </div>
+                        <div class="quick-link-arrow">→</div>
+                    </a>
+                    
+                    <a href="{% url 'visits:patron_list' %}" class="quick-link-item">
+                        <div class="quick-link-icon">👥</div>
+                        <div class="quick-link-content">
+                            <div class="quick-link-title">Manage Patrons</div>
+                            <div class="quick-link-description">Search and edit patron records</div>
+                        </div>
+                        <div class="quick-link-arrow">→</div>
+                    </a>
+                    
+                    <a href="{% url 'dashboard' %}" class="quick-link-item">
+                        <div class="quick-link-icon">🏠</div>
+                        <div class="quick-link-content">
+                            <div class="quick-link-title">Back to Dashboard</div>
+                            <div class="quick-link-description">Return to main dashboard</div>
+                        </div>
+                        <div class="quick-link-arrow">→</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Patron data for JavaScript -->
+<script id="patronData" type="application/json">
+{{ patrons|safe }}
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/visit_form.js' %}"></script>
+{% endblock %}

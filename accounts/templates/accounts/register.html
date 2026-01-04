@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <!-- Auth Card -->
+                <div class="auth-card">
+                    <!-- Logo/Branding -->
+                    <div class="auth-header">
+                        <!-- <a href="/" class="auth-logo">
+                            <span class="logo-text">FoodBanked</span>
+                        </a> -->
+                        <h1 class="auth-title">Create your account</h1>
+                        <p class="auth-subtitle">Start managing your food bank visits</p>
+                    </div>
+                    
+                    <!-- Registration Form -->
+                    <form method="post" class="auth-form">
+                        {% csrf_token %}
+                        
+                        <!-- Display non-field errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Registration Code Field -->
+                        <div class="form-group">
+                            <label for="{{ form.registration_code.id_for_label }}" class="form-label">
+                                Registration Code <span class="text-danger">*</span>
+                            </label>
+                            {{ form.registration_code }}
+                            {% if form.registration_code.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.registration_code.errors.0 }}
+                                </div>
+                            {% else %}
+                                <small class="form-text text-muted">{{ form.registration_code.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Foodbank Name Field -->
+                        <div class="form-group">
+                            <label for="{{ form.foodbank_name.id_for_label }}" class="form-label">
+                                Food Bank Name <span class="text-danger">*</span>
+                            </label>
+                            {{ form.foodbank_name }}
+                            {% if form.foodbank_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.foodbank_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Username Field -->
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                Username <span class="text-danger">*</span>
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.username.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Password Field -->
+                        <div class="form-group">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                Password <span class="text-danger">*</span>
+                            </label>
+                            <div class="password-input-wrapper">
+                                {{ form.password1 }}
+                                <button type="button" class="password-toggle" aria-label="Toggle password visibility" data-target="id_password1">
+                                    <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle class="eye-open" cx="12" cy="12" r="3"></circle>
+                                        <path class="eye-closed" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" style="display: none;"></path>
+                                        <line class="eye-closed" x1="1" y1="1" x2="23" y2="23" style="display: none;"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            {% if form.password1.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.password1.errors.0 }}
+                                </div>
+                            {% else %}
+                                <small class="form-text text-muted">
+                                    Must be at least 8 characters and not entirely numeric.
+                                </small>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Confirm Password Field -->
+                        <div class="form-group">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                Confirm Password <span class="text-danger">*</span>
+                            </label>
+                            <div class="password-input-wrapper">
+                                {{ form.password2 }}
+                                <button type="button" class="password-toggle" aria-label="Toggle password visibility" data-target="id_password2">
+                                    <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle class="eye-open" cx="12" cy="12" r="3"></circle>
+                                        <path class="eye-closed" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" style="display: none;"></path>
+                                        <line class="eye-closed" x1="1" y1="1" x2="23" y2="23" style="display: none;"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            {% if form.password2.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.password2.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                    </form>
+                    
+                    <!-- Divider -->
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+                    
+                    <!-- Login Link -->
+                    <div class="auth-footer">
+                        <p>Already have an account? <a href="{% url 'accounts:login' %}" class="register-link">Sign in</a></p>
+                        <p class="demo-link"><a href="/demo/">Try the demo</a> to see how it works</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Password visibility toggle for both password fields
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.password-toggle');
+    
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const passwordInput = document.getElementById(targetId);
+            const eyeOpen = this.querySelectorAll('.eye-open');
+            const eyeClosed = this.querySelectorAll('.eye-closed');
+            
+            if (passwordInput) {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                
+                eyeOpen.forEach(el => el.style.display = isPassword ? 'none' : 'block');
+                eyeClosed.forEach(el => el.style.display = isPassword ? 'block' : 'none');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

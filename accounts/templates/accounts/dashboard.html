@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<section class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="dashboard-title">
+                    {% if foodbank %}
+                        {{ foodbank.name }}
+                    {% else %}
+                        Dashboard
+                    {% endif %}
+                </h1>
+                <p class="dashboard-subtitle">Welcome back! Here's what's happening today.</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'visits:visit_create' %}" class="btn btn-primary btn-lg">
+                    <span class="btn-icon">+</span> New Visit
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard Content -->
+<section class="dashboard-content">
+    <div class="container">
+        <!-- Quick Stats Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">📅</div>
+                        <h3 class="stat-label">Today</h3>
+                    </div>
+                    <div class="stat-value">{{ visits_today|default:0 }}</div>
+                    <div class="stat-description">Visits recorded</div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">📊</div>
+                        <h3 class="stat-label">This Week</h3>
+                    </div>
+                    <div class="stat-value">{{ visits_this_week|default:0 }}</div>
+                    <div class="stat-description">Visits this week</div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">📈</div>
+                        <h3 class="stat-label">This Month</h3>
+                    </div>
+                    <div class="stat-value">{{ visits_this_month|default:0 }}</div>
+                    <div class="stat-description">Visits this month</div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">👥</div>
+                        <h3 class="stat-label">Patrons</h3>
+                    </div>
+                    <div class="stat-value">{{ total_patrons|default:0 }}</div>
+                    <div class="stat-description">Active patrons</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Cards Row -->
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'visits:visit_create' %}" class="action-card">
+                    <div class="action-icon">📝</div>
+                    <h3>Record New Visit</h3>
+                    <p>Track a patron's visit with household and demographic information.</p>
+                    <div class="action-arrow">→</div>
+                </a>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'visits:patron_list' %}" class="action-card">
+                    <div class="action-icon">👤</div>
+                    <h3>Manage Patrons</h3>
+                    <p>View, search, and manage your patron database.</p>
+                    <div class="action-arrow">→</div>
+                </a>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <a href="{% url 'visits:stats' %}" class="action-card">
+                    <div class="action-icon">📊</div>
+                    <h3>View Statistics</h3>
+                    <p>Generate reports and analyze visit data.</p>
+                    <div class="action-arrow">→</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Recent Activity Section -->
+        {% if recent_visits %}
+        <div class="recent-activity mt-5">
+            <div class="section-header">
+                <h2>Recent Visits</h2>
+                <a href="{% url 'visits:visit_list' %}" class="view-all-link">View all →</a>
+            </div>
+            
+            <div class="activity-list">
+                {% for visit in recent_visits %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        {% if visit.patron %}👤{% else %}❓{% endif %}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">
+                            {% if visit.patron %}
+                                {{ visit.patron.name }}
+                            {% else %}
+                                Anonymous Visit
+                            {% endif %}
+                        </div>
+                        <div class="activity-meta">
+                            {{ visit.zipcode }} • Household: {{ visit.household_size }} • {{ visit.visit_date|date:"M d, Y" }}
+                        </div>
+                    </div>
+                    <a href="{% url 'visits:visit_detail' visit.pk %}" class="activity-link">View</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

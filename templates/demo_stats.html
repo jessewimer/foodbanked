@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/demo.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Demo Banner -->
+<div class="demo-banner">
+    <div class="container">
+        <p class="mb-0">
+            <strong>Demo Mode</strong> - Sample statistics dashboard. 
+            <a href="/demo/" class="demo-stats-link">← Back to Visit Form</a>
+        </p>
+    </div>
+</div>
+
+<!-- Stats Dashboard -->
+<section class="stats-section">
+    <div class="container">
+        <div class="page-header mb-4">
+            <h1>Statistics & Reports</h1>
+            <p class="text-muted">Sample data showing what your reports would look like</p>
+        </div>
+        
+        <!-- Quick Stats Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-label">Total Visits This Month</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value">428</div>
+                    <div class="stat-label">Unique Households</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">👨‍👩‍👧‍👦</div>
+                    <div class="stat-value">3,641</div>
+                    <div class="stat-label">People Served</div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon">🆕</div>
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">New Visitors</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="row g-4 mb-5">
+            <!-- Visits Over Time Chart -->
+            <div class="col-lg-8">
+                <div class="chart-card">
+                    <h3>Visits Over Time</h3>
+                    <canvas id="visitsChart" height="80"></canvas>
+                </div>
+            </div>
+            
+            <!-- Age Distribution -->
+            <div class="col-lg-4">
+                <div class="chart-card">
+                    <h3>Age Distribution</h3>
+                    <canvas id="ageChart" height="160"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demographics Row -->
+        <div class="row g-4 mb-5">
+            <!-- Zip Code Breakdown -->
+            <div class="col-lg-6">
+                <div class="data-card">
+                    <h3>Top Zip Codes</h3>
+                    <div class="data-table">
+                        <div class="data-row">
+                            <span class="data-label">83843</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 85%"></div>
+                            </div>
+                            <span class="data-value">342 visits</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">83844</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 65%"></div>
+                            </div>
+                            <span class="data-value">261 visits</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">83845</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 52%"></div>
+                            </div>
+                            <span class="data-value">209 visits</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">83846</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 38%"></div>
+                            </div>
+                            <span class="data-value">153 visits</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">83847</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 28%"></div>
+                            </div>
+                            <span class="data-value">112 visits</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Household Size Breakdown -->
+            <div class="col-lg-6">
+                <div class="data-card">
+                    <h3>Household Sizes</h3>
+                    <div class="data-table">
+                        <div class="data-row">
+                            <span class="data-label">1 person</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 42%"></div>
+                            </div>
+                            <span class="data-value">524 households</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">2 people</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 58%"></div>
+                            </div>
+                            <span class="data-value">723 households</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">3 people</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 35%"></div>
+                            </div>
+                            <span class="data-value">437 households</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">4 people</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 28%"></div>
+                            </div>
+                            <span class="data-value">349 households</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">5+ people</span>
+                            <div class="data-bar-container">
+                                <div class="data-bar" style="width: 22%"></div>
+                            </div>
+                            <span class="data-value">274 households</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CTA Section -->
+        <div class="demo-cta">
+            <div class="cta-content-center">
+                <h2>Ready to track your own data?</h2>
+                <p>Create a free account and start recording visits today.</p>
+                <div class="cta-buttons">
+                    <a href="/accounts/register/" class="btn btn-primary btn-lg">Sign Up Free</a>
+                    <a href="/demo/" class="btn btn-outline-primary btn-lg">Try Recording More Visits</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/demo_stats.js' %}"></script>
+{% endblock %}

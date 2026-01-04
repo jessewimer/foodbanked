@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/demo.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Demo Banner -->
+<div class="demo-banner">
+    <div class="container">
+        <p class="mb-0">
+            <strong>Demo Mode</strong> - You're trying out FoodBanked with sample data. Nothing you enter here is saved. 
+            <a href="/demo/stats/" class="demo-stats-link">View Sample Stats →</a>
+        </p>
+    </div>
+</div>
+
+<!-- Main Demo Section -->
+<section class="demo-section">
+    <div class="container">
+        <div class="row">
+            <!-- Left Column - Instructions -->
+            <div class="col-lg-4 mb-4">
+                <div class="instructions-card">
+                    <h2>Try Recording a Visit</h2>
+                    <p>This is what your staff would use daily to track patron visits.</p>
+                    
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Search for a Patron</h4>
+                            <p>Look up returning visitors by name or address, or skip to record an anonymous visit.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Enter Visit Details</h4>
+                            <p>Capture household size, age groups, and zip code.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Submit</h4>
+                            <p>See instant confirmation and move on to the next visitor.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="cta-box">
+                        <p><strong>Like what you see?</strong></p>
+                        <a href="/accounts/register/" class="btn btn-primary">Create Free Account</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Visit Form -->
+            <div class="col-lg-8">
+                <div class="form-card">
+                    <h3 class="form-title">Record New Visit</h3>
+                    
+                    <form id="demoVisitForm">
+                        <!-- Patron Selection -->
+                        <div class="patron-selection mb-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="visitType" id="returningPatron" value="returning" checked>
+                                <label class="form-check-label" for="returningPatron">
+                                    Returning Patron
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="visitType" id="anonymousVisit" value="anonymous">
+                                <label class="form-check-label" for="anonymousVisit">
+                                    Anonymous Visit
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Patron Search (shown for returning patrons) -->
+                        <div id="patronSearchSection" class="mb-4">
+                            <label for="patronSearch" class="form-label">Search for Patron (by name or address)</label>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="patronSearch" 
+                                       placeholder="Start typing name or address..."
+                                       autocomplete="off">
+                                <div id="patronResults" class="autocomplete-results"></div>
+                            </div>
+                            <input type="hidden" id="selectedPatronId">
+                            <small class="text-muted">Or <a href="#" id="addNewPatron">add a new patron</a></small>
+                        </div>
+                        
+                        <!-- Visit Details -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="zipcode" class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="zipcode" maxlength="5" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="householdSize" class="form-label">Household Size <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="householdSize" min="1" value="1" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Age Groups -->
+                        <div class="age-groups mb-4">
+                            <label class="form-label">Number of People by Age Group</label>
+                            <div class="row g-3">
+                                <div class="col-6 col-md-3">
+                                    <label for="age0_17" class="form-label-sm">0-17 years</label>
+                                    <input type="number" class="form-control" id="age0_17" min="0" value="0">
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="age18_30" class="form-label-sm">18-30 years</label>
+                                    <input type="number" class="form-control" id="age18_30" min="0" value="0">
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="age31_50" class="form-label-sm">31-50 years</label>
+                                    <input type="number" class="form-control" id="age31_50" min="0" value="0">
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <label for="age51_plus" class="form-label-sm">51+ years</label>
+                                    <input type="number" class="form-control" id="age51_plus" min="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- First Visit Checkbox -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="firstVisit">
+                                <label class="form-check-label" for="firstVisit">
+                                    First visit this month
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Record Visit</button>
+                            <button type="button" class="btn btn-outline-secondary" id="resetForm">Clear Form</button>
+                        </div>
+                    </form>
+                    
+                    <!-- Success Message (hidden by default) -->
+                    <div id="successMessage" class="alert alert-success mt-4" style="display: none;">
+                        <h5 class="alert-heading">✓ Visit Recorded!</h5>
+                        <p class="mb-0">In the real app, this visit would be saved to your database.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hidden patron data for JavaScript -->
+<script id="patronData" type="application/json">
+{{ mock_patrons|safe }}
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/demo.js' %}"></script>
+{% endblock %}
