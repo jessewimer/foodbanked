@@ -1,0 +1,208 @@
+/* ========================================
+   Visit Detail Section
+   ======================================== */
+.visit-detail-section {
+    padding: 3rem 0;
+    background-color: #fefef9;
+    min-height: calc(100vh - 200px);
+}
+
+/* Header */
+.detail-header {
+    margin-bottom: 2rem;
+}
+
+.back-link {
+    color: #d97706;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+}
+
+.back-link:hover {
+    color: #b45309;
+    transform: translateX(-3px);
+}
+
+.detail-title {
+    font-size: 2.5rem;
+    color: #1f2937;
+    margin: 0;
+}
+
+/* Detail Card */
+.detail-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Sections */
+.detail-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-family: 'Public Sans', sans-serif;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+/* Detail Rows */
+.detail-row {
+    display: flex;
+    padding: 0.75rem 0;
+    align-items: center;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #6b7280;
+    min-width: 180px;
+    font-size: 0.95rem;
+}
+
+.detail-value {
+    color: #1f2937;
+    font-size: 1rem;
+}
+
+/* Badges */
+.badge-yes,
+.badge-no {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.badge-yes {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-no {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* Age Breakdown Grid */
+.age-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.age-group-item {
+    background-color: #fefef9;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.age-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.age-value {
+    font-size: 2rem;
+    font-family: 'DM Serif Display', Georgia, serif;
+    color: #d97706;
+    font-weight: 400;
+}
+
+/* Action Buttons */
+.detail-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    border-color: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: white;
+}
+
+/* Edit Form Styles */
+.visit-edit-form .form-label {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.visit-edit-form .form-control {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+}
+
+.visit-edit-form .form-control:focus {
+    border-color: #d97706;
+    box-shadow: 0 0 0 0.2rem rgba(217, 119, 6, 0.15);
+}
+
+.form-label-sm {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .detail-title {
+        font-size: 2rem;
+    }
+    
+    .detail-card {
+        padding: 1.5rem;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .detail-label {
+        min-width: auto;
+    }
+    
+    .age-breakdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .detail-actions {
+        flex-direction: column;
+    }
+    
+    .detail-actions .btn {
+        width: 100%;
+    }
+}

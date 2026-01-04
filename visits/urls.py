@@ -1,19 +1,14 @@
-"""
-URL configuration for visits app.
-"""
 from django.urls import path
 from . import views
 
 app_name = 'visits'
 
 urlpatterns = [
-    # Dashboard
-    # path('dashboard/', views.dashboard, name='dashboard'),
-    
     # Visits
     path('visits/', views.visit_list, name='visit_list'),
     path('visits/new/', views.visit_create, name='visit_create'),
     path('visits/<int:pk>/', views.visit_detail, name='visit_detail'),
+    path('visits/<int:pk>/delete/', views.visit_delete, name='visit_delete'),
     
     # Patrons
     path('patrons/', views.patron_list, name='patron_list'),

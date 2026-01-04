@@ -128,46 +128,42 @@
                 </div>
             </div>
             
-            <!-- Right Column - Quick Links -->
+            <!-- Right Column - Recent Visits -->
             <div class="col-lg-4">
-                <div class="quick-links-card">
-                    <h4>Quick Actions</h4>
+                <div class="recent-visits-card">
+                    <div class="recent-visits-header">
+                        <h4>Recent Visits</h4>
+                        <a href="{% url 'visits:visit_list' %}" class="view-all-btn">View All</a>
+                    </div>
                     
-                    <a href="{% url 'visits:patron_create' %}" class="quick-link-item">
-                        <div class="quick-link-icon">👤</div>
-                        <div class="quick-link-content">
-                            <div class="quick-link-title">Add New Patron</div>
-                            <div class="quick-link-description">Register a new patron in your database</div>
+                    {% if recent_visits %}
+                        <div class="recent-visits-list">
+                            {% for visit in recent_visits %}
+                            <a href="{% url 'visits:visit_detail' visit.pk %}" class="recent-visit-item">
+                                <div class="visit-patron">
+                                    {% if visit.patron %}
+                                        <span class="patron-icon">👤</span>
+                                        <span class="patron-name">{{ visit.patron.name }}</span>
+                                    {% else %}
+                                        <span class="patron-icon">❓</span>
+                                        <span class="patron-name">Anonymous</span>
+                                    {% endif %}
+                                </div>
+                                <div class="visit-details">
+                                    <span class="visit-date">{{ visit.visit_date|date:"M d, Y" }}</span>
+                                    <span class="visit-separator">•</span>
+                                    <span class="visit-household">{{ visit.household_size }} people</span>
+                                    <span class="visit-separator">•</span>
+                                    <span class="visit-zip">{{ visit.zipcode }}</span>
+                                </div>
+                            </a>
+                            {% endfor %}
                         </div>
-                        <div class="quick-link-arrow">→</div>
-                    </a>
-                    
-                    <a href="{% url 'visits:visit_list' %}" class="quick-link-item">
-                        <div class="quick-link-icon">📋</div>
-                        <div class="quick-link-content">
-                            <div class="quick-link-title">View All Visits</div>
-                            <div class="quick-link-description">See complete visit history</div>
+                    {% else %}
+                        <div class="no-visits-message">
+                            <p>No visits recorded yet. Start by recording your first visit above!</p>
                         </div>
-                        <div class="quick-link-arrow">→</div>
-                    </a>
-                    
-                    <a href="{% url 'visits:patron_list' %}" class="quick-link-item">
-                        <div class="quick-link-icon">👥</div>
-                        <div class="quick-link-content">
-                            <div class="quick-link-title">Manage Patrons</div>
-                            <div class="quick-link-description">Search and edit patron records</div>
-                        </div>
-                        <div class="quick-link-arrow">→</div>
-                    </a>
-                    
-                    <a href="{% url 'dashboard' %}" class="quick-link-item">
-                        <div class="quick-link-icon">🏠</div>
-                        <div class="quick-link-content">
-                            <div class="quick-link-title">Back to Dashboard</div>
-                            <div class="quick-link-description">Return to main dashboard</div>
-                        </div>
-                        <div class="quick-link-arrow">→</div>
-                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
