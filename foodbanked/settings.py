@@ -26,9 +26,9 @@ ENVIRONMENT = config('ENVIRONMENT')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-mu8^t=5y_z2&$ji1(363mo8ft2kfl(fty!0s)o)(96in@a-24r')
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-print(f'DEBUGGY={DEBUG}')
+# print(f'DEBUGGY={DEBUG}')
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -74,6 +74,7 @@ WSGI_APPLICATION = "foodbanked.wsgi.application"
 if ENVIRONMENT == 'production':
     WSGI_APPLICATION = "foodbanked.wsgi.application"
     DEBUG = False
+    print(f'Running in production mode, debug = {DEBUG}')
     ALLOWED_HOSTS = ['foodbanked.pythonanywhere.com']
     # Production-only settings here, e.g.:
     DATABASES = {
