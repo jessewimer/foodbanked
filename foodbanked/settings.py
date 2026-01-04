@@ -28,10 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-mu8^t=5y_z2&$ji1(363m
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
-print(f'DEBUG={DEBUG}, ALLOWED_HOSTS={ALLOWED_HOSTS}')
-# Application definition
+print(f'DEBUG={DEBUG}')
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -75,26 +72,54 @@ WSGI_APPLICATION = "foodbanked.wsgi.application"
 
 # Database config
 if ENVIRONMENT == 'production':
+    WSGI_APPLICATION = "foodbanked.wsgi.application"
+    DEBUG = False
+    ALLOWED_HOSTS = ['foodbanked.pythonanywhere.com']
+    # Production-only settings here, e.g.:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': config('DATABASE_NAME'),
-            'USER': config('DATABASE_USER'),
-            'PASSWORD': config('DATABASE_PASSWORD'),
+            'NAME': DATABASE_NAME,
+            'USER': DATABASE_USER,
+            'PASSWORD': DATABASE_PASSWORD,
             'HOST': 'foodbanked.mysql.pythonanywhere-services.com',
-            'PORT': '3306',
+            'PORT': '3306',  # Leave empty for the default MySQL port (3306)
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'",
             },
         }
     }
 else:
+    DEBUG = True
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    # Local dev DB config
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+# if ENVIRONMENT == 'production':
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'NAME': config('DATABASE_NAME'),
+#             'USER': config('DATABASE_USER'),
+#             'PASSWORD': config('DATABASE_PASSWORD'),
+#             'HOST': 'foodbanked.mysql.pythonanywhere-services.com',
+#             'PORT': '3306',
+#             'OPTIONS': {
+#                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'",
+#             },
+#         }
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
 
 # Password validation
