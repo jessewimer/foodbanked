@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-mu8^t=5y_z2&$ji1(363m
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-print(f'DEBUG={DEBUG}')
+print(f'DEBUGGY={DEBUG}')
 
 INSTALLED_APPS = [
     "django.contrib.admin",
