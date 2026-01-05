@@ -3,6 +3,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/demo.css' %}">
+<link rel="stylesheet" href="{% static 'css/visit_form.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -30,23 +31,23 @@
                         <div class="step-number">1</div>
                         <div class="step-content">
                             <h4>Search for a Patron</h4>
-                            <p>Look up returning visitors by name or address, or skip to record an anonymous visit.</p>
+                            <p>Search by last name, first name, or address. Use the dropdown to change search type.</p>
                         </div>
                     </div>
                     
                     <div class="instruction-step">
                         <div class="step-number">2</div>
                         <div class="step-content">
-                            <h4>Enter Visit Details</h4>
-                            <p>Capture household size, age groups, and zip code.</p>
+                            <h4>Auto-Fill Feature</h4>
+                            <p>When you select a patron, their details automatically populate from their last visit!</p>
                         </div>
                     </div>
                     
                     <div class="instruction-step">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h4>Submit</h4>
-                            <p>See instant confirmation and move on to the next visitor.</p>
+                            <h4>See Visit History</h4>
+                            <p>Instantly see how many times they've visited this month.</p>
                         </div>
                     </div>
                     
@@ -62,36 +63,61 @@
                 <div class="form-card">
                     <h3 class="form-title">Record New Visit</h3>
                     
-                    <form id="demoVisitForm">
+                    <form id="demoVisitForm" autocomplete="off">
                         <!-- Patron Selection -->
                         <div class="patron-selection mb-4">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="visitType" id="returningPatron" value="returning" checked>
                                 <label class="form-check-label" for="returningPatron">
-                                    Returning Patron
+                                   By Name
                                 </label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="visitType" id="anonymousVisit" value="anonymous">
                                 <label class="form-check-label" for="anonymousVisit">
-                                    Anonymous Visit
+                                    Anonymous
                                 </label>
                             </div>
                         </div>
                         
                         <!-- Patron Search (shown for returning patrons) -->
                         <div id="patronSearchSection" class="mb-4">
-                            <label for="patronSearch" class="form-label">Search for Patron (by name or address)</label>
-                            <div class="autocomplete-wrapper">
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="patronSearch" 
-                                       placeholder="Start typing name or address..."
-                                       autocomplete="off">
-                                <div id="patronResults" class="autocomplete-results"></div>
+                            <label for="patronSearch" class="form-label">Search for Patron</label>
+                            <div class="search-with-dropdown">
+                                <select id="searchType" class="search-type-select">
+                                    <option value="last_name" selected>Last Name</option>
+                                    <option value="first_name">First Name</option>
+                                    <option value="address">Address</option>
+                                </select>
+                                <div class="autocomplete-wrapper">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="patronSearch" 
+                                           name="patron_search_demo"
+                                           placeholder="Search by last name..."
+                                           autocomplete="new-password"
+                                           autocorrect="off"
+                                           autocapitalize="off"
+                                           spellcheck="false"
+                                           role="presentation">
+                                    <div id="patronResults" class="autocomplete-results"></div>
+                                </div>
                             </div>
                             <input type="hidden" id="selectedPatronId">
-                            <small class="text-muted">Or <a href="#" id="addNewPatron">add a new patron</a></small>
+                            <small class="text-muted">Try searching for "Smith", "Johnson", or "Brown"</small>
+                        </div>
+
+                        <!-- Visit Count Display (shown for returning patrons with selection) -->
+                        <div id="visitCountSection" class="visit-count-display mb-4" style="display: none;">
+                            <div class="visit-count-icon">📊</div>
+                            <div class="visit-count-content">
+                                <div class="visit-count-text">
+                                    <strong><span id="visitCountNumber">0</span> visit<span id="visitCountPlural">s</span></strong> this month
+                                </div>
+                                <div class="last-visit-text">
+                                    Last visit: <span id="lastVisitDate">--</span>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Visit Details -->
@@ -111,27 +137,23 @@
                         <div class="age-groups mb-4">
                             <label class="form-label">Number of People by Age Group</label>
                             <div class="row g-3">
-                                <div class="col-6 col-md-3">
-                                    <label for="age0_17" class="form-label-sm">0-17 years</label>
-                                    <input type="number" class="form-control" id="age0_17" min="0" value="0">
+                                <div class="col-6 col-md-4">
+                                    <label for="age0_18" class="form-label-sm">0-18 years</label>
+                                    <input type="number" class="form-control" id="age0_18" min="0" value="0">
                                 </div>
-                                <div class="col-6 col-md-3">
-                                    <label for="age18_30" class="form-label-sm">18-30 years</label>
-                                    <input type="number" class="form-control" id="age18_30" min="0" value="0">
+                                <div class="col-6 col-md-4">
+                                    <label for="age19_59" class="form-label-sm">19-59 years</label>
+                                    <input type="number" class="form-control" id="age19_59" min="0" value="0">
                                 </div>
-                                <div class="col-6 col-md-3">
-                                    <label for="age31_50" class="form-label-sm">31-50 years</label>
-                                    <input type="number" class="form-control" id="age31_50" min="0" value="0">
-                                </div>
-                                <div class="col-6 col-md-3">
-                                    <label for="age51_plus" class="form-label-sm">51+ years</label>
-                                    <input type="number" class="form-control" id="age51_plus" min="0" value="0">
+                                <div class="col-6 col-md-4">
+                                    <label for="age60_plus" class="form-label-sm">60+ years</label>
+                                    <input type="number" class="form-control" id="age60_plus" min="0" value="0">
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- First Visit Checkbox -->
-                        <div class="mb-4">
+                        <!-- First Visit Checkbox (shown for anonymous visits) -->
+                        <div id="firstVisitSection" class="mb-4" style="display: none;">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="firstVisit">
                                 <label class="form-check-label" for="firstVisit">
@@ -150,7 +172,7 @@
                     <!-- Success Message (hidden by default) -->
                     <div id="successMessage" class="alert alert-success mt-4" style="display: none;">
                         <h5 class="alert-heading">✓ Visit Recorded!</h5>
-                        <p class="mb-0">In the real app, this visit would be saved to your database.</p>
+                        <p class="mb-0">In the real app, this visit would be saved to your database and appear in your reports.</p>
                     </div>
                 </div>
             </div>
@@ -166,5 +188,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/demo.js' %}"></script>
+<script src="{% static 'js/demo.js' %}?v=2"></script>
 {% endblock %}
