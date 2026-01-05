@@ -349,19 +349,17 @@ def stats_view(request):
         foodbank=foodbank,
         visit_date__gte=month_start
     ).aggregate(
-        age_0_17=Sum('age_0_17'),
-        age_18_30=Sum('age_18_30'),
-        age_31_50=Sum('age_31_50'),
-        age_51_plus=Sum('age_51_plus')
+        age_0_18=Sum('age_0_18'),
+        age_19_59=Sum('age_19_59'),
+        age_60_plus=Sum('age_60_plus')
     )
     
     age_distribution = {
-        'labels': ['0-17 years', '18-30 years', '31-50 years', '51+ years'],
+        'labels': ['0-18 years', '19-59 years', '60+ years'],
         'values': [
-            age_totals['age_0_17'] or 0,
-            age_totals['age_18_30'] or 0,
-            age_totals['age_31_50'] or 0,
-            age_totals['age_51_plus'] or 0
+            age_totals['age_0_18'] or 0,
+            age_totals['age_19_59'] or 0,
+            age_totals['age_60_plus'] or 0
         ]
     }
     

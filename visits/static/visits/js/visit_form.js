@@ -146,10 +146,9 @@
         
         // Auto-update household size based on age groups
         const ageInputs = [
-            document.getElementById('id_age_0_17'),
-            document.getElementById('id_age_18_30'),
-            document.getElementById('id_age_31_50'),
-            document.getElementById('id_age_51_plus')
+            document.getElementById('id_age_0_18'),
+            document.getElementById('id_age_19_59'),
+            document.getElementById('id_age_60_plus')
         ];
         
         ageInputs.forEach(input => {

@@ -76,20 +76,16 @@
                                 <h3 class="section-title">Age Breakdown</h3>
                                 <div class="age-breakdown-grid">
                                     <div class="age-group-item">
-                                        <div class="age-label">0-17 years</div>
-                                        <div class="age-value">{{ visit.age_0_17 }}</div>
+                                        <div class="age-label">0-18 years</div>
+                                        <div class="age-value">{{ visit.age_0_18 }}</div>
                                     </div>
                                     <div class="age-group-item">
-                                        <div class="age-label">18-30 years</div>
-                                        <div class="age-value">{{ visit.age_18_30 }}</div>
+                                        <div class="age-label">19-59 years</div>
+                                        <div class="age-value">{{ visit.age_19_59 }}</div>
                                     </div>
                                     <div class="age-group-item">
-                                        <div class="age-label">31-50 years</div>
-                                        <div class="age-value">{{ visit.age_31_50 }}</div>
-                                    </div>
-                                    <div class="age-group-item">
-                                        <div class="age-label">51+ years</div>
-                                        <div class="age-value">{{ visit.age_51_plus }}</div>
+                                        <div class="age-label">60+ years</div>
+                                        <div class="age-value">{{ visit.age_60_plus }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -172,20 +168,16 @@
                                 <h3 class="section-title">Age Breakdown</h3>
                                 <div class="row g-3">
                                     <div class="col-6 col-md-3">
-                                        <label for="{{ form.age_0_17.id_for_label }}" class="form-label-sm">0-17 years</label>
-                                        {{ form.age_0_17 }}
+                                        <label for="{{ form.age_0_18.id_for_label }}" class="form-label-sm">0-18 years</label>
+                                        {{ form.age_0_18 }}
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label for="{{ form.age_18_30.id_for_label }}" class="form-label-sm">18-30 years</label>
-                                        {{ form.age_18_30 }}
+                                        <label for="{{ form.age_19_59.id_for_label }}" class="form-label-sm">19-59 years</label>
+                                        {{ form.age_19_59 }}
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label for="{{ form.age_31_50.id_for_label }}" class="form-label-sm">31-50 years</label>
-                                        {{ form.age_31_50 }}
-                                    </div>
-                                    <div class="col-6 col-md-3">
-                                        <label for="{{ form.age_51_plus.id_for_label }}" class="form-label-sm">51+ years</label>
-                                        {{ form.age_51_plus }}
+                                        <label for="{{ form.age_60_plus.id_for_label }}" class="form-label-sm">60+ years</label>
+                                        {{ form.age_60_plus }}
                                     </div>
                                 </div>
                             </div>

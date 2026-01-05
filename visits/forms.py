@@ -13,7 +13,7 @@ class VisitForm(forms.ModelForm):
     
     class Meta:
         model = Visit
-        fields = ['zipcode', 'household_size', 'age_0_17', 'age_18_30', 'age_31_50', 'age_51_plus', 'first_visit_this_month']
+        fields = ['zipcode', 'household_size', 'age_0_18', 'age_19_59', 'age_60_plus', 'first_visit_this_month']
         widgets = {
             'zipcode': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -25,22 +25,18 @@ class VisitForm(forms.ModelForm):
                 'min': '1',
                 'value': '1'
             }),
-            'age_0_17': forms.NumberInput(attrs={
+            'age_0_18': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0',
                 'value': '0'
             }),
-            'age_18_30': forms.NumberInput(attrs={
+            'age_19_59': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0',
                 'value': '0'
             }),
-            'age_31_50': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': '0',
-                'value': '0'
-            }),
-            'age_51_plus': forms.NumberInput(attrs={
+
+            'age_60_plus': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0',
                 'value': '0'
@@ -52,22 +48,20 @@ class VisitForm(forms.ModelForm):
         labels = {
             'zipcode': 'Zip Code',
             'household_size': 'Household Size',
-            'age_0_17': '0-17 years',
-            'age_18_30': '18-30 years',
-            'age_31_50': '31-50 years',
-            'age_51_plus': '51+ years',
+            'age_0_18': '0-18 years',
+            'age_19_59': '19-59 years',
+            'age_60_plus': '60+ years',
             'first_visit_this_month': 'First visit this month'
         }
     
     def clean(self):
         cleaned_data = super().clean()
         household_size = cleaned_data.get('household_size', 0)
-        age_0_17 = cleaned_data.get('age_0_17', 0)
-        age_18_30 = cleaned_data.get('age_18_30', 0)
-        age_31_50 = cleaned_data.get('age_31_50', 0)
-        age_51_plus = cleaned_data.get('age_51_plus', 0)
+        age_0_18 = cleaned_data.get('age_0_18', 0)
+        age_19_59 = cleaned_data.get('age_19_59', 0)
+        age_60_plus = cleaned_data.get('age_60_plus', 0)
         
-        total_ages = age_0_17 + age_18_30 + age_31_50 + age_51_plus
+        total_ages = age_0_18 + age_19_59 + age_60_plus
         
         if total_ages != household_size:
             raise forms.ValidationError(
