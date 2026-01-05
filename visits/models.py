@@ -31,6 +31,9 @@ class Visit(models.Model):
     age_18_30 = models.IntegerField(default=0)
     age_31_50 = models.IntegerField(default=0)
     age_51_plus = models.IntegerField(default=0)
+    age_0_18 = models.IntegerField(default=0)  
+    age_19_59 = models.IntegerField(default=0)
+    age_60_plus = models.IntegerField(default=0)
     
     # First visit this month
     first_visit_this_month = models.BooleanField(default=False)
