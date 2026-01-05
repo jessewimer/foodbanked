@@ -5,16 +5,18 @@ from accounts.models import Foodbank
 class Patron(models.Model):
     foodbank = models.ForeignKey(Foodbank, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     zipcode = models.CharField(max_length=10)
     phone = models.CharField(max_length=20, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.name} - {self.zipcode}"
+        return f"{self.first_name} {self.last_name} - {self.zipcode}"
     
     class Meta:
-        ordering = ['name']
+        ordering = ['last_name', 'first_name']
 
 
 class Visit(models.Model):
@@ -27,10 +29,6 @@ class Visit(models.Model):
     household_size = models.IntegerField()
     
     # Age group counts (adjust ranges as needed)
-    # age_0_17 = models.IntegerField(default=0)
-    # age_18_30 = models.IntegerField(default=0)
-    # age_31_50 = models.IntegerField(default=0)
-    # age_51_plus = models.IntegerField(default=0)
     age_0_18 = models.IntegerField(default=0)  
     age_19_59 = models.IntegerField(default=0)
     age_60_plus = models.IntegerField(default=0)
