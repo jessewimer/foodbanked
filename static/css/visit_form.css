@@ -1,4 +1,81 @@
 /* ========================================
+   Search with Dropdown
+   ======================================== */
+.search-with-dropdown {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-type-select {
+    flex-shrink: 0;
+    width: 140px;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1f2937;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-type-select:focus {
+    outline: none;
+    border-color: #d97706;
+    box-shadow: 0 0 0 0.2rem rgba(217, 119, 6, 0.15);
+}
+
+.search-type-select:hover {
+    border-color: #d97706;
+}
+
+.autocomplete-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.autocomplete-results {
+    max-height: 300px;  /* Shows ~5-6 results */
+    overflow-y: auto;
+}
+
+/* Visit Count Display */
+.visit-count-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-left: 4px solid #fbbf24;
+    border-radius: 0.5rem;
+}
+
+.visit-count-icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.visit-count-content {
+    flex: 1;
+}
+
+.visit-count-text {
+    color: #1f2937;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.visit-count-text strong {
+    color: #d97706;
+}
+
+.last-visit-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* ========================================
    Recent Visits Card
    ======================================== */
 .recent-visits-card {
@@ -114,6 +191,25 @@
     margin: 0 0.25rem;
 }
 
+/* Autocomplete Dropdown Results */
+.autocomplete-results .autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+}
+
+.autocomplete-item-name {
+    font-weight: 600;
+    color: #1f2937;
+    flex-shrink: 0;
+}
+
+.autocomplete-item-details {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
 /* No visits message */
 .no-visits-message {
     text-align: center;
@@ -138,6 +234,16 @@
     }
 }
 
+@media (max-width: 768px) {
+    .search-with-dropdown {
+        flex-direction: column;
+    }
+    
+    .search-type-select {
+        width: 100%;
+    }
+}
+
 @media (max-width: 576px) {
     .visit-details {
         flex-direction: column;
@@ -146,5 +252,10 @@
     
     .visit-separator {
         display: none;
+    }
+    
+    .visit-count-display {
+        flex-direction: column;
+        text-align: center;
     }
 }

@@ -24,11 +24,12 @@ class Visit(models.Model):
     patron = models.ForeignKey(Patron, on_delete=models.SET_NULL, null=True, blank=True)
     visit_date = models.DateField(auto_now_add=True)
     
-    # Required fields
+    # Snapshot of patron info at time of visit
+    patron_first_name = models.CharField(max_length=100, blank=True, null=True)
+    patron_last_name = models.CharField(max_length=100, blank=True, null=True)
+    patron_address = models.TextField(blank=True, null=True)
     zipcode = models.CharField(max_length=10)
     household_size = models.IntegerField()
-    
-    # Age group counts (adjust ranges as needed)
     age_0_18 = models.IntegerField(default=0)  
     age_19_59 = models.IntegerField(default=0)
     age_60_plus = models.IntegerField(default=0)

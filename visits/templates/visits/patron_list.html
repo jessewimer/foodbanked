@@ -44,7 +44,7 @@
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
 
-            <!-- Filter by First Letter -->
+            <!-- Filter by First Letter of Last Name -->
             <div class="letter-filter">
                 <a href="{% url 'visits:patron_list' %}" class="letter-btn {% if not letter_filter %}active{% endif %}">All</a>
                 {% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
@@ -60,7 +60,7 @@
                     {% for patron in patrons %}
                     <a href="{% url 'visits:patron_detail' patron.pk %}" class="patron-list-item">
                         <div class="patron-info">
-                            <div class="patron-name">{{ patron.name }}</div>
+                            <div class="patron-name">{{ patron.last_name }}, {{ patron.first_name }}</div>
                             <div class="patron-details">
                                 {% if patron.address %}
                                     {{ patron.address }}
@@ -86,7 +86,7 @@
                         <p>No patrons match your search "{{ search_query }}".</p>
                         <a href="{% url 'visits:patron_list' %}" class="btn btn-outline-primary">View All Patrons</a>
                     {% elif letter_filter %}
-                        <p>No patrons with names starting with "{{ letter_filter }}".</p>
+                        <p>No patrons with last names starting with "{{ letter_filter }}".</p>
                         <a href="{% url 'visits:patron_list' %}" class="btn btn-outline-primary">View All Patrons</a>
                     {% else %}
                         <p>Start by adding your first patron.</p>

@@ -25,7 +25,7 @@
                         </div>
                     {% endif %}
                     
-                    <form method="post" id="visitForm">
+                    <form method="post" id="visitForm" autocomplete="off">
                         {% csrf_token %}
                         
                         <!-- Patron Selection -->
@@ -33,13 +33,13 @@
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="visitType" id="returningPatron" value="returning" checked>
                                 <label class="form-check-label" for="returningPatron">
-                                    Returning Patron
+                                    By Name
                                 </label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="visitType" id="anonymousVisit" value="anonymous">
                                 <label class="form-check-label" for="anonymousVisit">
-                                    Anonymous Visit
+                                    Anonymous
                                 </label>
                             </div>
                         </div>
@@ -47,16 +47,41 @@
                         <!-- Patron Search (shown for returning patrons) -->
                         <div id="patronSearchSection" class="mb-4">
                             <label for="patronSearch" class="form-label">Search for Patron</label>
-                            <div class="autocomplete-wrapper">
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="patronSearch" 
-                                       placeholder="Search by name or address..."
-                                       autocomplete="off">
-                                <div id="patronResults" class="autocomplete-results"></div>
+                            <div class="search-with-dropdown">
+                                <select id="searchType" class="search-type-select">
+                                    <option value="last_name" selected>Last Name</option>
+                                    <option value="first_name">First Name</option>
+                                    <option value="address">Address</option>
+                                </select>
+                                <div class="autocomplete-wrapper">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="patronSearch" 
+                                           name="patron_search_xyz_ignore"
+                                           placeholder="Search by last name..."
+                                           autocomplete="new-password"
+                                           autocorrect="off"
+                                           autocapitalize="off"
+                                           spellcheck="false"
+                                           role="presentation">
+                                    <div id="patronResults" class="autocomplete-results"></div>
+                                </div>
                             </div>
                             <input type="hidden" name="patron_id" id="selectedPatronId">
                             <small class="text-muted">Or <a href="{% url 'visits:patron_create' %}">add a new patron</a></small>
+                        </div>
+
+                        <!-- Visit Count Display (shown for returning patrons with selection) -->
+                        <div id="visitCountSection" class="visit-count-display mb-4" style="display: none;">
+                            <div class="visit-count-icon">📊</div>
+                            <div class="visit-count-content">
+                                <div class="visit-count-text">
+                                    <strong><span id="visitCountNumber">0</span> visit<span id="visitCountPlural">s</span></strong> this month
+                                </div>
+                                <div class="last-visit-text">
+                                    Last visit: <span id="lastVisitDate">--</span>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Visit Details -->
@@ -90,23 +115,23 @@
                         <div class="age-groups mb-4">
                             <label class="form-label">Number of People by Age Group</label>
                             <div class="row g-3">
-                                <div class="col-6 col-md-3">
+                                <div class="col-6 col-md-4">
                                     <label for="{{ form.age_0_18.id_for_label }}" class="form-label-sm">0-18 years</label>
                                     {{ form.age_0_18 }}
                                 </div>
-                                <div class="col-6 col-md-3">
+                                <div class="col-6 col-md-4">
                                     <label for="{{ form.age_19_59.id_for_label }}" class="form-label-sm">19-59 years</label>
                                     {{ form.age_19_59 }}
                                 </div>
-                                <div class="col-6 col-md-3">
+                                <div class="col-6 col-md-4">
                                     <label for="{{ form.age_60_plus.id_for_label }}" class="form-label-sm">60+ years</label>
                                     {{ form.age_60_plus }}
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- First Visit Checkbox -->
-                        <div class="mb-4">
+                        <!-- First Visit Checkbox (shown for anonymous visits) -->
+                        <div id="firstVisitSection" class="mb-4" style="display: none;">
                             <div class="form-check">
                                 {{ form.first_visit_this_month }}
                                 <label class="form-check-label" for="{{ form.first_visit_this_month.id_for_label }}">
@@ -139,7 +164,7 @@
                                 <div class="visit-patron">
                                     {% if visit.patron %}
                                         <span class="patron-icon">👤</span>
-                                        <span class="patron-name">{{ visit.patron.name }}</span>
+                                        <span class="patron-name">{{ visit.patron.last_name }}, {{ visit.patron.first_name }}</span>
                                     {% else %}
                                         <span class="patron-icon">❓</span>
                                         <span class="patron-name">Anonymous</span>
@@ -174,5 +199,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/visit_form.js' %}"></script>
+<script src="{% static 'js/visit_form.js' %}?v=3"></script>
 {% endblock %}
