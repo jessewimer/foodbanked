@@ -29,3 +29,17 @@ class RegistrationCode(models.Model):
     
     class Meta:
         ordering = ['-created_date']
+
+class ServiceZipcode(models.Model):
+    """Service area zip codes for a food bank"""
+    foodbank = models.ForeignKey(Foodbank, on_delete=models.CASCADE, related_name='service_zipcodes')
+    zipcode = models.CharField(max_length=10)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=2)  # Two-letter state code
+    created_date = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['zipcode']
+    
+    def __str__(self):
+        return f"{self.zipcode} - {self.city}, {self.state}"

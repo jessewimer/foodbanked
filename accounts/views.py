@@ -1,13 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from .forms import FoodbankRegistrationForm
-
-
 from django.contrib.auth import logout as auth_logout
+from .models import ServiceZipcode
 
 def logout_view(request):
     """Custom logout view that accepts GET requests"""
@@ -84,3 +83,71 @@ def dashboard(request):
     }
     
     return render(request, 'accounts/dashboard.html', context)
+
+@login_required
+def account_admin(request):
+    """Account admin page for managing foodbank information"""
+    foodbank = request.user.foodbank
+    
+    # Check if we're in edit mode
+    edit_mode = request.GET.get('edit') == 'true' or request.method == 'POST'
+    
+    if request.method == 'POST':
+        from .forms import FoodbankForm
+        form = FoodbankForm(request.POST, instance=foodbank)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Food bank information updated successfully!')
+            return redirect('accounts:account_admin')
+    else:
+        from .forms import FoodbankForm
+        form = FoodbankForm(instance=foodbank) if edit_mode else None
+    
+    # Get service area zip codes
+    zipcodes = ServiceZipcode.objects.filter(foodbank=foodbank)
+    
+    context = {
+        'foodbank': foodbank,
+        'form': form,
+        'edit_mode': edit_mode,
+        'zipcodes': zipcodes,
+    }
+    return render(request, 'accounts/account_admin.html', context)
+
+
+@login_required
+def add_zipcode(request):
+    """Add a service area zip code"""
+    if request.method == 'POST':
+        foodbank = request.user.foodbank
+        zipcode = request.POST.get('zipcode')
+        city = request.POST.get('city')
+        state = request.POST.get('state', '').upper()
+        
+        # Check if zipcode already exists for this foodbank
+        if ServiceZipcode.objects.filter(foodbank=foodbank, zipcode=zipcode).exists():
+            messages.error(request, f'Zip code {zipcode} already exists in your service area.')
+        else:
+            ServiceZipcode.objects.create(
+                foodbank=foodbank,
+                zipcode=zipcode,
+                city=city,
+                state=state
+            )
+            messages.success(request, f'Zip code {zipcode} added successfully!')
+    
+    return redirect('accounts:account_admin')
+
+
+@login_required
+def delete_zipcode(request, pk):
+    """Delete a service area zip code"""
+    foodbank = request.user.foodbank
+    zipcode = get_object_or_404(ServiceZipcode, pk=pk, foodbank=foodbank)
+    
+    if request.method == 'POST':
+        zipcode_num = zipcode.zipcode
+        zipcode.delete()
+        messages.success(request, f'Zip code {zipcode_num} has been deleted.')
+    
+    return redirect('accounts:account_admin')

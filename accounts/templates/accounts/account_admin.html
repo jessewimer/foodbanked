@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/account_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Header -->
+                <div class="admin-header">
+                    <h1 class="admin-title">Account Settings</h1>
+                    <p class="admin-subtitle">Manage your food bank information and settings</p>
+                </div>
+
+                <!-- Food Bank Information Card -->
+                <div class="admin-card">
+                    {% if not edit_mode %}
+                        <!-- View Mode -->
+                        <div class="admin-view-mode">
+                            <div class="card-header-section">
+                                <h3 class="section-title">Food Bank Information</h3>
+                                <button type="button" class="btn btn-primary" onclick="window.location.href='?edit=true'">
+                                    Edit Information
+                                </button>
+                            </div>
+
+                            <div class="admin-section">
+                                <div class="admin-row">
+                                    <span class="admin-label">Food Bank Name:</span>
+                                    <span class="admin-value">{{ foodbank.name }}</span>
+                                </div>
+                                <div class="admin-row">
+                                    <span class="admin-label">Address:</span>
+                                    <span class="admin-value">
+                                        {% if foodbank.address %}
+                                            {{ foodbank.address }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="admin-row">
+                                    <span class="admin-label">City:</span>
+                                    <span class="admin-value">
+                                        {% if foodbank.city %}
+                                            {{ foodbank.city }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="admin-row">
+                                    <span class="admin-label">State:</span>
+                                    <span class="admin-value">
+                                        {% if foodbank.state %}
+                                            {{ foodbank.state }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="admin-row">
+                                    <span class="admin-label">Zip Code:</span>
+                                    <span class="admin-value">
+                                        {% if foodbank.zipcode %}
+                                            {{ foodbank.zipcode }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="admin-row">
+                                    <span class="admin-label">Phone:</span>
+                                    <span class="admin-value">
+                                        {% if foodbank.phone %}
+                                            {{ foodbank.phone }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="admin-row">
+                                    <span class="admin-label">Email:</span>
+                                    <span class="admin-value">
+                                        {% if foodbank.email %}
+                                            {{ foodbank.email }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="admin-row">
+                                    <span class="admin-label">Member Since:</span>
+                                    <span class="admin-value">{{ foodbank.created_date|date:"F d, Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Edit Mode -->
+                        <form method="post" class="admin-edit-form">
+                            {% csrf_token %}
+                            
+                            <!-- Form errors -->
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <div class="card-header-section">
+                                <h3 class="section-title">Food Bank Information</h3>
+                            </div>
+
+                            <div class="admin-section">
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">
+                                        Food Bank Name <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+                                    {{ form.address }}
+                                    {% if form.address.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.address.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                                        {{ form.city }}
+                                        {% if form.city.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.city.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                                        {{ form.state }}
+                                        {% if form.state.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.state.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.zipcode.id_for_label }}" class="form-label">Zip Code</label>
+                                        {{ form.zipcode }}
+                                        {% if form.zipcode.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.zipcode.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                                        {{ form.phone }}
+                                        {% if form.phone.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.phone.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.email.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="admin-actions">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <a href="{% url 'accounts:account_admin' %}" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <!-- Service Area Zip Codes Card -->
+                <div class="admin-card">
+                    <div class="card-header-section">
+                        <h3 class="section-title">Service Area Zip Codes</h3>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addZipModal">
+                            Add Zip Code
+                        </button>
+                    </div>
+
+                    {% if zipcodes %}
+                        <div class="zipcode-list">
+                            {% for zipcode in zipcodes %}
+                            <div class="zipcode-item">
+                                <div class="zipcode-info">
+                                    <span class="zipcode-number">{{ zipcode.zipcode }}</span>
+                                    <span class="zipcode-location">{{ zipcode.city }}, {{ zipcode.state }}</span>
+                                </div>
+                                <button type="button" class="btn-delete-zip" data-zipcode-id="{{ zipcode.id }}" data-bs-toggle="modal" data-bs-target="#deleteZipModal{{ zipcode.id }}">
+                                    Delete
+                                </button>
+                            </div>
+
+                            <!-- Delete Confirmation Modal for each zipcode -->
+                            <div class="modal fade" id="deleteZipModal{{ zipcode.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Delete Zip Code</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete <strong>{{ zipcode.zipcode }}</strong> ({{ zipcode.city }}, {{ zipcode.state }})?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form method="post" action="{% url 'accounts:delete_zipcode' zipcode.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-data-message">
+                            <p>No zip codes added yet. Click "Add Zip Code" to define your service area.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add Zip Code Modal -->
+<div class="modal fade" id="addZipModal" tabindex="-1" aria-labelledby="addZipModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addZipModalLabel">Add Service Area Zip Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'accounts:add_zipcode' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="zipcode" class="form-label">Zip Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="zipcode" name="zipcode" required maxlength="10">
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="city" name="city" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="state" name="state" required maxlength="2" placeholder="Two-letter code (e.g., WA)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Zip Code</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

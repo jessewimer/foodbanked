@@ -10,10 +10,12 @@ app_name = 'accounts'
 urlpatterns = [
     # Authentication
     path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
-    # path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     
-    # Dashboard (after login)
-    # path('dashboard/', views.dashboard, name='dashboard'),
+    # Account admin
+    path('admin/', views.account_admin, name='account_admin'),
+    path('admin/add-zipcode/', views.add_zipcode, name='add_zipcode'),
+    path('admin/delete-zipcode/<int:pk>/', views.delete_zipcode, name='delete_zipcode'),
+
 ]

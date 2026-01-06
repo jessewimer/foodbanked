@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.conf import settings
-from .models import Foodbank, RegistrationCode
-
+from .models import Foodbank, RegistrationCode, ServiceZipcode
 
 class FoodbankRegistrationForm(UserCreationForm):
     # Registration code field
@@ -99,3 +98,74 @@ class FoodbankRegistrationForm(UserCreationForm):
                     pass
         
         return user
+
+class FoodbankForm(forms.ModelForm):
+    """Form for editing foodbank information"""
+    
+    class Meta:
+        model = Foodbank
+        fields = ['name', 'address', 'city', 'state', 'zipcode', 'phone', 'email']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Food bank name'
+            }),
+            'address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Street address',
+                'rows': 2
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'City'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'State (e.g., WA)',
+                'maxlength': 2
+            }),
+            'zipcode': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Zip code'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Phone number'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Email address'
+            }),
+        }
+        labels = {
+            'name': 'Food Bank Name',
+            'address': 'Address',
+            'city': 'City',
+            'state': 'State',
+            'zipcode': 'Zip Code',
+            'phone': 'Phone',
+            'email': 'Email',
+        }
+
+
+class ServiceZipcodeForm(forms.ModelForm):
+    """Form for adding service area zip codes"""
+    
+    class Meta:
+        model = ServiceZipcode
+        fields = ['zipcode', 'city', 'state']
+        widgets = {
+            'zipcode': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Zip code'
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'City'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'State (e.g., WA)',
+                'maxlength': 2
+            }),
+        }
