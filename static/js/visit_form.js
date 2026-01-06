@@ -1,4 +1,4 @@
-// Visit Form JavaScript with Enhanced Search and Auto-populate
+// Visit Form JavaScript with Enhanced Search, Patron Info Display, and Inline Editing
 (function() {
     'use strict';
     
@@ -6,9 +6,12 @@
     
     // Parse patron data from script tag
     const patronDataElement = document.getElementById('patronData');
-    const patrons = patronDataElement ? JSON.parse(patronDataElement.textContent) : [];
+    let patrons = patronDataElement ? JSON.parse(patronDataElement.textContent) : [];
     
     console.log('Patrons loaded:', patrons.length);
+    
+    // Store currently selected patron for editing
+    let currentPatron = null;
     
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOM loaded');
@@ -20,10 +23,25 @@
         const selectedPatronId = document.getElementById('selectedPatronId');
         const searchTypeSelect = document.getElementById('searchType');
         
+        // Patron info card elements
+        const patronInfoCard = document.getElementById('patronInfoCard');
+        const patronInfoName = document.getElementById('patronInfoName');
+        const patronInfoAddress = document.getElementById('patronInfoAddress');
+        const patronInfoCityState = document.getElementById('patronInfoCityState');
+        const patronInfoZip = document.getElementById('patronInfoZip');
+        const patronInfoComments = document.getElementById('patronInfoComments');
+        const patronInfoCommentsRow = document.getElementById('patronInfoCommentsRow');
+        const editPatronBtn = document.getElementById('editPatronBtn');
+        
+        // Modal elements
+        const editPatronModal = new bootstrap.Modal(document.getElementById('editPatronModal'));
+        const savePatronBtn = document.getElementById('savePatronBtn');
+        
         console.log('Elements found:', {
             form: !!form,
             patronSearch: !!patronSearch,
-            searchTypeSelect: !!searchTypeSelect
+            searchTypeSelect: !!searchTypeSelect,
+            patronInfoCard: !!patronInfoCard
         });
         
         // Form fields
@@ -37,11 +55,6 @@
         const visitCountSection = document.getElementById('visitCountSection');
         const firstVisitSection = document.getElementById('firstVisitSection');
         
-        console.log('Sections found:', {
-            visitCountSection: !!visitCountSection,
-            firstVisitSection: !!firstVisitSection
-        });
-        
         // Handle visit type toggle
         const visitTypeRadios = document.querySelectorAll('input[name="visitType"]');
         
@@ -52,6 +65,7 @@
         if (initialChecked && initialChecked.value === 'anonymous') {
             console.log('Setting anonymous mode on load');
             patronSearchSection.style.display = 'none';
+            patronInfoCard.style.display = 'none';
             visitCountSection.style.display = 'none';
             firstVisitSection.style.display = 'block';
         }
@@ -61,8 +75,9 @@
                 console.log('Visit type changed to:', this.value);
                 
                 if (this.value === 'anonymous') {
-                    // Show first visit checkbox, hide patron search and visit count
+                    // Show first visit checkbox, hide patron search, info card, and visit count
                     patronSearchSection.style.display = 'none';
+                    patronInfoCard.style.display = 'none';
                     visitCountSection.style.display = 'none';
                     firstVisitSection.style.display = 'block';
                     
@@ -72,11 +87,13 @@
                     patronSearch.value = '';
                     selectedPatronId.value = '';
                     patronResults.classList.remove('show');
+                    currentPatron = null;
                     clearFormFields();
                 } else {
-                    // Show patron search, hide first visit checkbox
+                    // Show patron search, hide first visit checkbox and info card
                     patronSearchSection.style.display = 'block';
                     firstVisitSection.style.display = 'none';
+                    patronInfoCard.style.display = 'none';
                     visitCountSection.style.display = 'none';
                     
                     console.log('Returning mode: showing patron search, hiding first visit checkbox');
@@ -102,9 +119,11 @@
             // Clear search and results when changing type
             patronSearch.value = '';
             selectedPatronId.value = '';
+            patronInfoCard.style.display = 'none';
             visitCountSection.style.display = 'none';
             patronResults.classList.remove('show');
             selectedIndex = -1;
+            currentPatron = null;
         });
         
         // Autocomplete search functionality with smart matching
@@ -119,7 +138,9 @@
             if (searchTerm.length === 0) {
                 patronResults.classList.remove('show');
                 selectedPatronId.value = '';
+                patronInfoCard.style.display = 'none';
                 visitCountSection.style.display = 'none';
+                currentPatron = null;
                 return;
             }
             
@@ -202,9 +223,14 @@
         function selectPatron(patron) {
             console.log('Patron selected:', patron);
             
+            currentPatron = patron; // Store for editing
+            
             patronSearch.value = `${patron.last_name}, ${patron.first_name}`;
             selectedPatronId.value = patron.id;
             patronResults.classList.remove('show');
+            
+            // Display patron info card
+            displayPatronInfo(patron);
             
             // Auto-populate from last visit if available
             if (patron.last_visit) {
@@ -224,15 +250,53 @@
             displayVisitCount(patron);
         }
         
+        // Display patron information card
+        function displayPatronInfo(patron) {
+            patronInfoName.textContent = `${patron.last_name}, ${patron.first_name}`;
+            patronInfoAddress.textContent = patron.address || 'Not provided';
+            
+            // City and State
+            const cityState = [];
+            if (patron.city) cityState.push(patron.city);
+            if (patron.state) cityState.push(patron.state);
+            patronInfoCityState.textContent = cityState.length > 0 ? cityState.join(', ') : 'Not provided';
+            
+            patronInfoZip.textContent = patron.zipcode;
+            
+            // Comments (only show if exists)
+            if (patron.comments) {
+                patronInfoComments.textContent = patron.comments;
+                patronInfoCommentsRow.style.display = 'flex';
+            } else {
+                patronInfoCommentsRow.style.display = 'none';
+            }
+            
+            patronInfoCard.style.display = 'block';
+        }
+        
         // Display visit count for selected patron
         function displayVisitCount(patron) {
             console.log('Displaying visit count:', patron.visits_this_month);
             
             if (patron.visits_this_month !== undefined && patron.last_visit_date) {
                 const count = patron.visits_this_month;
-                document.getElementById('visitCountNumber').textContent = count;
-                document.getElementById('visitCountPlural').textContent = count === 1 ? '' : 's';
+                const visitStatusText = document.getElementById('visitStatusText');
+                
+                if (count === 0) {
+                    visitStatusText.textContent = '1st visit of the month';
+                } else if (count === 1) {
+                    visitStatusText.textContent = 'Visit #2 this month';
+                } else {
+                    visitStatusText.textContent = `Visit #${count + 1} this month`;
+                }
+                
                 document.getElementById('lastVisitDate').textContent = formatDate(patron.last_visit_date);
+                visitCountSection.style.display = 'flex';
+            } else if (patron.visits_this_month === 0) {
+                // First visit ever
+                const visitStatusText = document.getElementById('visitStatusText');
+                visitStatusText.textContent = '1st visit of the month';
+                document.getElementById('lastVisitDate').textContent = 'Never';
                 visitCountSection.style.display = 'flex';
             } else {
                 visitCountSection.style.display = 'none';
@@ -241,7 +305,9 @@
         
         // Format date for display
         function formatDate(dateString) {
-            const date = new Date(dateString);
+            // Parse the date string directly to avoid timezone issues
+            const [year, month, day] = dateString.split('-');
+            const date = new Date(year, month - 1, day); // month is 0-indexed in JS
             const options = { month: 'short', day: 'numeric', year: 'numeric' };
             return date.toLocaleDateString('en-US', options);
         }
@@ -253,6 +319,99 @@
             age0_18Input.value = '0';
             age19_59Input.value = '0';
             age60PlusInput.value = '0';
+        }
+        
+        // Edit patron button click
+        editPatronBtn.addEventListener('click', function() {
+            if (currentPatron) {
+                populateEditModal(currentPatron);
+                editPatronModal.show();
+            }
+        });
+        
+        // Populate edit modal with patron data
+        function populateEditModal(patron) {
+            document.getElementById('editPatronId').value = patron.id;
+            document.getElementById('editFirstName').value = patron.first_name;
+            document.getElementById('editLastName').value = patron.last_name;
+            document.getElementById('editAddress').value = patron.address || '';
+            document.getElementById('editCity').value = patron.city || '';
+            document.getElementById('editState').value = patron.state || '';
+            document.getElementById('editZipcode').value = patron.zipcode;
+            document.getElementById('editPhone').value = patron.phone || '';
+            document.getElementById('editComments').value = patron.comments || '';
+        }
+        
+        // Save patron changes via AJAX
+        savePatronBtn.addEventListener('click', function() {
+            const patronId = document.getElementById('editPatronId').value;
+            const formData = {
+                first_name: document.getElementById('editFirstName').value,
+                last_name: document.getElementById('editLastName').value,
+                address: document.getElementById('editAddress').value,
+                city: document.getElementById('editCity').value,
+                state: document.getElementById('editState').value,
+                zipcode: document.getElementById('editZipcode').value,
+                phone: document.getElementById('editPhone').value,
+                comments: document.getElementById('editComments').value
+            };
+            
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Send AJAX request
+            fetch(`/patron/${patronId}/edit-ajax/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update current patron object
+                    currentPatron = { ...currentPatron, ...formData };
+                    
+                    // Update patron in patrons array
+                    const index = patrons.findIndex(p => p.id == patronId);
+                    if (index !== -1) {
+                        patrons[index] = { ...patrons[index], ...formData };
+                    }
+                    
+                    // Refresh patron info card
+                    displayPatronInfo(currentPatron);
+                    
+                    // Update search display
+                    patronSearch.value = `${formData.last_name}, ${formData.first_name}`;
+                    
+                    // Close modal
+                    editPatronModal.hide();
+                    
+                    // Show success message
+                    showToast('Patron updated successfully!', 'success');
+                } else {
+                    showToast('Error updating patron. Please try again.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error updating patron. Please try again.', 'error');
+            });
+        });
+        
+        // Simple toast notification
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+            toast.style.zIndex = '9999';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         }
         
         // Keyboard navigation for autocomplete
@@ -304,20 +463,33 @@
         });
         
         // Auto-update household size based on age groups
-        const ageInputs = [age0_18Input, age19_59Input, age60PlusInput];
+        // const ageInputs = [age0_18Input, age19_59Input, age60PlusInput];
         
-        ageInputs.forEach(input => {
-            if (input) {
-                input.addEventListener('input', function() {
-                    const total = ageInputs.reduce((sum, inp) => {
-                        return sum + (parseInt(inp.value) || 0);
-                    }, 0);
+        // ageInputs.forEach(input => {
+        //     if (input) {
+        //         input.addEventListener('input', function() {
+        //             const total = ageInputs.reduce((sum, inp) => {
+        //                 return sum + (parseInt(inp.value) || 0);
+        //             }, 0);
                     
-                    if (total > 0) {
-                        householdSizeInput.value = total;
-                    }
-                });
+        //             if (total > 0) {
+        //                 householdSizeInput.value = total;
+        //             }
+        //         });
+        //     }
+        // });
+
+        // Restore patron selection if form had errors
+        const preselectedPatronId = selectedPatronId.value;
+        if (preselectedPatronId) {
+            const patron = patrons.find(p => p.id == preselectedPatronId);
+            if (patron) {
+                // Show patron info and search, but DON'T auto-populate form fields
+                patronSearch.value = `${patron.last_name}, ${patron.first_name}`;
+                displayPatronInfo(patron);
+                displayVisitCount(patron);
+                // Don't call selectPatron() because that would overwrite the form values
             }
-        });
+        }
     });
 })();

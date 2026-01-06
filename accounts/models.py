@@ -9,6 +9,7 @@ class Foodbank(models.Model):
     state = models.CharField(max_length=2, blank=True)
     zipcode = models.CharField(max_length=10, blank=True)
     phone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

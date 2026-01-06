@@ -40,14 +40,83 @@
     overflow-y: auto;
 }
 
-/* Visit Count Display */
+/* ========================================
+   Patron Info Card
+   ======================================== */
+.patron-info-card {
+    background-color: #fffbeb;
+    border: 2px solid #fbbf24;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+}
+
+.patron-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #fbbf24;
+}
+
+.patron-info-name {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.edit-patron-link {
+    color: #d97706;
+    font-size: 0.9rem;
+    text-decoration: none;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.edit-patron-link:hover {
+    color: #b45309;
+    text-decoration: underline;
+}
+
+.patron-info-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.patron-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.patron-info-label {
+    font-weight: 600;
+    color: #6b7280;
+    min-width: 100px;
+    font-size: 0.9rem;
+}
+
+.patron-info-value {
+    color: #1f2937;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+/* ========================================
+   Visit Count Display
+   ======================================== */
 .visit-count-display {
     display: flex;
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-    border-left: 4px solid #fbbf24;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 2px solid #86efac;
     border-radius: 0.5rem;
 }
 
@@ -67,7 +136,7 @@
 }
 
 .visit-count-text strong {
-    color: #d97706;
+    color: #15803d;
 }
 
 .last-visit-text {
@@ -86,6 +155,7 @@
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 2rem;
+    overflow-x: hidden;
 }
 
 .recent-visits-header {
@@ -159,7 +229,6 @@
 .recent-visit-item:hover {
     background-color: #fffbeb;
     border-color: #fbbf24;
-    transform: translateX(3px);
 }
 
 .visit-patron {
@@ -191,7 +260,9 @@
     margin: 0 0.25rem;
 }
 
-/* Autocomplete Dropdown Results */
+/* ========================================
+   Autocomplete Dropdown Results
+   ======================================== */
 .autocomplete-results .autocomplete-item {
     display: flex;
     align-items: center;
@@ -210,7 +281,40 @@
     color: #6b7280;
 }
 
-/* No visits message */
+/* ========================================
+   Modal Enhancements
+   ======================================== */
+.modal-content {
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.25rem 1.5rem;
+    background-color: #fefef9;
+}
+
+.modal-title {
+    font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+    background-color: #fefef9;
+}
+
+/* ========================================
+   No Visits Message
+   ======================================== */
 .no-visits-message {
     text-align: center;
     padding: 2rem 1rem;
@@ -222,7 +326,9 @@
     margin: 0;
 }
 
-/* Responsive adjustments */
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
 @media (max-width: 992px) {
     .recent-visits-card {
         position: static;
@@ -242,6 +348,27 @@
     .search-type-select {
         width: 100%;
     }
+    
+    .patron-info-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .patron-info-label {
+        min-width: 80px;
+        font-size: 0.85rem;
+    }
+    
+    .patron-info-value {
+        font-size: 0.85rem;
+    }
+    
+    .visit-count-display {
+        padding: 0.75rem;
+        flex-direction: column;
+        text-align: center;
+    }
 }
 
 @media (max-width: 576px) {
@@ -254,8 +381,11 @@
         display: none;
     }
     
-    .visit-count-display {
-        flex-direction: column;
-        text-align: center;
+    .patron-info-card {
+        padding: 1rem;
+    }
+    
+    .patron-info-name {
+        font-size: 1rem;
     }
 }

@@ -112,14 +112,19 @@ def visit_create(request):
             'first_name': patron.first_name,
             'last_name': patron.last_name,
             'address': patron.address or '',
+            'city': patron.city or '',
+            'state': patron.state or '',
             'zipcode': patron.zipcode,
+            'phone': patron.phone or '',
+            'comments': patron.comments or '',
             'phone': patron.phone or '',
             'visits_this_month': visits_this_month,
         }
         
         # Add last visit data if exists
         if last_visit:
-            patron_data['last_visit_date'] = last_visit.visit_date.isoformat()
+            # patron_data['last_visit_date'] = last_visit.visit_date.isoformat()
+            patron_data['last_visit_date'] = last_visit.visit_date.strftime('%Y-%m-%d')
             patron_data['last_visit'] = {
                 'zipcode': last_visit.zipcode,
                 'household_size': last_visit.household_size,
@@ -133,102 +138,25 @@ def visit_create(request):
         
         patrons.append(patron_data)
     
-    # Get recent visits (last 10)
+    today = timezone.now().date()
     recent_visits = Visit.objects.filter(
-        foodbank=foodbank
-    ).select_related('patron').order_by('-visit_date', '-id')[:10]
-    
+        foodbank=foodbank,
+        visit_date=today  # Only show today's visits
+    ).select_related('patron').order_by('-id')
+
+    # Count today's visits for display
+    todays_visit_count = Visit.objects.filter(
+        foodbank=foodbank,
+        visit_date=today
+    ).count()
+        
     context = {
         'form': form,
         'patrons': json.dumps(patrons),
         'recent_visits': recent_visits,
+        'todays_visit_count': todays_visit_count,
     }
     return render(request, 'visits/visit_form.html', context)
-# @login_required
-# def visit_create(request):
-#     """Create a new visit with enhanced patron data"""
-#     foodbank = request.user.foodbank
-    
-#     if request.method == 'POST':
-#         form = VisitForm(request.POST)
-#         if form.is_valid():
-#             visit = form.save(commit=False)
-#             visit.foodbank = foodbank
-            
-#             # Check if patron was selected
-#             patron_id = request.POST.get('patron_id')
-#             if patron_id:
-#                 try:
-#                     patron = Patron.objects.get(id=patron_id, foodbank=foodbank)
-#                     visit.patron = patron
-#                 except Patron.DoesNotExist:
-#                     pass
-            
-#             visit.save()
-#             messages.success(request, 'Visit recorded successfully!')
-#             return redirect('visits:visit_create')  # Stay on same page
-#     else:
-#         form = VisitForm()
-    
-#     # Get all patrons with enhanced data for autocomplete
-#     from django.utils import timezone
-#     from datetime import timedelta
-#     from django.db.models import Count
-    
-#     today = timezone.now().date()
-#     month_start = today.replace(day=1)
-    
-#     patrons_queryset = Patron.objects.filter(foodbank=foodbank)
-#     patrons = []
-    
-#     for patron in patrons_queryset:
-#         # Get visits this month count
-#         visits_this_month = Visit.objects.filter(
-#             patron=patron,
-#             visit_date__gte=month_start
-#         ).count()
-        
-#         # Get last visit
-#         last_visit = Visit.objects.filter(patron=patron).order_by('-visit_date', '-id').first()
-        
-#         patron_data = {
-#             'id': patron.id,
-#             'first_name': patron.first_name,
-#             'last_name': patron.last_name,
-#             'address': patron.address or '',
-#             'zipcode': patron.zipcode,
-#             'phone': patron.phone or '',
-#             'visits_this_month': visits_this_month,
-#         }
-        
-#         # Add last visit data if exists
-#         if last_visit:
-#             patron_data['last_visit_date'] = last_visit.visit_date.isoformat()
-#             patron_data['last_visit'] = {
-#                 'zipcode': last_visit.zipcode,
-#                 'household_size': last_visit.household_size,
-#                 'age_0_18': last_visit.age_0_18,
-#                 'age_19_59': last_visit.age_19_59,
-#                 'age_60_plus': last_visit.age_60_plus,
-#             }
-#         else:
-#             patron_data['last_visit_date'] = None
-#             patron_data['last_visit'] = None
-        
-#         patrons.append(patron_data)
-    
-#     # Get recent visits (last 10)
-#     recent_visits = Visit.objects.filter(
-#         foodbank=foodbank
-#     ).select_related('patron').order_by('-visit_date', '-id')[:10]
-    
-#     import json
-#     context = {
-#         'form': form,
-#         'patrons': json.dumps(patrons),
-#         'recent_visits': recent_visits,
-#     }
-#     return render(request, 'visits/visit_form.html', context)
 
 
 @login_required
@@ -343,40 +271,6 @@ def patron_list(request):
         'letter_filter': letter_filter,
     }
     return render(request, 'visits/patron_list.html', context)
-
-# @login_required
-# def patron_list(request):
-#     """List all patrons for this foodbank with search and filtering"""
-#     foodbank = request.user.foodbank
-    
-#     # Base queryset
-#     patrons = Patron.objects.filter(foodbank=foodbank)
-    
-#     # Search functionality
-#     search_query = request.GET.get('search', '').strip()
-#     if search_query:
-#         from django.db.models import Q
-#         patrons = patrons.filter(
-#             Q(name__icontains=search_query) |
-#             Q(address__icontains=search_query) |
-#             Q(zipcode__icontains=search_query) |
-#             Q(phone__icontains=search_query)
-#         )
-    
-#     # Letter filtering
-#     letter_filter = request.GET.get('letter', '').strip().upper()
-#     if letter_filter and letter_filter.isalpha():
-#         patrons = patrons.filter(name__istartswith=letter_filter)
-    
-#     # Order alphabetically by name
-#     patrons = patrons.order_by('name')
-    
-#     context = {
-#         'patrons': patrons,
-#         'search_query': search_query,
-#         'letter_filter': letter_filter,
-#     }
-#     return render(request, 'visits/patron_list.html', context)
 
 
 @login_required
@@ -585,3 +479,39 @@ def stats_view(request):
     }
     
     return render(request, 'visits/stats.html', context)
+
+
+@login_required
+def patron_edit_ajax(request, pk):
+    """AJAX endpoint for editing patron details from visit form"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    
+    foodbank = request.user.foodbank
+    patron = get_object_or_404(Patron, pk=pk, foodbank=foodbank)
+    
+    try:
+        import json
+        data = json.loads(request.body)
+        
+        # Update patron fields
+        patron.first_name = data.get('first_name', patron.first_name)
+        patron.last_name = data.get('last_name', patron.last_name)
+        patron.address = data.get('address', '')
+        patron.city = data.get('city', '')
+        patron.state = data.get('state', '')
+        patron.zipcode = data.get('zipcode', patron.zipcode)
+        patron.phone = data.get('phone', '')
+        patron.comments = data.get('comments', '')
+        
+        patron.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Patron updated successfully'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })

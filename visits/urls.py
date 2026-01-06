@@ -16,6 +16,9 @@ urlpatterns = [
     path('patrons/<int:pk>/', views.patron_detail, name='patron_detail'),
     path('patrons/<int:pk>/delete/', views.patron_delete, name='patron_delete'),
     
+    # AJAX endpoint for editing patron from visit form
+    path('patron/<int:pk>/edit-ajax/', views.patron_edit_ajax, name='patron_edit_ajax'),
+    
     # Stats
     path('stats/', views.stats_view, name='stats'),
 ]

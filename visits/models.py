@@ -9,9 +9,13 @@ class Patron(models.Model):
     last_name = models.CharField(max_length=100, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     zipcode = models.CharField(max_length=10)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     
+    comments = models.TextField(blank=True, null=True)
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} - {self.zipcode}"
     
@@ -29,6 +33,8 @@ class Visit(models.Model):
     patron_last_name = models.CharField(max_length=100, blank=True, null=True)
     patron_address = models.TextField(blank=True, null=True)
     zipcode = models.CharField(max_length=10)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
     household_size = models.IntegerField()
     age_0_18 = models.IntegerField(default=0)  
     age_19_59 = models.IntegerField(default=0)
@@ -36,6 +42,8 @@ class Visit(models.Model):
     
     # First visit this month
     first_visit_this_month = models.BooleanField(default=False)
+
+    comments = models.TextField(blank=True, null=True)
     
     def __str__(self):
         patron_name = self.patron.name if self.patron else "Anonymous"

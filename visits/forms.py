@@ -76,11 +76,15 @@
     
 #     class Meta:
 #         model = Patron
-#         fields = ['name', 'address', 'zipcode', 'phone']
+#         fields = ['first_name', 'last_name', 'address', 'zipcode', 'phone']
 #         widgets = {
-#             'name': forms.TextInput(attrs={
+#             'first_name': forms.TextInput(attrs={
 #                 'class': 'form-control',
-#                 'placeholder': 'First and last name'
+#                 'placeholder': 'First name'
+#             }),
+#             'last_name': forms.TextInput(attrs={
+#                 'class': 'form-control',
+#                 'placeholder': 'Last name'
 #             }),
 #             'address': forms.TextInput(attrs={
 #                 'class': 'form-control',
@@ -97,7 +101,8 @@
 #             }),
 #         }
 #         labels = {
-#             'name': 'Full Name',
+#             'first_name': 'First Name',
+#             'last_name': 'Last Name',
 #             'address': 'Address',
 #             'zipcode': 'Zip Code',
 #             'phone': 'Phone Number',
@@ -118,7 +123,7 @@ class VisitForm(forms.ModelForm):
     
     class Meta:
         model = Visit
-        fields = ['zipcode', 'household_size', 'age_0_18', 'age_19_59', 'age_60_plus', 'first_visit_this_month']
+        fields = ['zipcode', 'household_size', 'age_0_18', 'age_19_59', 'age_60_plus', 'first_visit_this_month', 'comments']
         widgets = {
             'zipcode': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -140,7 +145,6 @@ class VisitForm(forms.ModelForm):
                 'min': '0',
                 'value': '0'
             }),
-
             'age_60_plus': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'min': '0',
@@ -148,6 +152,11 @@ class VisitForm(forms.ModelForm):
             }),
             'first_visit_this_month': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
+            }),
+            'comments': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Optional notes about this visit',
+                'rows': 3
             })
         }
         labels = {
@@ -156,7 +165,8 @@ class VisitForm(forms.ModelForm):
             'age_0_18': '0-18 years',
             'age_19_59': '19-59 years',
             'age_60_plus': '60+ years',
-            'first_visit_this_month': 'First visit this month'
+            'first_visit_this_month': 'First visit this month',
+            'comments': 'Comments'
         }
     
     def clean(self):
@@ -181,7 +191,7 @@ class PatronForm(forms.ModelForm):
     
     class Meta:
         model = Patron
-        fields = ['first_name', 'last_name', 'address', 'zipcode', 'phone']
+        fields = ['first_name', 'last_name', 'address', 'city', 'state', 'zipcode', 'phone', 'comments']
         widgets = {
             'first_name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -195,6 +205,14 @@ class PatronForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Street address (optional)'
             }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'City (optional)'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'State (optional)'
+            }),
             'zipcode': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Zip code',
@@ -204,11 +222,19 @@ class PatronForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Phone number (optional)'
             }),
+            'comments': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Optional notes about this patron',
+                'rows': 3
+            })
         }
         labels = {
             'first_name': 'First Name',
             'last_name': 'Last Name',
             'address': 'Address',
+            'city': 'City',
+            'state': 'State',
             'zipcode': 'Zip Code',
             'phone': 'Phone Number',
+            'comments': 'Comments'
         }

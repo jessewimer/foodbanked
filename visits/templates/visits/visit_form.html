@@ -67,8 +67,37 @@
                                     <div id="patronResults" class="autocomplete-results"></div>
                                 </div>
                             </div>
-                            <input type="hidden" name="patron_id" id="selectedPatronId">
+                            {% comment %} <input type="hidden" name="patron_id" id="selectedPatronId"> {% endcomment %}
+                            <input type="hidden" name="patron_id" id="selectedPatronId" value="{{ request.POST.patron_id|default:'' }}">
                             <small class="text-muted">Or <a href="{% url 'visits:patron_create' %}">add a new patron</a></small>
+                        </div>
+
+                        <!-- Patron Info Card (shown when patron is selected) -->
+                        <div id="patronInfoCard" class="patron-info-card mb-4" style="display: none;">
+                            <div class="patron-info-header">
+                                <h5 class="patron-info-name" id="patronInfoName"></h5>
+                                <button type="button" class="btn-link edit-patron-link" id="editPatronBtn">
+                                    Edit patron details
+                                </button>
+                            </div>
+                            <div class="patron-info-body">
+                                <div class="patron-info-row">
+                                    <span class="patron-info-label">Address:</span>
+                                    <span class="patron-info-value" id="patronInfoAddress"></span>
+                                </div>
+                                <div class="patron-info-row">
+                                    <span class="patron-info-label">City, State:</span>
+                                    <span class="patron-info-value" id="patronInfoCityState"></span>
+                                </div>
+                                <div class="patron-info-row">
+                                    <span class="patron-info-label">Zip Code:</span>
+                                    <span class="patron-info-value" id="patronInfoZip"></span>
+                                </div>
+                                <div class="patron-info-row" id="patronInfoCommentsRow" style="display: none;">
+                                    <span class="patron-info-label">Comments:</span>
+                                    <span class="patron-info-value" id="patronInfoComments"></span>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Visit Count Display (shown for returning patrons with selection) -->
@@ -76,7 +105,7 @@
                             <div class="visit-count-icon">📊</div>
                             <div class="visit-count-content">
                                 <div class="visit-count-text">
-                                    <strong><span id="visitCountNumber">0</span> visit<span id="visitCountPlural">s</span></strong> this month
+                                    <strong id="visitStatusText"></strong>
                                 </div>
                                 <div class="last-visit-text">
                                     Last visit: <span id="lastVisitDate">--</span>
@@ -140,6 +169,21 @@
                             </div>
                         </div>
                         
+
+                        <!-- Visit Comments -->
+                        <div class="mb-4">
+                            {% comment %} <label for="{{ form.comments.id_for_label }}" class="form-label">
+                                Record a comment for this visit
+                            </label> {% endcomment %}
+                            {{ form.comments }}
+                            {% if form.comments.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.comments.errors.0 }}
+                                </div>
+                            {% endif %}
+                            {% comment %} <small class="form-text text-muted">Optional notes about this specific visit</small> {% endcomment %}
+                        </div>
+
                         <!-- Submit Button -->
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">Record Visit</button>
@@ -149,11 +193,11 @@
                 </div>
             </div>
             
-            <!-- Right Column - Recent Visits -->
+            <!-- Right Column - Today's Visits -->
             <div class="col-lg-4">
                 <div class="recent-visits-card">
                     <div class="recent-visits-header">
-                        <h4>Recent Visits</h4>
+                        <h4>Today's Visits ({{ todays_visit_count }})</h4>
                         <a href="{% url 'visits:visit_list' %}" class="view-all-btn">View All</a>
                     </div>
                     
@@ -173,7 +217,7 @@
                                 <div class="visit-details">
                                     <span class="visit-date">{{ visit.visit_date|date:"M d, Y" }}</span>
                                     <span class="visit-separator">•</span>
-                                    <span class="visit-household">{{ visit.household_size }} people</span>
+                                    <span class="visit-household">Household: {{ visit.household_size }}</span>
                                     <span class="visit-separator">•</span>
                                     <span class="visit-zip">{{ visit.zipcode }}</span>
                                 </div>
@@ -182,7 +226,7 @@
                         </div>
                     {% else %}
                         <div class="no-visits-message">
-                            <p>No visits recorded yet. Start by recording your first visit above!</p>
+                            <p>No visits recorded today yet.</p>
                         </div>
                     {% endif %}
                 </div>
@@ -190,6 +234,69 @@
         </div>
     </div>
 </section>
+
+<!-- Edit Patron Modal -->
+<div class="modal fade" id="editPatronModal" tabindex="-1" aria-labelledby="editPatronModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPatronModalLabel">Edit Patron Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPatronForm">
+                    <input type="hidden" id="editPatronId">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="editFirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editFirstName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editLastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editLastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editAddress" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="editAddress">
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="editCity" class="form-label">City</label>
+                            <input type="text" class="form-control" id="editCity">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editState" class="form-label">State</label>
+                            <input type="text" class="form-control" id="editState">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editZipcode" class="form-label">Zip Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editZipcode" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editPhone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="editPhone">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editComments" class="form-label">Comments</label>
+                        <textarea class="form-control" id="editComments" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="savePatronBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Patron data for JavaScript -->
 <script id="patronData" type="application/json">
@@ -199,5 +306,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/visit_form.js' %}?v=3"></script>
+<script src="{% static 'js/visit_form.js' %}?v=4"></script>
 {% endblock %}
