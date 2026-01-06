@@ -124,18 +124,14 @@ def add_zipcode(request):
         city = request.POST.get('city')
         state = request.POST.get('state', '').upper()
         
-        # Check if zipcode already exists for this foodbank
-        if ServiceZipcode.objects.filter(foodbank=foodbank, zipcode=zipcode).exists():
-            messages.error(request, f'Zip code {zipcode} already exists in your service area.')
-        else:
-            ServiceZipcode.objects.create(
-                foodbank=foodbank,
-                zipcode=zipcode,
-                city=city,
-                state=state
-            )
-            messages.success(request, f'Zip code {zipcode} added successfully!')
-    
+        ServiceZipcode.objects.create(
+            foodbank=foodbank,
+            zipcode=zipcode,
+            city=city,
+            state=state
+        )
+        messages.success(request, f'Zip code {zipcode} added successfully!')
+            
     return redirect('accounts:account_admin')
 
 
