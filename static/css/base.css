@@ -165,7 +165,7 @@ a {
     box-shadow: none;
 }
 
-.navbar-toggler[aria-expanded="true"]:focus {
+.navbar-toggler[aria-expanded="true"] {
     box-shadow: 0 0 0 0.2rem rgba(217, 119, 6, 0.25);
 }
 
