@@ -260,6 +260,36 @@
     margin: 0 0.25rem;
 }
 
+
+/* Age Groups Section - Yellow theme with border */
+.age-groups {
+    background-color: #fefce8;
+    border: 2px solid #eab308;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.age-groups .form-label {
+    color: #1f2937;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+
+/* ========================================
+   Visit Type Checkboxes
+   ======================================== */
+
+.visit-type-checkboxes {
+    display: flex;
+    gap: 2rem;
+    margin-top: 0.5rem;
+}
+
+.visit-type-checkboxes .form-check {
+    margin: 0;
+}
+
 /* ========================================
    Autocomplete Dropdown Results
    ======================================== */

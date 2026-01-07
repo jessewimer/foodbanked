@@ -462,23 +462,6 @@
             }
         });
         
-        // Auto-update household size based on age groups
-        // const ageInputs = [age0_18Input, age19_59Input, age60PlusInput];
-        
-        // ageInputs.forEach(input => {
-        //     if (input) {
-        //         input.addEventListener('input', function() {
-        //             const total = ageInputs.reduce((sum, inp) => {
-        //                 return sum + (parseInt(inp.value) || 0);
-        //             }, 0);
-                    
-        //             if (total > 0) {
-        //                 householdSizeInput.value = total;
-        //             }
-        //         });
-        //     }
-        // });
-
         // Restore patron selection if form had errors
         const preselectedPatronId = selectedPatronId.value;
         if (preselectedPatronId) {
@@ -490,6 +473,49 @@
                 displayVisitCount(patron);
                 // Don't call selectPatron() because that would overwrite the form values
             }
+        }
+
+        // Validate visit type checkboxes when food truck is enabled
+        const visitForm = document.getElementById('visitForm');
+        if (visitForm) {
+            visitForm.addEventListener('submit', function(e) {
+                const foodTruckEnabled = document.getElementById('visitTypePantry') !== null;
+                
+                if (foodTruckEnabled) {
+                    const pantryChecked = document.getElementById('visitTypePantry').checked;
+                    const foodTruckChecked = document.getElementById('visitTypeFoodTruck').checked;
+                    
+                    if (!pantryChecked && !foodTruckChecked) {
+                        e.preventDefault();
+                        
+                        // Remove any existing error messages
+                        const existingError = document.querySelector('.visit-type-error');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        // Create error message
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'alert alert-danger visit-type-error';
+                        errorDiv.setAttribute('role', 'alert');
+                        errorDiv.textContent = 'Please select at least one visit type (Pantry or Food Truck).';
+                        
+                        // Insert at top of form
+                        visitForm.insertBefore(errorDiv, visitForm.firstChild);
+                        
+                        // Scroll to error
+                        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        return false;
+                    } else {
+                        // Remove error if it exists and form is valid
+                        const existingError = document.querySelector('.visit-type-error');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                    }
+                }
+            });
         }
     });
 })();

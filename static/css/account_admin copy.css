@@ -1,9 +1,7 @@
-/* ========================================
-   Admin Page Layout
-   ======================================== */
+/* Admin Section */
 .admin-section {
     padding: 3rem 0;
-    /* min-height: calc(100vh - 200px); */
+    min-height: calc(100vh - 200px);
 }
 
 .admin-header {
@@ -24,18 +22,7 @@
     margin: 0;
 }
 
-/* Override Bootstrap padding on admin page */
-.admin-section .row {
-    margin-bottom: 0;
-}
-
-.admin-section .col-lg-10 {
-    padding-bottom: 0;
-}
-
-/* ========================================
-   Admin Card Structure
-   ======================================== */
+/* Admin Card */
 .admin-card {
     background: white;
     padding: 1rem;
@@ -43,11 +30,6 @@
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
-}
-
-/* Remove bottom padding from foodbank info card only */
-.admin-card:first-of-type {
-    padding-bottom: 0.5rem;
 }
 
 .card-header-section {
@@ -67,39 +49,7 @@
     margin: 0;
 }
 
-
-
-/* ========================================
-   Food Bank Information Section
-   ======================================== */
-.admin-view-mode {
-    padding-bottom: 0;
-    margin-bottom: 0;
-}
-
-.admin-edit-form {
-    padding-bottom: 0;
-    margin-bottom: 0;
-}
-
-.admin-view-mode .admin-section,
-.admin-edit-form .admin-section {
-    padding-top: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-/* Force no bottom spacing on foodbank section container */
-.admin-view-mode .admin-section {
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-.admin-edit-form .admin-section {
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-}
-
+/* Admin View Mode */
 .admin-section {
     display: flex;
     flex-direction: column;
@@ -114,7 +64,6 @@
 
 .admin-row:last-child {
     border-bottom: none;
-    padding-bottom: 0;
 }
 
 .admin-label {
@@ -130,9 +79,23 @@
     flex: 1;
 }
 
-/* ========================================
-   Admin Actions (Edit Mode Buttons)
-   ======================================== */
+/* Tighter spacing for foodbank info section only */
+.admin-view-mode .admin-section,
+.admin-edit-form .admin-section {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+/* Reduce bottom padding for foodbank info card only */
+.admin-view-mode {
+    padding-bottom: 0;
+}
+
+.admin-edit-form {
+    padding-bottom: 0;
+}
+
+/* Admin Actions */
 .admin-actions {
     display: flex;
     gap: 1rem;
@@ -141,14 +104,11 @@
     border-top: 1px solid #e5e7eb;
 }
 
-/* ========================================
-   Service Area Zipcode List
-   ======================================== */
+/* Zipcode List */
 .zipcode-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    margin-top: 1rem;
 }
 
 .zipcode-item {
@@ -200,12 +160,10 @@
     color: white;
 }
 
-/* ========================================
-   No Data Message
-   ======================================== */
+/* No Data Message */
 .no-data-message {
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 3rem 1rem;
     color: #6b7280;
 }
 
@@ -214,9 +172,7 @@
     font-size: 1rem;
 }
 
-/* ========================================
-   Form Styling
-   ======================================== */
+/* Form Styling */
 .form-label {
     font-weight: 500;
     color: #374151;
@@ -240,9 +196,7 @@ textarea.form-control {
     min-height: 80px;
 }
 
-/* ========================================
-   Modal Styling
-   ======================================== */
+/* Modal Enhancements */
 .modal-content {
     border-radius: 0.75rem;
     border: none;
@@ -271,9 +225,7 @@ textarea.form-control {
     background-color: #fefef9;
 }
 
-/* ========================================
-   Buttons
-   ======================================== */
+/* Buttons */
 .btn-primary {
     background-color: #d97706;
     border-color: #d97706;
@@ -319,93 +271,7 @@ textarea.form-control {
     border-color: #b91c1c;
 }
 
-/* ========================================
-   Food Truck Toggle
-   ======================================== */
-.food-truck-toggle-card {
-    margin-bottom: 1.5rem;
-}
-
-.food-truck-toggle-card .card-header-section {
-    margin-bottom: 0.75rem;
-}
-
-.section-description {
-    color: #6b7280;
-    font-size: 0.9rem;
-    margin: 0.25rem 0 0 0;
-}
-
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-    margin: 0;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #d1d5db;
-    transition: 0.3s;
-    border-radius: 34px;
-}
-
-.toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
-}
-
-input:checked + .toggle-slider {
-    background-color: #d97706;
-}
-
-input:checked + .toggle-slider:before {
-    transform: translateX(26px);
-}
-
-.toggle-info {
-    padding-top: 0.75rem;
-    border-top: 1px solid #e5e7eb;
-}
-
-.toggle-status {
-    margin: 0 0 0.5rem 0;
-    color: #1f2937;
-    font-size: 0.95rem;
-}
-
-.toggle-status strong {
-    color: #d97706;
-}
-
-.toggle-description {
-    margin: 0;
-    color: #6b7280;
-    font-size: 0.9rem;
-}
-
-/* ========================================
-   Responsive Design
-   ======================================== */
+/* Responsive */
 @media (max-width: 768px) {
     .admin-title {
         font-size: 2rem;
@@ -448,29 +314,4 @@ input:checked + .toggle-slider:before {
     .btn-delete-zip {
         width: 100%;
     }
-
-    .card-header-section {
-        flex-direction: column;
-        align-items: center;  /* Changed from flex-start to center */
-        text-align: center;
-        gap: 1rem;
-    }
-    
-    .section-title {
-        text-align: center;
-    }
-    
-    .section-description {
-        text-align: center;
-    }
-}
-
-/* Override any conflicting spacing */
-.admin-card:first-child .admin-view-mode,
-.admin-card:first-child .admin-edit-form {
-    padding-bottom: 0 !important;
-}
-
-.admin-card:first-child {
-    padding-bottom: 0.5rem !important;
 }

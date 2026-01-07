@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from .models import Visit, Patron
 from .forms import VisitForm
+from foodbanked.utils import get_foodbank_today
 
 
 @login_required
@@ -21,7 +22,7 @@ def visit_list(request):
     from django.utils import timezone
     from datetime import timedelta
     
-    today = timezone.now().date()
+    today = get_foodbank_today(foodbank)
     filter_label = None
     
     if filter_type == 'today':
@@ -51,47 +52,86 @@ def visit_list(request):
     return render(request, 'visits/visit_list.html', context)
 
 
-
-
 @login_required
 def visit_create(request):
     """Create a new visit with enhanced patron data"""
     foodbank = request.user.foodbank
-    
     if request.method == 'POST':
         form = VisitForm(request.POST)
         if form.is_valid():
-            visit = form.save(commit=False)
-            visit.foodbank = foodbank
+            # Get visit type selections
+            pantry_selected = request.POST.get('visit_type_pantry') == 'on'
+            food_truck_selected = request.POST.get('visit_type_food_truck') == 'on'
             
-            # Check if patron was selected
+            # Validate at least one is selected (if food truck is enabled)
+            if foodbank.food_truck_enabled and not pantry_selected and not food_truck_selected:
+                messages.error(request, 'Please select at least one visit type.')
+                return redirect('visits:visit_create')
+            
+            # Get patron info
             patron_id = request.POST.get('patron_id')
+            patron = None
             if patron_id:
                 try:
                     patron = Patron.objects.get(id=patron_id, foodbank=foodbank)
-                    visit.patron = patron
-                    
-                    # Snapshot patron info at time of visit
-                    visit.patron_first_name = patron.first_name
-                    visit.patron_last_name = patron.last_name
-                    visit.patron_address = patron.address
-                    # Note: zipcode already stored separately in visit.zipcode
-                    
                 except Patron.DoesNotExist:
                     pass
             
-            visit.save()
-            messages.success(request, 'Visit recorded successfully!')
-            return redirect('visits:visit_create')  # Stay on same page
+            # Create visit(s)
+            visits_to_create = []
+            
+            if foodbank.food_truck_enabled:
+                # If food truck is enabled, create based on selections
+                if pantry_selected:
+                    visits_to_create.append(False)  # Pantry visit
+                if food_truck_selected:
+                    visits_to_create.append(True)   # Food truck visit
+            else:
+                # If food truck not enabled, create regular pantry visit
+                visits_to_create.append(False)
+            
+            # Create each visit
+            for is_food_truck in visits_to_create:
+                visit = Visit(
+                    foodbank=foodbank,
+                    is_food_truck=is_food_truck,
+                    zipcode=form.cleaned_data['zipcode'],
+                    household_size=form.cleaned_data['household_size'],
+                    age_0_18=form.cleaned_data['age_0_18'],
+                    age_19_59=form.cleaned_data['age_19_59'],
+                    age_60_plus=form.cleaned_data['age_60_plus'],
+                    first_visit_this_month=form.cleaned_data['first_visit_this_month'],
+                    comments=form.cleaned_data.get('comments', ''),
+                )
+                
+                if patron:
+                    visit.patron = patron
+                    visit.patron_first_name = patron.first_name
+                    visit.patron_last_name = patron.last_name
+                    visit.patron_address = patron.address
+                
+                visit.save()
+
+
+
+
+            # Success message
+            visit_count = len(visits_to_create)
+            if visit_count == 1:
+                messages.success(request, 'Visit recorded successfully!')
+            else:
+                messages.success(request, f'{visit_count} visits recorded successfully!')
+            
+            return redirect('visits:visit_create')
     else:
         form = VisitForm()
-    
+
     # Get all patrons with enhanced data for autocomplete
     from django.utils import timezone
     from django.db.models import Count
     import json
     
-    today = timezone.now().date()
+    today = get_foodbank_today(foodbank)
     month_start = today.replace(day=1)
     
     patrons_queryset = Patron.objects.filter(foodbank=foodbank)
@@ -138,16 +178,18 @@ def visit_create(request):
         
         patrons.append(patron_data)
     
-    today = timezone.now().date()
+    today = get_foodbank_today(foodbank)
     recent_visits = Visit.objects.filter(
         foodbank=foodbank,
-        visit_date=today  # Only show today's visits
+        visit_date=today,  # Only show today's visits
+        is_food_truck=False 
     ).select_related('patron').order_by('-id')
 
     # Count today's visits for display
     todays_visit_count = Visit.objects.filter(
         foodbank=foodbank,
-        visit_date=today
+        visit_date=today,
+        is_food_truck=False 
     ).count()
         
     context = {
@@ -155,6 +197,7 @@ def visit_create(request):
         'patrons': json.dumps(patrons),
         'recent_visits': recent_visits,
         'todays_visit_count': todays_visit_count,
+        'food_truck_enabled': foodbank.food_truck_enabled,
     }
     return render(request, 'visits/visit_form.html', context)
 
@@ -354,7 +397,7 @@ def stats_view(request):
     from datetime import timedelta
     import json
     
-    today = timezone.now().date()
+    today = get_foodbank_today(foodbank)
     month_start = today.replace(day=1)
     thirty_days_ago = today - timedelta(days=30)
     

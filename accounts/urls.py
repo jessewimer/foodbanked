@@ -17,5 +17,6 @@ urlpatterns = [
     path('admin/', views.account_admin, name='account_admin'),
     path('admin/add-zipcode/', views.add_zipcode, name='add_zipcode'),
     path('admin/delete-zipcode/<int:pk>/', views.delete_zipcode, name='delete_zipcode'),
+    path('admin/toggle-food-truck/', views.toggle_food_truck, name='toggle_food_truck'),
 
 ]

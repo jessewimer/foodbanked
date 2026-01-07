@@ -16,6 +16,22 @@
                     <p class="admin-subtitle">Manage your food bank information and settings</p>
                 </div>
 
+
+                <!-- Food Truck Toggle Card -->
+                <div class="admin-card food-truck-toggle-card">
+                    <div class="card-header-section" style="margin-bottom: 0; padding-bottom: 0; border-bottom: none;">
+                        <div>
+                            <h3 class="section-title" style="margin-bottom: 0.25rem;">Food Truck Mode</h3>
+                            <p class="section-description">Enable food truck visits for your food bank</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="foodTruckToggle" {% if foodbank.food_truck_enabled %}checked{% endif %}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+
                 <!-- Food Bank Information Card -->
                 <div class="admin-card">
                     {% if not edit_mode %}
@@ -292,4 +308,42 @@
         </div>
     </div>
 </div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('foodTruckToggle');
+    
+    if (toggle) {
+        toggle.addEventListener('change', function() {
+            const isEnabled = this.checked;
+            
+            fetch('{% url "accounts:toggle_food_truck" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ enabled: isEnabled })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    // Revert toggle on error
+                    toggle.checked = !isEnabled;
+                    alert('Error updating food truck mode');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toggle.checked = !isEnabled;
+                alert('Error updating food truck mode');
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

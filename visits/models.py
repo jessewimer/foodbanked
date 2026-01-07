@@ -44,6 +44,8 @@ class Visit(models.Model):
     first_visit_this_month = models.BooleanField(default=False)
 
     comments = models.TextField(blank=True, null=True)
+
+    is_food_truck = models.BooleanField(default=False)
     
     def __str__(self):
         patron_name = self.patron.name if self.patron else "Anonymous"

@@ -7,6 +7,8 @@ from datetime import timedelta
 from .forms import FoodbankRegistrationForm
 from django.contrib.auth import logout as auth_logout
 from .models import ServiceZipcode
+from django.http import JsonResponse
+from foodbanked.utils import get_foodbank_today
 
 def logout_view(request):
     """Custom logout view that accepts GET requests"""
@@ -44,7 +46,7 @@ def dashboard(request):
         return render(request, 'accounts/dashboard.html', {'foodbank': None})
     
     # Calculate date ranges
-    today = timezone.now().date()
+    today = get_foodbank_today(foodbank)
     week_start = today - timedelta(days=today.weekday())  # Monday of this week
     month_start = today.replace(day=1)
     
@@ -147,3 +149,30 @@ def delete_zipcode(request, pk):
         messages.success(request, f'Zip code {zipcode_num} has been deleted.')
     
     return redirect('accounts:account_admin')
+
+
+@login_required
+def toggle_food_truck(request):
+    """Toggle food truck mode for the foodbank"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    
+    foodbank = request.user.foodbank
+    
+    try:
+        import json
+        data = json.loads(request.body)
+        enabled = data.get('enabled', False)
+        
+        foodbank.food_truck_enabled = enabled
+        foodbank.save()
+        
+        return JsonResponse({
+            'success': True,
+            'enabled': enabled
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
