@@ -13,10 +13,10 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     
-    # Account admin
-    path('admin/', views.account_admin, name='account_admin'),
-    path('admin/add-zipcode/', views.add_zipcode, name='add_zipcode'),
-    path('admin/delete-zipcode/<int:pk>/', views.delete_zipcode, name='delete_zipcode'),
-    path('admin/toggle-food-truck/', views.toggle_food_truck, name='toggle_food_truck'),
+    # Account settings
+    path('settings/', views.account_settings, name='account_settings'),
+    path('settings/add-zipcode/', views.add_zipcode, name='add_zipcode'),
+    path('settings/delete-zipcode/<int:pk>/', views.delete_zipcode, name='delete_zipcode'),
+    path('settings/toggle-food-truck/', views.toggle_food_truck, name='toggle_food_truck'),
 
 ]

@@ -17,23 +17,7 @@ Including another URLconf
 """
 URL configuration for foodbanked project.
 """
-# from django.contrib import admin
-# from django.urls import path, include
-# from . import views
 
-# urlpatterns = [
-#     # Admin
-#     path('admin/', admin.site.urls),
-    
-#     # Public pages
-#     path('', views.landing_page, name='landing'),
-#     path('demo/', views.demo_page, name='demo'),
-#     path('demo/stats/', views.demo_stats_page, name='demo_stats'),
-    
-#     # App URLs
-#     path('accounts/', include('accounts.urls')),
-#     path('', include('visits.urls')),  
-# ]
 
 from django.contrib import admin
 from django.urls import path, include
@@ -47,11 +31,13 @@ urlpatterns = [
     path('', views.landing_page, name='landing'),
     path('demo/', views.demo_page, name='demo'),
     path('demo/stats/', views.demo_stats_page, name='demo_stats'),
+    path('about/', views.about_page, name='about'),
+    path('pricing/', views.pricing_page, name='pricing'),
     
     # Dashboard
     path('dashboard/', dashboard, name='dashboard'),
     
     # App URLs
-    path('accounts/', include('accounts.urls')),  # Just login/register/logout
-    path('', include('visits.urls')),  # visits/, patrons/, stats/ at root
+    path('accounts/', include('accounts.urls')),
+    path('', include('visits.urls')),
 ]

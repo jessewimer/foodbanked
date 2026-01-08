@@ -87,8 +87,8 @@ def dashboard(request):
     return render(request, 'accounts/dashboard.html', context)
 
 @login_required
-def account_admin(request):
-    """Account admin page for managing foodbank information"""
+def account_settings(request):
+    """Account settings page for managing foodbank information"""
     foodbank = request.user.foodbank
     
     # Check if we're in edit mode
@@ -100,7 +100,7 @@ def account_admin(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Food bank information updated successfully!')
-            return redirect('accounts:account_admin')
+            return redirect('accounts:account_settings')
     else:
         from .forms import FoodbankForm
         form = FoodbankForm(instance=foodbank) if edit_mode else None
@@ -114,7 +114,7 @@ def account_admin(request):
         'edit_mode': edit_mode,
         'zipcodes': zipcodes,
     }
-    return render(request, 'accounts/account_admin.html', context)
+    return render(request, 'accounts/account_settings.html', context)
 
 
 @login_required
@@ -134,7 +134,7 @@ def add_zipcode(request):
         )
         messages.success(request, f'Zip code {zipcode} added successfully!')
             
-    return redirect('accounts:account_admin')
+    return redirect('accounts:account_settings')
 
 
 @login_required
@@ -148,7 +148,7 @@ def delete_zipcode(request, pk):
         zipcode.delete()
         messages.success(request, f'Zip code {zipcode_num} has been deleted.')
     
-    return redirect('accounts:account_admin')
+    return redirect('accounts:account_settings')
 
 
 @login_required
