@@ -8,8 +8,7 @@
 {% block content %}
 <section class="visit-list-section">
     <div class="container">
-        
-        <!-- Page Header -->
+        <!-- Header -->
         <div class="list-header">
             <div>
                 <h1 class="list-title">All Visits</h1>
@@ -22,7 +21,7 @@
                     {% else %}
                         visit{{ visits.count|pluralize }}
                     {% endif %}
-                    {% if filter_label %} {{ filter_label }}{% endif %}
+                    {% if filter_label %}{{ filter_label }}{% endif %}
                 </p>
             </div>
             <a href="{% url 'visits:visit_create' %}" class="btn btn-primary">
@@ -30,47 +29,30 @@
             </a>
         </div>
 
-        <!-- Filters Section (All in One Row) -->
-        <div class="filters-container">
-            <div class="filters-scroll">
-                <!-- Time-based Filter Tabs -->
-                <a href="{% url 'visits:visit_list' %}{% if visit_type_filter %}?visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if not filter %}active{% endif %}">
-                    All
-                </a>
-                <a href="?filter=today{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'today' %}active{% endif %}">
-                    Today
-                </a>
-                <a href="?filter=week{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'week' %}active{% endif %}">
-                    This Week
-                </a>
-                <a href="?filter=month{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'month' %}active{% endif %}">
-                    This Month
-                </a>
-                <a href="?filter=ytd{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'ytd' %}active{% endif %}">
-                    Year to Date
-                </a>
-
-                <!-- Visit Type Dropdown -->
-                <div class="filter-divider"></div>
-                <div class="visit-type-filter">
-                    <label for="visitTypeFilter">Type:</label>
-                    <select id="visitTypeFilter" class="visit-type-select">
-                        <option value="all" {% if not visit_type_filter %}selected{% endif %}>All</option>
-                        <option value="pantry" {% if visit_type_filter == 'pantry' %}selected{% endif %}>Pantry</option>
-                        <option value="food_truck" {% if visit_type_filter == 'food_truck' %}selected{% endif %}>Food Truck</option>
-                    </select>
-                </div>
-
-                <!-- Clear Filters Button -->
-                <div class="filter-divider"></div>
-                <a href="{% url 'visits:visit_list' %}" class="filter-tab clear-filters">
-                    Clear
-                </a>
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <a href="{% url 'visits:visit_list' %}" class="filter-tab {% if not filter %}active{% endif %}">
+                All
+            </a>
+            <a href="{% url 'visits:visit_list' %}?filter=today" class="filter-tab {% if filter == 'today' %}active{% endif %}">
+                Today
+            </a>
+            <a href="{% url 'visits:visit_list' %}?filter=week" class="filter-tab {% if filter == 'week' %}active{% endif %}">
+                This Week
+            </a>
+            <a href="{% url 'visits:visit_list' %}?filter=month" class="filter-tab {% if filter == 'month' %}active{% endif %}">
+                This Month
+            </a>
+            <a href="{% url 'visits:visit_list' %}?filter=ytd" class="filter-tab {% if filter == 'ytd' %}active{% endif %}">
+                Year to Date
+            </a>
+            <div class="visit-type-filter">
+                <label for="visitTypeFilter">Visit Type:</label>
+                <select id="visitTypeFilter" class="visit-type-select">
+                    <option value="all" {% if not visit_type_filter %}selected{% endif %}>All Types</option>
+                    <option value="pantry" {% if visit_type_filter == 'pantry' %}selected{% endif %}>Pantry Only</option>
+                    <option value="food_truck" {% if visit_type_filter == 'food_truck' %}selected{% endif %}>Food Truck Only</option>
+                </select>
             </div>
         </div>
 
@@ -81,7 +63,6 @@
                     {% for visit in visits %}
                     <a href="{% url 'visits:visit_detail' visit.pk %}" class="visit-list-item">
                         <div class="visit-main-info">
-                            <!-- Patron Name -->
                             <div class="visit-patron-info">
                                 {% if visit.patron %}
                                     <span class="patron-icon">👤</span>
@@ -91,8 +72,15 @@
                                     <span class="patron-name">Anonymous</span>
                                 {% endif %}
                             </div>
-                            
-                            <!-- Visit Metadata -->
+                            {% comment %} <div class="visit-meta">
+                                <span class="visit-date">{{ visit.visit_date|date:"M d, Y" }}</span>
+                                <span class="visit-separator">•</span>
+                                <span class="visit-household">{{ visit.household_size }} people</span>
+                                <span class="visit-separator">•</span>
+                                <span class="visit-zip">{{ visit.zipcode }}</span>
+                            </div> {% endcomment %}
+
+
                             <div class="visit-meta">
                                 <span class="visit-date">{{ visit.visit_date|date:"M d, Y" }}</span>
                                 <span class="visit-separator">•</span>
@@ -109,13 +97,19 @@
                     </a>
                     {% endfor %}
                 </div>
+
+                <!-- Pagination (if needed later) -->
+                {% comment %}
+                <div class="pagination-section">
+                    <!-- Add pagination here if you implement it -->
+                </div>
+                {% endcomment %}
             {% else %}
-                <!-- No Visits Found State -->
                 <div class="no-visits">
                     <div class="no-visits-icon">📋</div>
                     <h3>No visits found</h3>
-                    {% if filter or visit_type_filter %}
-                        <p>No visits match the selected filters.</p>
+                    {% if filter %}
+                        <p>No visits recorded {{ filter_label }}.</p>
                         <a href="{% url 'visits:visit_list' %}" class="btn btn-outline-primary">View All Visits</a>
                     {% else %}
                         <p>Start by recording your first visit.</p>
@@ -124,14 +118,12 @@
                 </div>
             {% endif %}
         </div>
-        
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Visit type dropdown handler
 document.addEventListener('DOMContentLoaded', function() {
     const visitTypeSelect = document.getElementById('visitTypeFilter');
     
@@ -147,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentUrl.searchParams.set('visit_type', visitType);
             }
             
-            // Navigate to new URL (preserves existing filter parameter)
+            // Navigate to new URL
             window.location.href = currentUrl.toString();
         });
     }

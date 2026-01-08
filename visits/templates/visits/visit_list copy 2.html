@@ -30,48 +30,48 @@
             </a>
         </div>
 
-        <!-- Filters Section (All in One Row) -->
-        <div class="filters-container">
-            <div class="filters-scroll">
+        <!-- Filters Section -->
+        <div class="filters-wrapper">
+            <div class="filters-left">
                 <!-- Time-based Filter Tabs -->
-                <a href="{% url 'visits:visit_list' %}{% if visit_type_filter %}?visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if not filter %}active{% endif %}">
-                    All
-                </a>
-                <a href="?filter=today{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'today' %}active{% endif %}">
-                    Today
-                </a>
-                <a href="?filter=week{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'week' %}active{% endif %}">
-                    This Week
-                </a>
-                <a href="?filter=month{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'month' %}active{% endif %}">
-                    This Month
-                </a>
-                <a href="?filter=ytd{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
-                   class="filter-tab {% if filter == 'ytd' %}active{% endif %}">
-                    Year to Date
-                </a>
-
-                <!-- Visit Type Dropdown -->
-                <div class="filter-divider"></div>
-                <div class="visit-type-filter">
-                    <label for="visitTypeFilter">Type:</label>
-                    <select id="visitTypeFilter" class="visit-type-select">
-                        <option value="all" {% if not visit_type_filter %}selected{% endif %}>All</option>
-                        <option value="pantry" {% if visit_type_filter == 'pantry' %}selected{% endif %}>Pantry</option>
-                        <option value="food_truck" {% if visit_type_filter == 'food_truck' %}selected{% endif %}>Food Truck</option>
-                    </select>
+                <div class="filter-tabs">
+                    <a href="{% url 'visits:visit_list' %}{% if visit_type_filter %}?visit_type={{ visit_type_filter }}{% endif %}" 
+                       class="filter-tab {% if not filter %}active{% endif %}">
+                        All
+                    </a>
+                    <a href="?filter=today{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
+                       class="filter-tab {% if filter == 'today' %}active{% endif %}">
+                        Today
+                    </a>
+                    <a href="?filter=week{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
+                       class="filter-tab {% if filter == 'week' %}active{% endif %}">
+                        This Week
+                    </a>
+                    <a href="?filter=month{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
+                       class="filter-tab {% if filter == 'month' %}active{% endif %}">
+                        This Month
+                    </a>
+                    <a href="?filter=ytd{% if visit_type_filter %}&visit_type={{ visit_type_filter }}{% endif %}" 
+                       class="filter-tab {% if filter == 'ytd' %}active{% endif %}">
+                        Year to Date
+                    </a>
                 </div>
 
-                <!-- Clear Filters Button -->
-                <div class="filter-divider"></div>
-                <a href="{% url 'visits:visit_list' %}" class="filter-tab clear-filters">
-                    Clear
-                </a>
+                <!-- Visit Type Dropdown -->
+                <div class="visit-type-filter">
+                    <label for="visitTypeFilter">Visit Type:</label>
+                    <select id="visitTypeFilter" class="visit-type-select">
+                        <option value="all" {% if not visit_type_filter %}selected{% endif %}>All Types</option>
+                        <option value="pantry" {% if visit_type_filter == 'pantry' %}selected{% endif %}>Pantry Only</option>
+                        <option value="food_truck" {% if visit_type_filter == 'food_truck' %}selected{% endif %}>Food Truck Only</option>
+                    </select>
+                </div>
             </div>
+
+            <!-- Clear Filters Button -->
+            <a href="{% url 'visits:visit_list' %}" class="btn btn-outline-secondary clear-filters-btn">
+                Clear Filters
+            </a>
         </div>
 
         <!-- Visits List -->

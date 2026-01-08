@@ -74,7 +74,7 @@ WSGI_APPLICATION = "foodbanked.wsgi.application"
 if ENVIRONMENT == 'production':
     WSGI_APPLICATION = "foodbanked.wsgi.application"
     DEBUG = False
-    print(f'Running in production mode, debug = {DEBUG}')
+    # print(f'Running in production mode, debug = {DEBUG}')
     ALLOWED_HOSTS = ['foodbanked.pythonanywhere.com']
     # Production-only settings here, e.g.:
     DATABASES = {

@@ -12,14 +12,20 @@ def visit_list(request):
     """List all visits for this foodbank with filtering"""
     foodbank = request.user.foodbank
     
-    # Get filter parameter
+    # Get filter parameters
     filter_type = request.GET.get('filter', None)
+    visit_type_filter = request.GET.get('visit_type', None)
     
     # Base queryset
     visits = Visit.objects.filter(foodbank=foodbank).select_related('patron')
     
-    # Apply filters
-    from django.utils import timezone
+    # Apply visit type filter first
+    if visit_type_filter == 'pantry':
+        visits = visits.filter(is_food_truck=False)
+    elif visit_type_filter == 'food_truck':
+        visits = visits.filter(is_food_truck=True)
+    
+    # Apply time-based filters
     from datetime import timedelta
     
     today = get_foodbank_today(foodbank)
@@ -40,7 +46,7 @@ def visit_list(request):
         year_start = today.replace(month=1, day=1)
         visits = visits.filter(visit_date__gte=year_start)
         filter_label = "year to date"
-    
+        
     # Order by most recent first
     visits = visits.order_by('-visit_date', '-id')
     
@@ -48,8 +54,58 @@ def visit_list(request):
         'visits': visits,
         'filter': filter_type,
         'filter_label': filter_label,
+        'visit_type_filter': visit_type_filter,
     }
     return render(request, 'visits/visit_list.html', context)
+# @login_required
+# def visit_list(request):
+#     """List all visits for this foodbank with filtering"""
+#     foodbank = request.user.foodbank
+    
+#     # Get filter parameter
+#     filter_type = request.GET.get('filter', None)
+    
+#     # Base queryset
+#     visits = Visit.objects.filter(foodbank=foodbank).select_related('patron')
+    
+#     # Apply filters
+#     from django.utils import timezone
+#     from datetime import timedelta
+    
+#     today = get_foodbank_today(foodbank)
+#     filter_label = None
+    
+#     if filter_type == 'today':
+#         visits = visits.filter(visit_date=today)
+#         filter_label = "today"
+#     elif filter_type == 'week':
+#         week_start = today - timedelta(days=today.weekday())  # Monday
+#         visits = visits.filter(visit_date__gte=week_start)
+#         filter_label = "this week"
+#     elif filter_type == 'month':
+#         month_start = today.replace(day=1)
+#         visits = visits.filter(visit_date__gte=month_start)
+#         filter_label = "this month"
+#     elif filter_type == 'ytd':
+#         year_start = today.replace(month=1, day=1)
+#         visits = visits.filter(visit_date__gte=year_start)
+#         filter_label = "year to date"
+#     elif filter_type == 'pantry':
+#         visits = visits.filter(is_food_truck=False)
+#         filter_label = "pantry visits"
+#     elif filter_type == 'food_truck':
+#         visits = visits.filter(is_food_truck=True)
+#         filter_label = "food truck visits"
+        
+#     # Order by most recent first
+#     visits = visits.order_by('-visit_date', '-id')
+    
+#     context = {
+#         'visits': visits,
+#         'filter': filter_type,
+#         'filter_label': filter_label,
+#     }
+#     return render(request, 'visits/visit_list.html', context)
 
 
 @login_required
