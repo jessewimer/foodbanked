@@ -2,19 +2,20 @@
 (function() {
     'use strict';
     
-    console.log('Visit form script loaded');
-    
     // Parse patron data from script tag
     const patronDataElement = document.getElementById('patronData');
     let patrons = patronDataElement ? JSON.parse(patronDataElement.textContent) : [];
-    
-    console.log('Patrons loaded:', patrons.length);
     
     // Store currently selected patron for editing
     let currentPatron = null;
     
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOM loaded');
+        // hide city/state/zip row if returning patron is selected
+        const addressRow = document.querySelector('.row.mb-4');
+        if (addressRow && addressRow.querySelector('#id_zipcode')) {
+            addressRow.style.display = 'none';
+        }
         
         const form = document.getElementById('visitForm');
         const patronSearchSection = document.getElementById('patronSearchSection');
@@ -36,16 +37,13 @@
         // Modal elements
         const editPatronModal = new bootstrap.Modal(document.getElementById('editPatronModal'));
         const savePatronBtn = document.getElementById('savePatronBtn');
-        
-        console.log('Elements found:', {
-            form: !!form,
-            patronSearch: !!patronSearch,
-            searchTypeSelect: !!searchTypeSelect,
-            patronInfoCard: !!patronInfoCard
-        });
+    
         
         // Form fields
         const zipcodeInput = document.getElementById('id_zipcode');
+        const zipcodeResults = document.getElementById('zipcodeResults');
+        const cityInput = document.getElementById('id_city');
+        const stateInput = document.getElementById('id_state');
         const householdSizeInput = document.getElementById('id_household_size');
         const age0_18Input = document.getElementById('id_age_0_18');
         const age19_59Input = document.getElementById('id_age_19_59');
@@ -60,8 +58,18 @@
         
         // Check initial state on page load
         const initialChecked = document.querySelector('input[name="visitType"]:checked');
-        console.log('Initial checked:', initialChecked ? initialChecked.value : 'none');
+        // console.log('Initial checked:', initialChecked ? initialChecked.value : 'none');
         
+
+        [zipcodeInput, cityInput, stateInput].forEach(input => {
+            if (input) {
+                input.setAttribute('readonly', 'readonly');
+                input.addEventListener('focus', function() {
+                    this.removeAttribute('readonly');
+                });
+            }
+        });
+
         if (initialChecked && initialChecked.value === 'anonymous') {
             console.log('Setting anonymous mode on load');
             patronSearchSection.style.display = 'none';
@@ -82,7 +90,11 @@
                     firstVisitSection.style.display = 'block';
                     
                     console.log('Anonymous mode: hiding patron search, showing first visit checkbox');
-                    
+                    // Show the zip/city/state row again
+                    const addressRow = document.querySelector('.row.mb-4');
+                    if (addressRow && addressRow.querySelector('#id_zipcode')) {
+                        addressRow.style.display = '';
+                    }
                     // Clear patron selection and form
                     patronSearch.value = '';
                     selectedPatronId.value = '';
@@ -95,36 +107,54 @@
                     firstVisitSection.style.display = 'none';
                     patronInfoCard.style.display = 'none';
                     visitCountSection.style.display = 'none';
+                    //hide the zip/city/state row since it's shown in patron card
+                    const addressRow = document.querySelector('.row.mb-4');
+                    if (addressRow && addressRow.querySelector('#id_zipcode')) {
+                        addressRow.style.display = 'none';
+                    }
                     
                     console.log('Returning mode: showing patron search, hiding first visit checkbox');
                 }
             });
         });
         
-        // Update search placeholder based on dropdown selection
         searchTypeSelect.addEventListener('change', function() {
-            const searchType = this.value;
-            console.log('Search type changed to:', searchType);
+            const value = this.value;
             
-            if (searchType === 'last_name') {
-                patronSearch.placeholder = 'Search by last name...';
-            } else if (searchType === 'first_name') {
-                patronSearch.placeholder = 'Search by first name...';
-            } else if (searchType === 'address') {
-                patronSearch.placeholder = 'Search by address...';
+            // Update hidden field
+            document.getElementById('searchTypeHidden').value = value;
+            
+            if (value === 'anonymous') {
+                patronSearchSection.style.display = 'none';
+                clearPatronSelection();
+                // Clear all form fields
+                clearFormFields();
+            } else {
+                patronSearchSection.style.display = 'block';
+                updateSearchPlaceholder();
+                clearPatronSelection();
+                // Clear all form fields
+                clearFormFields();
+                patronSearch.focus();
             }
             
-            console.log('Placeholder updated to:', patronSearch.placeholder);
-            
-            // Clear search and results when changing type
+            patronResults.style.display = 'none';
             patronSearch.value = '';
-            selectedPatronId.value = '';
-            patronInfoCard.style.display = 'none';
-            visitCountSection.style.display = 'none';
-            patronResults.classList.remove('show');
             selectedIndex = -1;
-            currentPatron = null;
         });
+
+        // ADD THIS HELPER FUNCTION
+        function clearFormFields() {
+            if (zipcodeInput) zipcodeInput.value = '';
+            if (cityInput) cityInput.value = '';
+            if (stateInput) stateInput.value = '';
+            if (householdSizeInput) householdSizeInput.value = '1';
+            if (age0_18Input) age0_18Input.value = '0';
+            if (age19_59Input) age19_59Input.value = '0';
+            if (age60PlusInput) age60PlusInput.value = '0';
+            const firstVisitCheckbox = document.getElementById('id_first_visit_this_month');
+            if (firstVisitCheckbox) firstVisitCheckbox.checked = false;
+        }
         
         // Autocomplete search functionality with smart matching
         let selectedIndex = -1;
@@ -225,8 +255,24 @@
             
             currentPatron = patron; // Store for editing
             
-            patronSearch.value = `${patron.last_name}, ${patron.first_name}`;
-            selectedPatronId.value = patron.id;
+            // Update patron info card
+            patronInfoName.textContent = `${patron.first_name} ${patron.last_name}`;
+            patronInfoAddress.textContent = patron.address || 'Not provided';
+            patronInfoCityState.textContent = patron.city && patron.state 
+                ? `${patron.city}, ${patron.state}` 
+                : 'Not provided';
+            patronInfoZip.textContent = patron.zipcode || 'Not provided';
+            // Auto-populate hidden address fields
+            if (zipcodeInput) zipcodeInput.value = patron.zipcode || '';
+            if (cityInput) cityInput.value = patron.city || '';
+            if (stateInput) stateInput.value = patron.state || '';
+
+            // Hide the zip/city/state row since it's shown in patron card
+            const addressRow = document.querySelector('.row.mb-4');
+            if (addressRow && addressRow.querySelector('#id_zipcode')) {
+                addressRow.style.display = 'none';
+            }
+
             patronResults.classList.remove('show');
             
             // Display patron info card
@@ -249,6 +295,7 @@
             // Display visit count and last visit date
             displayVisitCount(patron);
         }
+       
         
         // Display patron information card
         function displayPatronInfo(patron) {
@@ -371,6 +418,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+
+                    clearFormFields();
+
+
+
                     // Update current patron object
                     currentPatron = { ...currentPatron, ...formData };
                     
@@ -474,6 +526,39 @@
                 // Don't call selectPatron() because that would overwrite the form values
             }
         }
+      
+        // RESTORE STATE AFTER VALIDATION ERROR
+        const formStateElement = document.getElementById('formStateData');
+        if (formStateElement) {
+            const formState = JSON.parse(formStateElement.textContent);
+            const selectedPatronIdFromServer = formState.selected_patron_id;
+            const searchTypeFromServer = formState.search_type;
+
+            // ONLY restore if search_type exists (means validation error occurred)
+            if (searchTypeFromServer) {
+                if (searchTypeFromServer === 'anonymous') {
+                    // Restore anonymous mode
+                    searchTypeSelect.value = 'anonymous';
+                    patronSearchSection.style.display = 'none';
+                    document.getElementById('searchTypeHidden').value = 'anonymous';
+                } else {
+                    // Restore "By Name" mode
+                    const dropdownValue = searchTypeFromServer === 'name' ? 'last_name' : searchTypeFromServer;
+                    searchTypeSelect.value = dropdownValue;
+                    patronSearchSection.style.display = 'block';
+                    updateSearchPlaceholder();
+                    document.getElementById('searchTypeHidden').value = searchTypeFromServer;
+                    
+                    // Restore patron if one was selected
+                    if (selectedPatronIdFromServer) {
+                        const patron = patrons.find(p => p.id === parseInt(selectedPatronIdFromServer));
+                        if (patron) {
+                            selectPatron(patron);
+                        }
+                    }
+                }
+            }
+        }
 
         // Validate visit type checkboxes when food truck is enabled
         const visitForm = document.getElementById('visitForm');
@@ -517,5 +602,111 @@
                 }
             });
         }
+
+        // Service zipcodes data (passed from backend)
+        const serviceZipcodes = JSON.parse(document.getElementById('serviceZipcodesData')?.textContent || '[]');
+
+        let selectedZipcodeIndex = -1;
+
+        if (zipcodeInput && zipcodeResults) {
+            // Show all zipcodes on focus
+            zipcodeInput.addEventListener('focus', function() {
+                if (serviceZipcodes.length > 0) {
+                    displayZipcodeResults(serviceZipcodes);
+                }
+            });
+            
+            // Filter zipcodes as user types
+            zipcodeInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                
+                if (query === '') {
+                    displayZipcodeResults(serviceZipcodes);
+                } else {
+                    const filtered = serviceZipcodes.filter(z => 
+                        z.zipcode.toLowerCase().includes(query) ||
+                        z.city.toLowerCase().includes(query)
+                    );
+                    displayZipcodeResults(filtered);
+                }
+            });
+            
+            // Keyboard navigation
+            zipcodeInput.addEventListener('keydown', function(e) {
+                const items = zipcodeResults.querySelectorAll('.autocomplete-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedZipcodeIndex = Math.min(selectedZipcodeIndex + 1, items.length - 1);
+                    updateZipcodeSelection(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedZipcodeIndex = Math.max(selectedZipcodeIndex - 1, -1);
+                    updateZipcodeSelection(items);
+                } else if (e.key === 'Enter' && selectedZipcodeIndex >= 0) {
+                    e.preventDefault();
+                    items[selectedZipcodeIndex].click();
+                } else if (e.key === 'Escape') {
+                    zipcodeResults.style.display = 'none';
+                    selectedZipcodeIndex = -1;
+                }
+            });
+            
+            // Hide results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!zipcodeInput.contains(e.target) && !zipcodeResults.contains(e.target)) {
+                    zipcodeResults.style.display = 'none';
+                    selectedZipcodeIndex = -1;
+                }
+            });
+        }
+
+        function displayZipcodeResults(zipcodes) {
+            // Add dummy zipcodes at the top
+            const dummyZipcodes = [
+                { zipcode: '00001', city: 'Un-housed', state: '' },
+                { zipcode: '00002', city: 'Out of area', state: '' }
+            ];
+            
+            const allZipcodes = [...dummyZipcodes, ...zipcodes];
+            
+            if (allZipcodes.length === 0) {
+                zipcodeResults.style.display = 'none';
+                return;
+            }
+            
+            zipcodeResults.innerHTML = allZipcodes.map(z => `
+                <div class="autocomplete-item" data-zipcode="${z.zipcode}" data-city="${z.city}" data-state="${z.state}">
+                    <span class="zipcode-item-code">${z.zipcode}</span>
+                    <span class="zipcode-item-location">${z.city}${z.state ? ', ' + z.state : ''}</span>
+                </div>
+            `).join('');
+            
+            zipcodeResults.style.display = 'block';
+            selectedZipcodeIndex = -1;
+            
+            // Add click handlers
+            zipcodeResults.querySelectorAll('.autocomplete-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    zipcodeInput.value = this.dataset.zipcode;
+                    cityInput.value = this.dataset.city;
+                    stateInput.value = this.dataset.state;
+                    zipcodeResults.style.display = 'none';
+                    selectedZipcodeIndex = -1;
+                });
+            });
+        }
+
+        function updateZipcodeSelection(items) {
+            items.forEach((item, index) => {
+                if (index === selectedZipcodeIndex) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+            
     });
 })();

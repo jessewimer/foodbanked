@@ -30,7 +30,7 @@ urlpatterns = [
     # Public pages
     path('', views.landing_page, name='landing'),
     path('demo/', views.demo_page, name='demo'),
-    path('demo/stats/', views.demo_stats_page, name='demo_stats'),
+    path('demo/stats/', views.demo_analytics_page, name='demo_analytics'),
     path('about/', views.about_page, name='about'),
     path('pricing/', views.pricing_page, name='pricing'),
     

@@ -234,9 +234,9 @@ def demo_page(request):
     }
     return render(request, 'demo.html', context)
 
-def demo_stats_page(request):
+def demo_analytics_page(request):
     """Demo statistics page showing sample data visualizations"""
-    return render(request, 'demo_stats.html')
+    return render(request, 'demo_analytics.html')
 
 def about_page(request):
     """About page"""

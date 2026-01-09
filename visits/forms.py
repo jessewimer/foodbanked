@@ -13,12 +13,22 @@ class VisitForm(forms.ModelForm):
     
     class Meta:
         model = Visit
-        fields = ['zipcode', 'household_size', 'age_0_18', 'age_19_59', 'age_60_plus', 'first_visit_this_month', 'comments', 'is_food_truck']
+        # fields = ['zipcode', 'household_size', 'age_0_18', 'age_19_59', 'age_60_plus', 'first_visit_this_month', 'comments', 'is_food_truck']
+        fields = ['zipcode', 'city', 'state', 'household_size', 'age_0_18', 'age_19_59', 'age_60_plus', 'first_visit_this_month', 'comments', 'is_food_truck']
         widgets = {
             'zipcode': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter zip code',
                 'maxlength': '5'
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'City'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'ST',
+                'maxlength': '2'
             }),
             'household_size': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -54,6 +64,8 @@ class VisitForm(forms.ModelForm):
         }
         labels = {
             'zipcode': 'Zip Code',
+            'city': 'City',
+            'state': 'State',
             'household_size': 'Household Size',
             'age_0_18': '0-18 years',
             'age_19_59': '19-59 years',
