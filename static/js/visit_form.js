@@ -280,8 +280,8 @@
             
             // Auto-populate from last visit if available
             if (patron.last_visit) {
-                console.log('Auto-populating from last visit');
-                zipcodeInput.value = patron.last_visit.zipcode;
+                // console.log('Auto-populating from last visit');
+                // zipcodeInput.value = patron.last_visit.zipcode;
                 householdSizeInput.value = patron.last_visit.household_size;
                 age0_18Input.value = patron.last_visit.age_0_18;
                 age19_59Input.value = patron.last_visit.age_19_59;
