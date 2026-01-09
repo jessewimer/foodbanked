@@ -13,6 +13,9 @@ class Foodbank(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     food_truck_enabled = models.BooleanField(default=False)
     timezone = models.CharField(max_length=50, default='America/Los_Angeles')
+
+    allow_by_name = models.BooleanField(default=True)
+    allow_anonymous = models.BooleanField(default=True)
     
     def __str__(self):
         return self.name

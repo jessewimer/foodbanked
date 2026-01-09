@@ -31,6 +31,36 @@
                     </div>
                 </div>
 
+                <!-- Patron Type Settings Card -->
+                <div class="admin-card patron-type-card">
+                    <div class="card-header-section">
+                        <h2 class="section-title">Patron Types</h2>
+                    </div>
+                    
+                    <div class="patron-type-controls">
+                        <!-- By Name Toggle -->
+                        <div class="patron-type-item">
+                            <span class="patron-type-label">By Name:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" 
+                                    id="allowByNameToggle" 
+                                    {% if foodbank.allow_by_name %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- Anonymous Toggle -->
+                        <div class="patron-type-item">
+                            <span class="patron-type-label">Anonymous:</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" 
+                                    id="allowAnonymousToggle" 
+                                    {% if foodbank.allow_anonymous %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Food Bank Information Card -->
                 <div class="admin-card">
@@ -341,6 +371,69 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error:', error);
                 toggle.checked = !isEnabled;
                 alert('Error updating food truck mode');
+            });
+        });
+    }
+
+    // Patron Type Toggles
+    const byNameToggle = document.getElementById('allowByNameToggle');
+    const anonymousToggle = document.getElementById('allowAnonymousToggle');
+
+    if (byNameToggle) {
+        byNameToggle.addEventListener('change', function() {
+            const enabled = this.checked;
+            
+            fetch('{% url "accounts:toggle_by_name" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ enabled: enabled })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Optional: Show success message
+                    console.log('By Name setting updated');
+                } else {
+                    alert('Error updating setting. Please try again.');
+                    this.checked = !enabled;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating setting. Please try again.');
+                this.checked = !enabled;
+            });
+        });
+    }
+
+    if (anonymousToggle) {
+        anonymousToggle.addEventListener('change', function() {
+            const enabled = this.checked;
+            
+            fetch('{% url "accounts:toggle_anonymous" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ enabled: enabled })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Optional: show a brief success indicator
+                } else {
+                    alert('Error updating setting. Please try again.');
+                    this.checked = !enabled;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating setting. Please try again.');
+                this.checked = !enabled;
             });
         });
     }

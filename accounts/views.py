@@ -9,6 +9,8 @@ from django.contrib.auth import logout as auth_logout
 from .models import ServiceZipcode
 from django.http import JsonResponse
 from foodbanked.utils import get_foodbank_today
+from django.views.decorators.http import require_POST
+import json
 
 def logout_view(request):
     """Custom logout view that accepts GET requests"""
@@ -176,3 +178,37 @@ def toggle_food_truck(request):
             'success': False,
             'error': str(e)
         })
+    
+
+
+@login_required
+@require_POST
+def toggle_by_name(request):
+    """Toggle allow_by_name setting via AJAX"""
+    try:
+        data = json.loads(request.body)
+        enabled = data.get('enabled', False)
+        
+        foodbank = request.user.foodbank
+        foodbank.allow_by_name = enabled
+        foodbank.save()
+        
+        return JsonResponse({'success': True, 'enabled': enabled})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+@login_required
+@require_POST
+def toggle_anonymous(request):
+    """Toggle allow_anonymous setting via AJAX"""
+    try:
+        data = json.loads(request.body)
+        enabled = data.get('enabled', False)
+        
+        foodbank = request.user.foodbank
+        foodbank.allow_anonymous = enabled
+        foodbank.save()
+        
+        return JsonResponse({'success': True, 'enabled': enabled})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)

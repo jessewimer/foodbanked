@@ -18,5 +18,7 @@ urlpatterns = [
     path('settings/add-zipcode/', views.add_zipcode, name='add_zipcode'),
     path('settings/delete-zipcode/<int:pk>/', views.delete_zipcode, name='delete_zipcode'),
     path('settings/toggle-food-truck/', views.toggle_food_truck, name='toggle_food_truck'),
+    path('settings/toggle-by-name/', views.toggle_by_name, name='toggle_by_name'),
+    path('settings/toggle-anonymous/', views.toggle_anonymous, name='toggle_anonymous'),
 
 ]

@@ -40,4 +40,5 @@ urlpatterns = [
     # App URLs
     path('accounts/', include('accounts.urls')),
     path('', include('visits.urls')),
+
 ]
