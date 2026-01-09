@@ -280,8 +280,6 @@
             
             // Auto-populate from last visit if available
             if (patron.last_visit) {
-                // console.log('Auto-populating from last visit');
-                // zipcodeInput.value = patron.last_visit.zipcode;
                 householdSizeInput.value = patron.last_visit.household_size;
                 age0_18Input.value = patron.last_visit.age_0_18;
                 age19_59Input.value = patron.last_visit.age_19_59;
@@ -419,10 +417,6 @@
             .then(data => {
                 if (data.success) {
 
-                    clearFormFields();
-
-
-
                     // Update current patron object
                     currentPatron = { ...currentPatron, ...formData };
                     
@@ -435,9 +429,14 @@
                     // Refresh patron info card
                     displayPatronInfo(currentPatron);
                     
+                    // Update the hidden form fields with new address data
+                    if (zipcodeInput) zipcodeInput.value = currentPatron.zipcode || '';
+                    if (cityInput) cityInput.value = currentPatron.city || '';
+                    if (stateInput) stateInput.value = currentPatron.state || '';
+                    
                     // Update search display
                     patronSearch.value = `${formData.last_name}, ${formData.first_name}`;
-                    
+
                     // Close modal
                     editPatronModal.hide();
                     
