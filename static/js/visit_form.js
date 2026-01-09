@@ -163,7 +163,6 @@
                     setTimeout(() => { isSwitchingMode = false; }, 100);
                     
                 } else {
-                    console.log('Switching to BY NAME mode');
                     
                     // Show patron search section
                     patronSearchSection.style.display = 'block';
@@ -177,15 +176,13 @@
                     const addressRow = document.querySelector('.row.mb-4');
                     if (addressRow && addressRow.querySelector('#id_zipcode')) {
                         addressRow.style.display = 'none';
-                        console.log('Address row hidden (will show in patron card)');
+                        // console.log('Address row hidden (will show in patron card)');
                     }
                     
                     // Clear all form fields
-                    console.log('Calling clearFormFields for by name mode');
                     clearFormFields();
                 }
-                
-                console.log('=== Visit type change complete ===');
+
             });
         });
         // visitTypeRadios.forEach(radio => {
@@ -252,21 +249,6 @@
             patronSearch.value = '';
             selectedIndex = -1;
         });
-
-        // ADD THIS HELPER FUNCTION
-        // function clearFormFields() {
-        //     if (zipcodeInput) zipcodeInput.value = '';
-        //     if (cityInput) cityInput.value = '';
-        //     if (stateInput) stateInput.value = '';
-
-        //     if (householdSizeInput) householdSizeInput.value = '1';
-        //     if (age0_18Input) age0_18Input.value = '0';
-        //     if (age19_59Input) age19_59Input.value = '0';
-        //     if (age60PlusInput) age60PlusInput.value = '0';
-        //     const firstVisitCheckbox = document.getElementById('id_first_visit_this_month');
-        //     if (firstVisitCheckbox) firstVisitCheckbox.checked = false;
-        // }
-
 
                 
         // Autocomplete search functionality with smart matching
@@ -367,7 +349,7 @@
             console.log('Patron selected:', patron);
             
             currentPatron = patron; // Store for editing
-            
+            selectedPatronId.value = patron.id;
             // Update patron info card
             patronInfoName.textContent = `${patron.first_name} ${patron.last_name}`;
             patronInfoAddress.textContent = patron.address || 'Not provided';
@@ -469,15 +451,6 @@
             const options = { month: 'short', day: 'numeric', year: 'numeric' };
             return date.toLocaleDateString('en-US', options);
         }
-        
-        // Clear form fields
-        // function clearFormFields() {
-        //     zipcodeInput.value = '';
-        //     householdSizeInput.value = '1';
-        //     age0_18Input.value = '0';
-        //     age19_59Input.value = '0';
-        //     age60PlusInput.value = '0';
-        // }
         
         // Edit patron button click
         editPatronBtn.addEventListener('click', function() {

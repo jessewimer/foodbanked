@@ -152,6 +152,8 @@ def visit_create(request):
                     foodbank=foodbank,
                     is_food_truck=is_food_truck,
                     zipcode=form.cleaned_data['zipcode'],
+                    city=form.cleaned_data.get('city', ''),  # ADD THIS
+                    state=form.cleaned_data.get('state', ''),
                     household_size=form.cleaned_data['household_size'],
                     age_0_18=form.cleaned_data['age_0_18'],
                     age_19_59=form.cleaned_data['age_19_59'],
