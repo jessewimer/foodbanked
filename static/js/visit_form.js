@@ -52,7 +52,7 @@
         // Visit count section
         const visitCountSection = document.getElementById('visitCountSection');
         const firstVisitSection = document.getElementById('firstVisitSection');
-        
+        let isSwitchingMode = false;
         // Handle visit type toggle
         const visitTypeRadios = document.querySelectorAll('input[name="visitType"]');
         
@@ -61,14 +61,59 @@
         // console.log('Initial checked:', initialChecked ? initialChecked.value : 'none');
         
 
-        [zipcodeInput, cityInput, stateInput].forEach(input => {
-            if (input) {
-                input.setAttribute('readonly', 'readonly');
-                input.addEventListener('focus', function() {
-                    this.removeAttribute('readonly');
-                });
+        // [zipcodeInput, cityInput, stateInput].forEach(input => {
+        //     if (input) {
+        //         input.setAttribute('readonly', 'readonly');
+        //         input.addEventListener('focus', function() {
+        //             this.removeAttribute('readonly');
+        //         });
+        //     }
+        // });
+
+
+        console.log('About to define clearFormFields function');
+        function clearFormFields() {
+            try {
+                console.log('=== clearFormFields called ===');
+                console.log('zipcodeInput:', zipcodeInput);
+                // ... rest of code
+            } catch (error) {
+                console.error('ERROR in clearFormFields:', error);
             }
-        });
+            console.log('=== clearFormFields called ===');
+            console.log('zipcodeInput:', zipcodeInput);
+            console.log('cityInput:', cityInput);
+            console.log('stateInput:', stateInput);
+            
+            if (zipcodeInput) {
+                console.log('Clearing zipcode, current value:', zipcodeInput.value);
+                zipcodeInput.value = '';
+                console.log('Zipcode after clear:', zipcodeInput.value);
+            }
+            if (cityInput) {
+                console.log('Clearing city, current value:', cityInput.value);
+                cityInput.value = '';
+                console.log('City after clear:', cityInput.value);
+            }
+            if (stateInput) {
+                console.log('Clearing state, current value:', stateInput.value);
+                stateInput.value = '';
+                console.log('State after clear:', stateInput.value);
+            }
+            if (householdSizeInput) householdSizeInput.value = '1';
+            if (age0_18Input) age0_18Input.value = '0';
+            if (age19_59Input) age19_59Input.value = '0';
+            if (age60PlusInput) age60PlusInput.value = '0';
+            const firstVisitCheckbox = document.getElementById('id_first_visit_this_month');
+            if (firstVisitCheckbox) firstVisitCheckbox.checked = false;
+            
+            console.log('=== clearFormFields finished ===');
+        }
+        console.log('clearFormFields function defined, type:', typeof clearFormFields);
+
+
+
+
 
         if (initialChecked && initialChecked.value === 'anonymous') {
             console.log('Setting anonymous mode on load');
@@ -80,43 +125,108 @@
         
         visitTypeRadios.forEach(radio => {
             radio.addEventListener('change', function() {
-                console.log('Visit type changed to:', this.value);
+                console.log('=== Visit type changed to:', this.value, '===');
                 
                 if (this.value === 'anonymous') {
-                    // Show first visit checkbox, hide patron search, info card, and visit count
+                    console.log('Switching to ANONYMOUS mode');
+                    isSwitchingMode = true;
+                    // Hide patron-related sections
                     patronSearchSection.style.display = 'none';
                     patronInfoCard.style.display = 'none';
                     visitCountSection.style.display = 'none';
+                    
+                    // Show anonymous-specific sections
                     firstVisitSection.style.display = 'block';
                     
-                    console.log('Anonymous mode: hiding patron search, showing first visit checkbox');
-                    // Show the zip/city/state row again
+                    // Show the zip/city/state row for manual entry
                     const addressRow = document.querySelector('.row.mb-4');
                     if (addressRow && addressRow.querySelector('#id_zipcode')) {
                         addressRow.style.display = '';
+                        console.log('Address row shown for anonymous entry');
                     }
-                    // Clear patron selection and form
+                    
+                    // Clear patron selection
                     patronSearch.value = '';
                     selectedPatronId.value = '';
                     patronResults.classList.remove('show');
                     currentPatron = null;
-                    clearFormFields();
+                    console.log('Patron selection cleared');
+                    
+                    // Clear all form fields
+           
+                    console.log('Calling clearFormFields for anonymous mode');
+                    console.log('Type of clearFormFields:', typeof clearFormFields);
+                    console.log('clearFormFields is:', clearFormFields);
+                    const fn = clearFormFields;
+                    fn();
+                    // clearFormFields();
+                    setTimeout(() => { isSwitchingMode = false; }, 100);
+                    
                 } else {
-                    // Show patron search, hide first visit checkbox and info card
+                    console.log('Switching to BY NAME mode');
+                    
+                    // Show patron search section
                     patronSearchSection.style.display = 'block';
+                    
+                    // Hide anonymous-specific sections
                     firstVisitSection.style.display = 'none';
                     patronInfoCard.style.display = 'none';
                     visitCountSection.style.display = 'none';
-                    //hide the zip/city/state row since it's shown in patron card
+                    
+                    // Hide the zip/city/state row (will show in patron card after selection)
                     const addressRow = document.querySelector('.row.mb-4');
                     if (addressRow && addressRow.querySelector('#id_zipcode')) {
                         addressRow.style.display = 'none';
+                        console.log('Address row hidden (will show in patron card)');
                     }
                     
-                    console.log('Returning mode: showing patron search, hiding first visit checkbox');
+                    // Clear all form fields
+                    console.log('Calling clearFormFields for by name mode');
+                    clearFormFields();
                 }
+                
+                console.log('=== Visit type change complete ===');
             });
         });
+        // visitTypeRadios.forEach(radio => {
+        //     radio.addEventListener('change', function() {
+        //         console.log('Visit type changed to:', this.value);
+                
+        //         if (this.value === 'anonymous') {
+        //             // Show first visit checkbox, hide patron search, info card, and visit count
+        //             patronSearchSection.style.display = 'none';
+        //             patronInfoCard.style.display = 'none';
+        //             visitCountSection.style.display = 'none';
+        //             firstVisitSection.style.display = 'block';
+                    
+        //             console.log('Anonymous mode: hiding patron search, showing first visit checkbox');
+        //             // Show the zip/city/state row again
+        //             const addressRow = document.querySelector('.row.mb-4');
+        //             if (addressRow && addressRow.querySelector('#id_zipcode')) {
+        //                 addressRow.style.display = '';
+        //             }
+        //             // Clear patron selection and form
+        //             patronSearch.value = '';
+        //             selectedPatronId.value = '';
+        //             patronResults.classList.remove('show');
+        //             currentPatron = null;
+        //             clearFormFields();
+        //         } else {
+        //             // Show patron search, hide first visit checkbox and info card
+        //             patronSearchSection.style.display = 'block';
+        //             firstVisitSection.style.display = 'none';
+        //             patronInfoCard.style.display = 'none';
+        //             visitCountSection.style.display = 'none';
+        //             //hide the zip/city/state row since it's shown in patron card
+        //             const addressRow = document.querySelector('.row.mb-4');
+        //             if (addressRow && addressRow.querySelector('#id_zipcode')) {
+        //                 addressRow.style.display = 'none';
+        //             }
+                    
+        //             console.log('Returning mode: showing patron search, hiding first visit checkbox');
+        //         }
+        //     });
+        // });
         
         searchTypeSelect.addEventListener('change', function() {
             const value = this.value;
@@ -144,18 +254,21 @@
         });
 
         // ADD THIS HELPER FUNCTION
-        function clearFormFields() {
-            if (zipcodeInput) zipcodeInput.value = '';
-            if (cityInput) cityInput.value = '';
-            if (stateInput) stateInput.value = '';
-            if (householdSizeInput) householdSizeInput.value = '1';
-            if (age0_18Input) age0_18Input.value = '0';
-            if (age19_59Input) age19_59Input.value = '0';
-            if (age60PlusInput) age60PlusInput.value = '0';
-            const firstVisitCheckbox = document.getElementById('id_first_visit_this_month');
-            if (firstVisitCheckbox) firstVisitCheckbox.checked = false;
-        }
-        
+        // function clearFormFields() {
+        //     if (zipcodeInput) zipcodeInput.value = '';
+        //     if (cityInput) cityInput.value = '';
+        //     if (stateInput) stateInput.value = '';
+
+        //     if (householdSizeInput) householdSizeInput.value = '1';
+        //     if (age0_18Input) age0_18Input.value = '0';
+        //     if (age19_59Input) age19_59Input.value = '0';
+        //     if (age60PlusInput) age60PlusInput.value = '0';
+        //     const firstVisitCheckbox = document.getElementById('id_first_visit_this_month');
+        //     if (firstVisitCheckbox) firstVisitCheckbox.checked = false;
+        // }
+
+
+                
         // Autocomplete search functionality with smart matching
         let selectedIndex = -1;
         
@@ -358,13 +471,13 @@
         }
         
         // Clear form fields
-        function clearFormFields() {
-            zipcodeInput.value = '';
-            householdSizeInput.value = '1';
-            age0_18Input.value = '0';
-            age19_59Input.value = '0';
-            age60PlusInput.value = '0';
-        }
+        // function clearFormFields() {
+        //     zipcodeInput.value = '';
+        //     householdSizeInput.value = '1';
+        //     age0_18Input.value = '0';
+        //     age19_59Input.value = '0';
+        //     age60PlusInput.value = '0';
+        // }
         
         // Edit patron button click
         editPatronBtn.addEventListener('click', function() {
@@ -610,7 +723,7 @@
         if (zipcodeInput && zipcodeResults) {
             // Show all zipcodes on focus
             zipcodeInput.addEventListener('focus', function() {
-                if (serviceZipcodes.length > 0) {
+                if (!isSwitchingMode && serviceZipcodes.length > 0) {
                     displayZipcodeResults(serviceZipcodes);
                 }
             });
