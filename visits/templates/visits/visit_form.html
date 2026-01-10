@@ -25,11 +25,14 @@
                         </div>
                     {% endif %}
                     
-                    <form method="post" id="visitForm" autocomplete="off">
+                    {% comment %} <form method="post" id="visitForm" autocomplete="off"> {% endcomment %}
+                    <form method="post" id="visitForm" autocomplete="off" 
+                        data-allow-by-name="{{ allow_by_name|lower }}" 
+                        data-allow-anonymous="{{ allow_anonymous|lower }}">
                         {% csrf_token %}
                         
                         <!-- Patron Selection -->
-                        <div class="patron-selection mb-4">
+                        {% comment %} <div class="patron-selection mb-4">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="visitType" id="returningPatron" value="returning" checked>
                                 <label class="form-check-label" for="returningPatron">
@@ -42,9 +45,115 @@
                                     Anonymous
                                 </label>
                             </div>
-                        </div>
+                        </div> {% endcomment %}
+
+                        <!-- Patron Selection -->
+                        {% if allow_by_name and allow_anonymous %}
+                            <!-- Both enabled: Show radio buttons -->
+                            <div class="patron-selection mb-4">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="visitType" id="returningPatron" value="returning" checked>
+                                    <label class="form-check-label" for="returningPatron">
+                                        By Name
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="visitType" id="anonymousVisit" value="anonymous">
+                                    <label class="form-check-label" for="anonymousVisit">
+                                        Anonymous
+                                    </label>
+                                </div>
+                            </div>
+                        {% elif not allow_by_name and not allow_anonymous %}
+                            <!-- Neither enabled: Show error message -->
+                            <div class="alert alert-warning" role="alert">
+                                <strong>No patron type selected.</strong> Please go to <a href="{% url 'accounts:account_settings' %}" class="alert-link">Settings</a> to enable at least one patron type.
+                            </div>
+                        {% else %}
+                            <!-- Only one enabled: Hidden radio button with auto-selected value -->
+                            <div class="patron-selection mb-4" style="display: none;">
+                                {% if allow_by_name %}
+                                    <input type="radio" name="visitType" id="returningPatron" value="returning" checked>
+                                {% else %}
+                                    <input type="radio" name="visitType" id="anonymousVisit" value="anonymous" checked>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                         
-                        <!-- Patron Search (shown for returning patrons) -->
+                        
+                        {% if allow_by_name %}
+                            <!-- Patron Search (shown for returning patrons) -->
+                            <div id="patronSearchSection" class="mb-4" {% if not allow_anonymous %}style="display: block;"{% endif %}>
+                                <label for="patronSearch" class="form-label">Search for Patron</label>
+                                <div class="search-with-dropdown">
+                                    <select id="searchType" class="search-type-select">
+                                        <option value="last_name" selected>Last Name</option>
+                                        <option value="first_name">First Name</option>
+                                        <option value="address">Address</option>
+                                    </select>
+                                    <div class="autocomplete-wrapper">
+                                        <input type="text" 
+                                            class="form-control" 
+                                            id="patronSearch" 
+                                            name="patron_search_xyz_ignore"
+                                            placeholder="Search by last name..."
+                                            autocomplete="new-password"
+                                            autocorrect="off"
+                                            autocapitalize="off"
+                                            spellcheck="false"
+                                            role="presentation">
+                                        <div id="patronResults" class="autocomplete-results"></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="patron_id" id="selectedPatronId" value="{{ request.POST.patron_id|default:'' }}">
+                                <small class="text-muted">Or <a href="{% url 'visits:patron_create' %}">add a new patron</a></small>
+                            </div>
+
+                            <!-- Patron Info Card (shown when patron is selected) -->
+                            <div id="patronInfoCard" class="patron-info-card mb-4" style="display: none;">
+                                <div class="patron-info-header">
+                                    <h5 class="patron-info-name" id="patronInfoName"></h5>
+                                    <button type="button" class="btn-link edit-patron-link" id="editPatronBtn">
+                                        Edit patron details
+                                    </button>
+                                </div>
+                                <div class="patron-info-body">
+                                    <div class="patron-info-row">
+                                        <span class="patron-info-label">Address:</span>
+                                        <span class="patron-info-value" id="patronInfoAddress"></span>
+                                    </div>
+                                    <div class="patron-info-row">
+                                        <span class="patron-info-label">City, State:</span>
+                                        <span class="patron-info-value" id="patronInfoCityState"></span>
+                                    </div>
+                                    <div class="patron-info-row">
+                                        <span class="patron-info-label">Zip Code:</span>
+                                        <span class="patron-info-value" id="patronInfoZip"></span>
+                                    </div>
+                                    <div class="patron-info-row" id="patronInfoCommentsRow" style="display: none;">
+                                        <span class="patron-info-label">Comments:</span>
+                                        <span class="patron-info-value" id="patronInfoComments"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Visit Count Display (shown for returning patrons with selection) -->
+                            <div id="visitCountSection" class="visit-count-display mb-4" style="display: none;">
+                                <div class="visit-count-icon">📊</div>
+                                <div class="visit-count-content">
+                                    <div class="visit-count-text">
+                                        <strong id="visitStatusText"></strong>
+                                    </div>
+                                    <div class="last-visit-text">
+                                        Last visit: <span id="lastVisitDate">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+
+
+                        {% comment %} <!-- Patron Search (shown for returning patrons) -->
                         <div id="patronSearchSection" class="mb-4">
                             <label for="patronSearch" class="form-label">Search for Patron</label>
                             <div class="search-with-dropdown">
@@ -67,7 +176,7 @@
                                     <div id="patronResults" class="autocomplete-results"></div>
                                 </div>
                             </div>
-                            {% comment %} <input type="hidden" name="patron_id" id="selectedPatronId"> {% endcomment %}
+                         
                             <input type="hidden" name="patron_id" id="selectedPatronId" value="{{ request.POST.patron_id|default:'' }}">
                             <small class="text-muted">Or <a href="{% url 'visits:patron_create' %}">add a new patron</a></small>
                         </div>
@@ -112,7 +221,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+                         {% endcomment %}
                         
                         <!-- Visit Details -->
                         <div class="row">
@@ -188,14 +297,25 @@
                         </div>
                         
                         <!-- First Visit Checkbox (shown for anonymous visits) -->
-                        <div id="firstVisitSection" class="mb-4" style="display: none;">
+                        {% comment %} <div id="firstVisitSection" class="mb-4" style="display: none;">
                             <div class="form-check">
                                 {{ form.first_visit_this_month }}
                                 <label class="form-check-label" for="{{ form.first_visit_this_month.id_for_label }}">
                                     First visit this month
                                 </label>
                             </div>
-                        </div>
+                        </div> {% endcomment %}
+                        {% if allow_anonymous %}
+                            <!-- First Visit This Month (shown for anonymous visits) -->
+                            <div id="firstVisitSection" class="mb-3" style="display: none;">
+                                <div class="form-check">
+                                    {{ form.first_visit_this_month }}
+                                    <label class="form-check-label" for="{{ form.first_visit_this_month.id_for_label }}">
+                                        {{ form.first_visit_this_month.label }}
+                                    </label>
+                                </div>
+                            </div>
+                        {% endif %}
 
 
                         <!-- Visit Type Selection (shown when food truck is enabled) -->
@@ -357,4 +477,12 @@
 
 {% block extra_js %}
 <script src="{% static 'js/visit_form.js' %}?v=4"></script>
+<script>
+    // Pass Django variables to JavaScript
+    window.allowByName = {{ allow_by_name|lower }};
+    window.allowAnonymous = {{ allow_anonymous|lower }};
+</script>
 {% endblock %}
+
+
+

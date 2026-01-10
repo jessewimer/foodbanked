@@ -112,6 +112,10 @@ def visit_list(request):
 def visit_create(request):
     """Create a new visit with enhanced patron data"""
     foodbank = request.user.foodbank
+
+    allow_by_name = foodbank.allow_by_name
+    allow_anonymous = foodbank.allow_anonymous
+
     if request.method == 'POST':
         form = VisitForm(request.POST)
         if form.is_valid():
@@ -256,6 +260,8 @@ def visit_create(request):
         'recent_visits': recent_visits,
         'todays_visit_count': todays_visit_count,
         'food_truck_enabled': foodbank.food_truck_enabled,
+        'allow_by_name': allow_by_name,
+        'allow_anonymous': allow_anonymous,
     }
     return render(request, 'visits/visit_form.html', context)
 
