@@ -24,9 +24,9 @@
             'DC'
         ];
 
-        // hide city/state/zip row if returning patron is selected
-        const addressRow = document.querySelector('.row.mb-4');
-        if (addressRow && addressRow.querySelector('#id_zipcode')) {
+        // hide city/state/zip row if by name is default mode
+        const addressRow = document.getElementById('addressRow');
+        if (addressRow) {
             addressRow.style.display = 'none';
         }
         
@@ -82,8 +82,19 @@
                 patronInfoCard.style.display = 'none';
                 visitCountSection.style.display = 'none';
                 firstVisitSection.style.display = 'block';
+
+                const addressRow = document.getElementById('addressRow');
+                if (addressRow) {
+                    addressRow.style.display = '';
+                }
+            } else {
+                // By Name selected on load (default) - hide address fields
+                const addressRow = document.getElementById('addressRow');
+                if (addressRow) {
+                    addressRow.style.display = 'none';
+                }
             }
-            
+                        
             // Radio button change handlers (only needed when both are enabled)
             visitTypeRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
@@ -99,8 +110,13 @@
                         firstVisitSection.style.display = 'block';
                         
                         // Show the zip/city/state row for manual entry
-                        const addressRow = document.querySelector('.row.mb-4');
-                        if (addressRow && addressRow.querySelector('#id_zipcode')) {
+                        // const addressRow = document.querySelector('.row.mb-4');
+                        // if (addressRow && addressRow.querySelector('#id_zipcode')) {
+                        //     addressRow.style.display = '';
+                        // }
+                        // Show the zip/city/state row for manual entry
+                        const addressRow = document.getElementById('addressRow');
+                        if (addressRow) {
                             addressRow.style.display = '';
                         }
                         
@@ -124,11 +140,15 @@
                         visitCountSection.style.display = 'none';
                         
                         // Hide the zip/city/state row (will show in patron card after selection)
-                        const addressRow = document.querySelector('.row.mb-4');
-                        if (addressRow && addressRow.querySelector('#id_zipcode')) {
+                        // const addressRow = document.querySelector('.row.mb-4');
+                        // if (addressRow && addressRow.querySelector('#id_zipcode')) {
+                        //     addressRow.style.display = 'none';
+                        // }
+                        // Hide the zip/city/state row (address comes from patron profile)
+                        const addressRow = document.getElementById('addressRow');
+                        if (addressRow) {
                             addressRow.style.display = 'none';
                         }
-                        
                         // Clear all form fields
                         clearFormFields();
                     }
@@ -140,6 +160,10 @@
             // Only by name enabled - always show patron search
             if (patronSearchSection) patronSearchSection.style.display = 'block';
             if (firstVisitSection) firstVisitSection.style.display = 'none';
+            const addressRow = document.getElementById('addressRow');
+            if (addressRow) {
+                addressRow.style.display = 'none';
+            }
             
         } else if (!allowByName && allowAnonymous) {
             // Only anonymous enabled - hide patron search, show first visit
@@ -147,6 +171,10 @@
             if (patronInfoCard) patronInfoCard.style.display = 'none';
             if (visitCountSection) visitCountSection.style.display = 'none';
             if (firstVisitSection) firstVisitSection.style.display = 'block';
+            const addressRow = document.getElementById('addressRow');
+            if (addressRow) {
+                addressRow.style.display = '';
+            }
         }
 
 
@@ -316,8 +344,13 @@
             if (stateInput) stateInput.value = patron.state || '';
 
             // Hide the zip/city/state row since it's shown in patron card
-            const addressRow = document.querySelector('.row.mb-4');
-            if (addressRow && addressRow.querySelector('#id_zipcode')) {
+            // const addressRow = document.querySelector('.row.mb-4');
+            // if (addressRow && addressRow.querySelector('#id_zipcode')) {
+            //     addressRow.style.display = 'none';
+            // }
+            // Hide the zip/city/state row since it's shown in patron card
+            const addressRow = document.getElementById('addressRow');
+            if (addressRow) {
                 addressRow.style.display = 'none';
             }
 
@@ -649,53 +682,6 @@
             });
         }
 
-        // // Validate visit type checkboxes when food truck is enabled
-        // const visitForm = document.getElementById('visitForm');
-        // if (visitForm) {
-        //     visitForm.addEventListener('submit', function(e) {
-
-        //         const foodTruckEnabled = document.getElementById('visitTypePantry') !== null;
-                
-        //         if (foodTruckEnabled) {
-        //             const pantryChecked = document.getElementById('visitTypePantry').checked;
-        //             const foodTruckChecked = document.getElementById('visitTypeFoodTruck').checked;
-                    
-        //             if (!pantryChecked && !foodTruckChecked) {
-        //                 e.preventDefault();
-                        
-        //                 // Remove any existing error messages
-        //                 const existingError = document.querySelector('.visit-type-error');
-        //                 if (existingError) {
-        //                     existingError.remove();
-        //                 }
-                        
-        //                 // Create error message
-        //                 const errorDiv = document.createElement('div');
-        //                 errorDiv.className = 'alert alert-danger visit-type-error';
-        //                 errorDiv.setAttribute('role', 'alert');
-        //                 errorDiv.textContent = 'Please select at least one visit type (Pantry or Food Truck).';
-                        
-        //                 // Insert at top of form
-        //                 visitForm.insertBefore(errorDiv, visitForm.firstChild);
-                        
-        //                 // Scroll to error
-        //                 errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        
-        //                 return false;
-        //             } else {
-        //                 // Remove error if it exists and form is valid
-        //                 const existingError = document.querySelector('.visit-type-error');
-        //                 if (existingError) {
-        //                     existingError.remove();
-        //                 }
-        //             }
-        //         }
-        //     });
-        // }
-
-        // Service zipcodes data (passed from backend)
-        // const serviceZipcodes = JSON.parse(document.getElementById('serviceZipcodesData')?.textContent || '[]');
-
         let selectedZipcodeIndex = -1;
 
         if (zipcodeInput && zipcodeResults) {
@@ -750,11 +736,6 @@
                 }
             });
         }
-
-
-
-
-
 
         // Form validation function
         function validateForm() {
@@ -846,11 +827,6 @@
             
             return isValid;
         }
-
-
-
-
-
 
         // Auto-populate city/state based on zipcode (for anonymous mode)
         if (zipcodeInput && cityInput && stateInput) {
@@ -1028,52 +1004,52 @@
 
 
 
-        function displayZipcodeResults(zipcodes) {
-            // Add dummy zipcodes at the top
-            const dummyZipcodes = [
-                { zipcode: '00001', city: 'Un-housed', state: '' },
-                { zipcode: '00002', city: 'Out of area', state: '' }
-            ];
+        // function displayZipcodeResults(zipcodes) {
+        //     // Add dummy zipcodes at the top
+        //     const dummyZipcodes = [
+        //         { zipcode: '00001', city: 'Un-housed', state: '' },
+        //         { zipcode: '00002', city: 'Out of area', state: '' }
+        //     ];
             
-            const allZipcodes = [...dummyZipcodes, ...zipcodes];
+        //     const allZipcodes = [...dummyZipcodes, ...zipcodes];
             
-            if (allZipcodes.length === 0) {
-                zipcodeResults.style.display = 'none';
-                return;
-            }
+        //     if (allZipcodes.length === 0) {
+        //         zipcodeResults.style.display = 'none';
+        //         return;
+        //     }
             
-            zipcodeResults.innerHTML = allZipcodes.map(z => `
-                <div class="autocomplete-item" data-zipcode="${z.zipcode}" data-city="${z.city}" data-state="${z.state}">
-                    <span class="zipcode-item-code">${z.zipcode}</span>
-                    <span class="zipcode-item-location">${z.city}${z.state ? ', ' + z.state : ''}</span>
-                </div>
-            `).join('');
+        //     zipcodeResults.innerHTML = allZipcodes.map(z => `
+        //         <div class="autocomplete-item" data-zipcode="${z.zipcode}" data-city="${z.city}" data-state="${z.state}">
+        //             <span class="zipcode-item-code">${z.zipcode}</span>
+        //             <span class="zipcode-item-location">${z.city}${z.state ? ', ' + z.state : ''}</span>
+        //         </div>
+        //     `).join('');
             
-            zipcodeResults.style.display = 'block';
-            selectedZipcodeIndex = -1;
+        //     zipcodeResults.style.display = 'block';
+        //     selectedZipcodeIndex = -1;
             
-            // Add click handlers
-            zipcodeResults.querySelectorAll('.autocomplete-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    zipcodeInput.value = this.dataset.zipcode;
-                    cityInput.value = this.dataset.city;
-                    stateInput.value = this.dataset.state;
-                    zipcodeResults.style.display = 'none';
-                    selectedZipcodeIndex = -1;
-                });
-            });
-        }
+        //     // Add click handlers
+        //     zipcodeResults.querySelectorAll('.autocomplete-item').forEach(item => {
+        //         item.addEventListener('click', function() {
+        //             zipcodeInput.value = this.dataset.zipcode;
+        //             cityInput.value = this.dataset.city;
+        //             stateInput.value = this.dataset.state;
+        //             zipcodeResults.style.display = 'none';
+        //             selectedZipcodeIndex = -1;
+        //         });
+        //     });
+        // }
 
-        function updateZipcodeSelection(items) {
-            items.forEach((item, index) => {
-                if (index === selectedZipcodeIndex) {
-                    item.classList.add('selected');
-                    item.scrollIntoView({ block: 'nearest' });
-                } else {
-                    item.classList.remove('selected');
-                }
-            });
-        }
+        // function updateZipcodeSelection(items) {
+        //     items.forEach((item, index) => {
+        //         if (index === selectedZipcodeIndex) {
+        //             item.classList.add('selected');
+        //             item.scrollIntoView({ block: 'nearest' });
+        //         } else {
+        //             item.classList.remove('selected');
+        //         }
+        //     });
+        // }
             
     });
 })();
