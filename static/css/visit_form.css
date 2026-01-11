@@ -356,6 +356,90 @@
     margin: 0;
 }
 
+
+
+/* ========================================
+   City/State Autocomplete Dropdown
+   ======================================== */
+.city-state-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    margin-top: 0.25rem;
+}
+
+.city-state-dropdown .city-state-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.city-state-dropdown .city-state-item:last-child {
+    border-bottom: none;
+}
+
+.city-state-dropdown .city-state-item:hover {
+    background-color: #fffbeb;
+}
+
+.city-state-dropdown .city-state-item.selected {
+    background-color: #fef3c7;
+}
+
+.city-state-city {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+.city-state-details {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.125rem;
+}
+
+
+/* ========================================
+   Front-end Validation Errors
+   ======================================== */
+.field-error {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.15) !important;
+}
+
+.error-message {
+    display: block;
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.error-shake {
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+
+
+
+
 /* ========================================
    Responsive Adjustments
    ======================================== */
