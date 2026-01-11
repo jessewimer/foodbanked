@@ -409,7 +409,7 @@ def patron_delete(request, pk):
 
 
 @login_required
-def stats_view(request):
+def analytics_view(request):
     """View statistics and reports with real data"""
     foodbank = request.user.foodbank
     
@@ -542,7 +542,7 @@ def stats_view(request):
         'household_size_data': household_size_data,
     }
     
-    return render(request, 'visits/stats.html', context)
+    return render(request, 'visits/account_analytics.html', context)
 
 
 @login_required

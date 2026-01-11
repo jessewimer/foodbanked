@@ -1,6 +1,8 @@
 from django.shortcuts import render
 import json
 from datetime import datetime, timedelta
+from django.contrib.auth.decorators import login_required
+
 
 def landing_page(request):
     """Public landing page view"""
@@ -246,3 +248,8 @@ def about_page(request):
 def pricing_page(request):
     """Pricing page"""
     return render(request, 'pricing.html')
+
+@login_required
+def shelf_life(request):
+    return render(request, 'shelf_life.html')
+

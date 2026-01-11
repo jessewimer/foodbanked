@@ -20,5 +20,5 @@ urlpatterns = [
     path('patron/<int:pk>/edit-ajax/', views.patron_edit_ajax, name='patron_edit_ajax'),
     
     # Stats
-    path('stats/', views.stats_view, name='stats'),
+    path('analytics/', views.analytics_view, name='analytics'),
 ]
