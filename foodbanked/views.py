@@ -248,8 +248,3 @@ def about_page(request):
 def pricing_page(request):
     """Pricing page"""
     return render(request, 'pricing.html')
-
-@login_required
-def shelf_life(request):
-    return render(request, 'shelf_life.html')
-

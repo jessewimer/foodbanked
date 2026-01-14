@@ -18,6 +18,8 @@ urlpatterns = [
     
     # AJAX endpoint for editing patron from visit form
     path('patron/<int:pk>/edit-ajax/', views.patron_edit_ajax, name='patron_edit_ajax'),
+
+    path('api/patron/<int:patron_id>/', views.patron_detail_api, name='patron_detail_api'),
     
     # Stats
     path('analytics/', views.analytics_view, name='analytics'),

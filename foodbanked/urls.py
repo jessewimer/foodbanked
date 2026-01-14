@@ -40,7 +40,6 @@ urlpatterns = [
     # App URLs
     path('accounts/', include('accounts.urls')),
     path('', include('visits.urls')),
-
-    path('shelf-life/', views.shelf_life, name='shelf_life'),
+    path('resources/', include('resources.urls')),
 
 ]

@@ -12,8 +12,8 @@
             <div class="col-lg-6">
                 <!-- Header -->
                 <div class="form-header">
-                    <a href="{% url 'visits:patron_list' %}" class="back-link">
-                        ← Back to Patrons
+                    <a href="{% if request.GET.return_to == 'visit_form' %}{% url 'visits:visit_create' %}{% else %}{% url 'visits:patron_list' %}{% endif %}" class="back-link">
+                        ← Back to {% if request.GET.return_to == 'visit_form' %}New Visit{% else %}Patrons{% endif %}
                     </a>
                     <h1 class="form-title">Add New Patron</h1>
                     <p class="form-subtitle">Register a new patron in your database</p>
@@ -161,7 +161,7 @@
                             <button type="submit" class="btn btn-primary btn-lg">
                                 Add Patron
                             </button>
-                            <a href="{% url 'visits:patron_list' %}" class="btn btn-outline-secondary btn-lg">
+                            <a href="{% if request.GET.return_to == 'visit_form' %}{% url 'visits:visit_create' %}{% else %}{% url 'visits:patron_list' %}{% endif %}" class="btn btn-outline-secondary btn-lg">
                                 Cancel
                             </a>
                         </div>
@@ -176,4 +176,5 @@
         </div>
     </div>
 </section>
+
 {% endblock %}

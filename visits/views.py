@@ -6,6 +6,8 @@ from .models import Visit, Patron
 from .forms import VisitForm
 from foodbanked.utils import get_foodbank_today
 from accounts.models import ServiceZipcode
+from .forms import PatronForm
+from django.urls import reverse
 
 
 @login_required
@@ -372,26 +374,107 @@ def patron_detail(request, pk):
 
 @login_required
 def patron_create(request):
-    """Create a new patron"""
-    foodbank = request.user.foodbank
-    
     if request.method == 'POST':
-        from .forms import PatronForm
         form = PatronForm(request.POST)
         if form.is_valid():
             patron = form.save(commit=False)
-            patron.foodbank = foodbank
+            patron.foodbank = request.user.foodbank
             patron.save()
-            messages.success(request, 'Patron added successfully!')
-            return redirect('visits:patron_detail', pk=patron.pk)
+            
+            # Check if we should return to visit form
+            return_to = request.GET.get('return_to')
+            if return_to == 'visit_form':
+                # Redirect to visit form with patron data in URL
+                from urllib.parse import urlencode
+                params = urlencode({
+                    'patron_id': patron.id,
+                    'first_name': patron.first_name,
+                    'last_name': patron.last_name,
+                    'zipcode': patron.zipcode,
+                    'city': patron.city or '',
+                    'state': patron.state or '',
+                    'address': patron.address or '',
+                    'comments': patron.comments or '',
+                })
+                return redirect(f"{reverse('visits:visit_create')}?{params}")
+            else:
+                # Normal flow - go to patron list
+                messages.success(request, 'Patron added successfully!')
+                return redirect('visits:patron_list')
     else:
-        from .forms import PatronForm
         form = PatronForm()
     
-    context = {
-        'form': form,
-    }
-    return render(request, 'visits/patron_form.html', context)
+    return render(request, 'visits/patron_form.html', {'form': form})
+
+
+@login_required
+def patron_detail_api(request, patron_id):
+    patron = get_object_or_404(Patron, id=patron_id, foodbank=request.user.foodbank)
+    
+    # Get last visit data using the correct related name: visit_set
+    last_visit_data = None
+    visit_count = 0
+    visits_this_month = 0
+    last_visit_date = None
+    
+    try:
+        last_visit = patron.visit_set.order_by('-visit_date').first()
+        visit_count = patron.visit_set.count()
+        
+        # Get visits this month
+        from django.utils import timezone
+        from datetime import datetime
+        now = timezone.now()
+        first_day_of_month = datetime(now.year, now.month, 1).date()
+        visits_this_month = patron.visit_set.filter(visit_date__gte=first_day_of_month).count()
+        
+        if last_visit:
+            last_visit_date = last_visit.visit_date.isoformat()
+            last_visit_data = {
+                'household_size': last_visit.household_size,
+                'age_0_18': last_visit.age_0_18,
+                'age_19_59': last_visit.age_19_59,
+                'age_60_plus': last_visit.age_60_plus,
+            }
+    except Exception as e:
+        print(f"Error fetching visits: {e}")
+    
+    return JsonResponse({
+        'id': patron.id,
+        'first_name': patron.first_name,
+        'last_name': patron.last_name,
+        'address': patron.address or '',
+        'city': patron.city or '',
+        'state': patron.state or '',
+        'zipcode': patron.zipcode,
+        'comments': patron.comments or '',
+        'last_visit': last_visit_data,
+        'visit_count': visit_count,
+        'visits_this_month': visits_this_month,
+        'last_visit_date': last_visit_date,
+    })
+# @login_required
+# def patron_create(request):
+#     """Create a new patron"""
+#     foodbank = request.user.foodbank
+    
+#     if request.method == 'POST':
+#         from .forms import PatronForm
+#         form = PatronForm(request.POST)
+#         if form.is_valid():
+#             patron = form.save(commit=False)
+#             patron.foodbank = foodbank
+#             patron.save()
+#             messages.success(request, 'Patron added successfully!')
+#             return redirect('visits:patron_detail', pk=patron.pk)
+#     else:
+#         from .forms import PatronForm
+#         form = PatronForm()
+    
+#     context = {
+#         'form': form,
+#     }
+#     return render(request, 'visits/patron_form.html', context)
 
 
 @login_required
