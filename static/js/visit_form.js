@@ -155,7 +155,7 @@
             // Radio button change handlers (only needed when both are enabled)
             visitTypeRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
-                    
+                    clearErrorMessages(); // ADD THIS LINE
                     if (this.value === 'anonymous') {
                         isSwitchingMode = true;
                         // Hide patron-related sections
@@ -807,16 +807,14 @@
             
             // Validate Household Size (must be at least 1)
             const householdSize = parseInt(householdSizeInput.value) || 0;
-            if (householdSize < 1) {
-                showError(householdSizeInput, 'Household size must be at least 1');
-            }
-            
+
             // Validate Age Groups (must add up to household size)
             const age0_18 = parseInt(age0_18Input.value) || 0;
             const age19_59 = parseInt(age19_59Input.value) || 0;
             const age60Plus = parseInt(age60PlusInput.value) || 0;
             const totalAges = age0_18 + age19_59 + age60Plus;
-            if (totalAges !== householdSize) {
+            console.log('Validating age groups:', {age0_18, age19_59, age60Plus, totalAges});
+            if (totalAges !== householdSize || totalAges === 0) {
                 const ageGroupsSection = document.querySelector('.age-groups');
                 if (ageGroupsSection) {
                     isValid = false;
@@ -829,7 +827,7 @@
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'error-message';
                     errorDiv.style.marginTop = '0.75rem';
-                    errorDiv.textContent = `Age groups must add up to household size (${householdSize}). Currently adds to ${totalAges}.`;
+                    errorDiv.textContent = `Total age groups must be greater than 0`;
                     
                     ageGroupsSection.appendChild(errorDiv);
                     
@@ -892,6 +890,24 @@
             return isValid;
         }
 
+
+        function clearErrorMessages() {
+            // Remove error styling from all fields
+            document.querySelectorAll('.field-error').forEach(field => {
+                field.classList.remove('field-error');
+            });
+            
+            // Remove all error message text
+            document.querySelectorAll('.error-message').forEach(msg => {
+                msg.remove();
+            });
+            
+            // Clear patron card error if it exists
+            const patronCardError = document.getElementById('patron-card-error');
+            if (patronCardError) {
+                patronCardError.remove();
+            }
+        }
 
         // Auto-populate city/state based on zipcode (for anonymous mode)
         if (zipcodeInput && cityInput && stateInput) {

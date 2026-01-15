@@ -261,7 +261,14 @@
 }
 
 
-/* Age Groups Section - Yellow theme with border */
+
+
+
+
+/* ========================================
+   Age Groups Section
+   ======================================== */
+
 .age-groups {
     background-color: #fefce8;
     border: 2px solid #eab308;
@@ -434,6 +441,17 @@
     margin-top: 1rem;
     animation: shake 0.4s;
 }
+
+
+
+/* ========================================
+   Household Size Section
+   ======================================== */
+
+.mb-3:has(#id_household_size) {
+    display: none !important;
+}
+
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
