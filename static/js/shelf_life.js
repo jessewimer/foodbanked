@@ -205,10 +205,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
         `;
         
+
         if (item.subcategory) {
             content += `
                 <div class="detail-row">
-                    <strong>Type</strong>
+                    <strong>Sub category</strong>
                     <span>${escapeHtml(item.subcategory)}</span>
                 </div>
             `;
@@ -221,11 +222,23 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        if (item.has_numeric_shelf_life) {
+        if (item.has_numeric_shelf_life && item.shelf_life_max_days < 10000) {
+            // Calculate the date by subtracting shelf life days from today
+            const today = new Date();
+            const okayToUseDate = new Date(today);
+            okayToUseDate.setDate(today.getDate() - item.shelf_life_max_days);
+            
+            // Format date as "Month Day, Year"
+            const formattedDate = okayToUseDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
             content += `
                 <div class="detail-row">
-                    <strong>Duration</strong>
-                    <span>${item.shelf_life_min_days}${item.shelf_life_min_days !== item.shelf_life_max_days ? ' - ' + item.shelf_life_max_days : ''} days</span>
+                    <strong>Okay to use if date on package is after</strong>
+                    <span>${formattedDate}</span>
                 </div>
             `;
         }
