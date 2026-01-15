@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('foodSearchInput');
     const searchResults = document.getElementById('searchResults');
-    const clearButton = document.getElementById('clearSearch');
+    // const clearButton = document.getElementById('clearSearch');
     const modal = new bootstrap.Modal(document.getElementById('foodItemModal'));
     
     let searchTimeout;
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const query = this.value.trim();
         
         // Show/hide clear button
-        clearButton.style.display = query.length > 0 ? 'block' : 'none';
+        // clearButton.style.display = query.length > 0 ? 'block' : 'none';
         
         if (query.length < 2) {
             hideResults();
@@ -28,12 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Clear search
-    clearButton.addEventListener('click', function() {
-        searchInput.value = '';
-        clearButton.style.display = 'none';
-        hideResults();
-        searchInput.focus();
-    });
+    // clearButton.addEventListener('click', function() {
+    //     searchInput.value = '';
+    //     clearButton.style.display = 'none';
+    //     hideResults();
+    //     searchInput.focus();
+    // });
     
     // Keyboard navigation
     searchInput.addEventListener('keydown', function(e) {

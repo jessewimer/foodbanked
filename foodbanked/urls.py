@@ -35,9 +35,10 @@ urlpatterns = [
     path('pricing/', views.pricing_page, name='pricing'),
     
     # Dashboard
-    path('dashboard/', dashboard, name='dashboard'),
+    # path('dashboard/', dashboard, name='dashboard'),
     
     # App URLs
+    # path('accounts/', include('accounts.urls')),
     path('accounts/', include('accounts.urls')),
     path('', include('visits.urls')),
     path('resources/', include('resources.urls')),

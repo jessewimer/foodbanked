@@ -42,7 +42,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/dashboard/">Dashboard</a>
+                            <a class="nav-link" href="/accounts/dashboard/">Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/visits/new/">New Visit</a>
@@ -63,9 +63,6 @@
                             <a class="nav-link btn-primary-nav" href="/accounts/logout/">Logout</a>
                         </li>
                     {% else %}
-                        {% comment %} <li class="nav-item">
-                            <a class="nav-link" href="/">Home</a>
-                        </li> {% endcomment %}
                         <li class="nav-item">
                             <a class="nav-link" href="/about/">About</a>
                         </li>

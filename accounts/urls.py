@@ -13,6 +13,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     
+
+    # Dashboards
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('organization-dashboard/', views.organization_dashboard, name='organization_dashboard'),
+    
     # Account settings
     path('settings/', views.account_settings, name='account_settings'),
     path('settings/add-zipcode/', views.add_zipcode, name='add_zipcode'),

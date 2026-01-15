@@ -34,18 +34,37 @@ def register(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
+
+
+
+
+
 @login_required
 def dashboard(request):
-    """Main dashboard after login with real statistics"""
+    """Smart dashboard that routes based on account type"""
+    
+    # Check if they're an organization admin
+    if hasattr(request.user, 'organizationadmin'):
+        return redirect('organization_dashboard')
+    
+    # Check if they're a regular foodbank
+    elif hasattr(request.user, 'foodbank'):
+        return foodbank_dashboard(request)
+    
+    # Fallback for accounts without proper setup
+    else:
+        messages.warning(request, 'No food bank or organization associated with your account.')
+        return render(request, 'accounts/dashboard.html', {'foodbank': None})
+
+
+@login_required
+def foodbank_dashboard(request):
+    """Dashboard for individual foodbanks"""
     # Import Visit and Patron models
     from visits.models import Visit, Patron
     
     # Get the foodbank
-    foodbank = request.user.foodbank if hasattr(request.user, 'foodbank') else None
-    
-    if not foodbank:
-        messages.warning(request, 'No food bank associated with your account.')
-        return render(request, 'accounts/dashboard.html', {'foodbank': None})
+    foodbank = request.user.foodbank
     
     # Calculate date ranges
     today = get_foodbank_today(foodbank)
@@ -87,6 +106,138 @@ def dashboard(request):
     }
     
     return render(request, 'accounts/dashboard.html', context)
+
+
+@login_required
+def organization_dashboard(request):
+    """Dashboard for organization admins"""
+    from visits.models import Visit, Patron
+    
+    # Get the organization admin and their organization
+    org_admin = request.user.organizationadmin
+    organization = org_admin.organization
+    
+    # Get all member foodbanks
+    member_foodbanks = organization.member_foodbanks.all()
+    
+    # Calculate date ranges (using first foodbank's timezone, or default)
+    first_foodbank = member_foodbanks.first()
+    if first_foodbank:
+        today = get_foodbank_today(first_foodbank)
+    else:
+        from django.utils import timezone as django_tz
+        today = django_tz.now().date()
+    
+    week_start = today - timedelta(days=today.weekday())
+    month_start = today.replace(day=1)
+    
+    # Aggregate statistics across all member foodbanks
+    total_visits_today = Visit.objects.filter(
+        foodbank__organization=organization,
+        visit_date=today
+    ).count()
+    
+    total_visits_week = Visit.objects.filter(
+        foodbank__organization=organization,
+        visit_date__gte=week_start
+    ).count()
+    
+    total_visits_month = Visit.objects.filter(
+        foodbank__organization=organization,
+        visit_date__gte=month_start
+    ).count()
+    
+    total_patrons = Patron.objects.filter(
+        foodbank__organization=organization
+    ).count()
+    
+    # Get recent visits across all member foodbanks (last 10)
+    recent_visits = Visit.objects.filter(
+        foodbank__organization=organization
+    ).select_related('patron', 'foodbank').order_by('-visit_date', '-created_at')[:10]
+    
+    # Statistics by foodbank
+    foodbank_stats = []
+    for fb in member_foodbanks:
+        visits_today = Visit.objects.filter(foodbank=fb, visit_date=today).count()
+        visits_month = Visit.objects.filter(foodbank=fb, visit_date__gte=month_start).count()
+        foodbank_stats.append({
+            'foodbank': fb,
+            'visits_today': visits_today,
+            'visits_month': visits_month,
+        })
+    
+    context = {
+        'organization': organization,
+        'member_foodbanks': member_foodbanks,
+        'total_visits_today': total_visits_today,
+        'total_visits_week': total_visits_week,
+        'total_visits_month': total_visits_month,
+        'total_patrons': total_patrons,
+        'recent_visits': recent_visits,
+        'foodbank_stats': foodbank_stats,
+    }
+    
+    return render(request, 'accounts/organization_dashboard.html', context)
+
+
+
+
+
+
+# @login_required
+# def dashboard(request):
+#     """Main dashboard after login with real statistics"""
+#     # Import Visit and Patron models
+#     from visits.models import Visit, Patron
+    
+#     # Get the foodbank
+#     foodbank = request.user.foodbank if hasattr(request.user, 'foodbank') else None
+    
+#     if not foodbank:
+#         messages.warning(request, 'No food bank associated with your account.')
+#         return render(request, 'accounts/dashboard.html', {'foodbank': None})
+    
+#     # Calculate date ranges
+#     today = get_foodbank_today(foodbank)
+#     week_start = today - timedelta(days=today.weekday())  # Monday of this week
+#     month_start = today.replace(day=1)
+    
+#     # Get statistics
+#     visits_today = Visit.objects.filter(
+#         foodbank=foodbank,
+#         visit_date=today
+#     ).count()
+    
+#     visits_this_week = Visit.objects.filter(
+#         foodbank=foodbank,
+#         visit_date__gte=week_start
+#     ).count()
+    
+#     visits_this_month = Visit.objects.filter(
+#         foodbank=foodbank,
+#         visit_date__gte=month_start
+#     ).count()
+    
+#     total_patrons = Patron.objects.filter(
+#         foodbank=foodbank
+#     ).count()
+    
+#     # Get recent visits (last 5)
+#     recent_visits = Visit.objects.filter(
+#         foodbank=foodbank
+#     ).select_related('patron').order_by('-visit_date')[:5]
+    
+#     context = {
+#         'foodbank': foodbank,
+#         'visits_today': visits_today,
+#         'visits_this_week': visits_this_week,
+#         'visits_this_month': visits_this_month,
+#         'total_patrons': total_patrons,
+#         'recent_visits': recent_visits,
+#     }
+    
+#     return render(request, 'accounts/dashboard.html', context)
 
 @login_required
 def account_settings(request):
