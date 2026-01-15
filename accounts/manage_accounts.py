@@ -13,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'foodbanked.settings')
 django.setup()
 
-from accounts.models import Foodbank
+from accounts.models import Foodbank, FoodbankOrganization
 
 
 def clear_screen():
@@ -197,6 +197,163 @@ def edit_foodbank():
     input("\nPress Enter to continue...")
 
 
+
+def add_foodbank_organization():
+    """Add a new organization"""
+    clear_screen()
+    print_header("Add New Organization")
+    
+    print("Enter organization details:\n")
+    
+    # Collect organization info
+    name = input("Organization Name: ").strip()
+    if not name:
+        print("\nError: Organization name is required!")
+        input("Press Enter to continue...")
+        return
+    
+    address = input("Address (optional): ").strip()
+    city = input("City (optional): ").strip()
+    state = input("State (optional): ").strip()
+    zipcode = input("Zip Code (optional): ").strip()
+    phone = input("Phone (optional): ").strip()
+    email = input("Email (optional): ").strip()
+    website = input("Website (optional): ").strip()
+    
+    # Show confirmation
+    clear_screen()
+    print_header("Confirm New Organization")
+    
+    print("Organization details:\n")
+    print(f"  Name: {name}")
+    print(f"  Address: {address or 'Not set'}")
+    print(f"  City: {city or 'Not set'}")
+    print(f"  State: {state or 'Not set'}")
+    print(f"  Zip Code: {zipcode or 'Not set'}")
+    print(f"  Phone: {phone or 'Not set'}")
+    print(f"  Email: {email or 'Not set'}")
+    print(f"  Website: {website or 'Not set'}")
+    
+    confirm = input("\nCreate this organization? [Y/N]: ").strip().upper()
+    
+    if confirm == 'Y':
+        try:
+            org = FoodbankOrganization.objects.create(
+                name=name,
+                address=address or None,
+                city=city or None,
+                state=state or None,
+                zipcode=zipcode or None,
+                phone=phone or None,
+                email=email or None,
+                website=website or None
+            )
+            print(f"\n✓ Organization '{org.name}' created successfully!")
+        except Exception as e:
+            print(f"\n✗ Error creating organization: {e}")
+    else:
+        print("\n✗ Organization creation cancelled.")
+    
+    input("\nPress Enter to continue...")
+
+
+def assign_foodbank_to_organization():
+    """Assign a foodbank to an organization"""
+    clear_screen()
+    print_header("Assign Food Bank to Organization")
+    
+    # Check if there are organizations
+    organizations = FoodbankOrganization.objects.all().order_by('name')
+    if not organizations:
+        print("  No organizations found. Please create an organization first.\n")
+        input("Press Enter to continue...")
+        return
+    
+    # Check if there are foodbanks
+    foodbanks = Foodbank.objects.all().order_by('name')
+    if not foodbanks:
+        print("  No food banks found.\n")
+        input("Press Enter to continue...")
+        return
+    
+    # Select organization
+    print("Available organizations:\n")
+    for i, org in enumerate(organizations, 1):
+        fb_count = org.foodbanks.count()
+        print(f"  {i}. {org.name} ({fb_count} food bank{'s' if fb_count != 1 else ''})")
+    
+    print("\n  0. Cancel")
+    
+    try:
+        choice = input("\nSelect an organization (enter number): ").strip()
+        if choice == '0':
+            return
+        
+        idx = int(choice) - 1
+        if idx < 0 or idx >= len(organizations):
+            print("\nInvalid selection!")
+            input("Press Enter to continue...")
+            return
+        
+        organization = organizations[idx]
+    except (ValueError, IndexError):
+        print("\nInvalid selection!")
+        input("Press Enter to continue...")
+        return
+    
+    # Select foodbank
+    clear_screen()
+    print_header(f"Assign Food Bank to: {organization.name}")
+    
+    print("Available food banks:\n")
+    for i, fb in enumerate(foodbanks, 1):
+        org_name = fb.organization.name if fb.organization else "Not assigned"
+        print(f"  {i}. {fb.name} (Currently: {org_name})")
+    
+    print("\n  0. Cancel")
+    
+    try:
+        choice = input("\nSelect a food bank (enter number): ").strip()
+        if choice == '0':
+            return
+        
+        idx = int(choice) - 1
+        if idx < 0 or idx >= len(foodbanks):
+            print("\nInvalid selection!")
+            input("Press Enter to continue...")
+            return
+        
+        foodbank = foodbanks[idx]
+    except (ValueError, IndexError):
+        print("\nInvalid selection!")
+        input("Press Enter to continue...")
+        return
+    
+    # Show confirmation
+    clear_screen()
+    print_header("Confirm Assignment")
+    
+    current_org = foodbank.organization.name if foodbank.organization else "None"
+    
+    print(f"  Food Bank: {foodbank.name}")
+    print(f"  Current Organization: {current_org}")
+    print(f"  New Organization: {organization.name}")
+    
+    confirm = input("\nConfirm this assignment? [Y/N]: ").strip().upper()
+    
+    if confirm == 'Y':
+        try:
+            foodbank.organization = organization
+            foodbank.save()
+            print(f"\n✓ '{foodbank.name}' assigned to '{organization.name}' successfully!")
+        except Exception as e:
+            print(f"\n✗ Error assigning food bank: {e}")
+    else:
+        print("\n✗ Assignment cancelled.")
+    
+    input("\nPress Enter to continue...")
+
+
 def main_menu():
     """Display main menu and handle selection"""
     while True:
@@ -205,6 +362,8 @@ def main_menu():
         
         print("  1. View all food banks")
         print("  2. Edit food bank")
+        print("  3. Add food bank organization")
+        print("  4. Assign food bank to organization")
         print("\n  0. Exit")
         
         choice = input("\nSelect an option: ").strip()
@@ -213,6 +372,10 @@ def main_menu():
             view_all_foodbanks()
         elif choice == '2':
             edit_foodbank()
+        elif choice == '3':
+            add_foodbank_organization()
+        elif choice == '4':
+            assign_foodbank_to_organization()
         elif choice == '0':
             clear_screen()
             print("\nGoodbye!\n")

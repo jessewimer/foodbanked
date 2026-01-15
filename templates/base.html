@@ -41,27 +41,47 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/accounts/dashboard/">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/visits/new/">New Visit</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/patrons/">Patrons</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/analytics/">Analytics</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/accounts/settings/">Settings</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/resources/shelf-life/">Shelf Life</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn-primary-nav" href="/accounts/logout/">Logout</a>
-                        </li>
+                        {% if user.organizationadmin %}
+                            {# Navigation for Organization Admins #}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:organization_dashboard' %}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/analytics/">Analytics</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/resources/shelf-life/">Shelf Life</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/accounts/settings/">Settings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-primary-nav" href="/accounts/logout/">Logout</a>
+                            </li>
+                        {% else %}
+                            {# Navigation for Regular Foodbank Users #}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:dashboard' %}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/visits/new/">New Visit</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/patrons/">Patrons</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/analytics/">Analytics</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'accounts:settings' %}">Settings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/resources/shelf-life/">Shelf Life</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-primary-nav" href="{% url 'accounts:logout' %}">Logout</a>
+                            </li>
+                        {% endif %}
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="/about/">About</a>
@@ -73,7 +93,7 @@
                             <a class="nav-link" href="/demo/">Demo</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn-primary-nav" href="/accounts/login/">Login</a>
+                            <a class="nav-link btn-primary-nav" href="{% url 'accounts:login' %}">Login</a>
                         </li>
                     {% endif %}
                 </ul>

@@ -45,7 +45,7 @@ def dashboard(request):
     
     # Check if they're an organization admin
     if hasattr(request.user, 'organizationadmin'):
-        return redirect('organization_dashboard')
+        return redirect('accounts:organization_dashboard')
     
     # Check if they're a regular foodbank
     elif hasattr(request.user, 'foodbank'):
@@ -118,10 +118,10 @@ def organization_dashboard(request):
     organization = org_admin.organization
     
     # Get all member foodbanks
-    member_foodbanks = organization.member_foodbanks.all()
+    foodbanks = organization.foodbanks.all()
     
     # Calculate date ranges (using first foodbank's timezone, or default)
-    first_foodbank = member_foodbanks.first()
+    first_foodbank = foodbanks.first()
     if first_foodbank:
         today = get_foodbank_today(first_foodbank)
     else:
@@ -154,11 +154,11 @@ def organization_dashboard(request):
     # Get recent visits across all member foodbanks (last 10)
     recent_visits = Visit.objects.filter(
         foodbank__organization=organization
-    ).select_related('patron', 'foodbank').order_by('-visit_date', '-created_at')[:10]
+    ).select_related('patron', 'foodbank').order_by('-visit_date')[:10]
     
     # Statistics by foodbank
     foodbank_stats = []
-    for fb in member_foodbanks:
+    for fb in foodbanks:
         visits_today = Visit.objects.filter(foodbank=fb, visit_date=today).count()
         visits_month = Visit.objects.filter(foodbank=fb, visit_date__gte=month_start).count()
         foodbank_stats.append({
@@ -169,7 +169,7 @@ def organization_dashboard(request):
     
     context = {
         'organization': organization,
-        'member_foodbanks': member_foodbanks,
+        'foodbanks': foodbanks,
         'total_visits_today': total_visits_today,
         'total_visits_week': total_visits_week,
         'total_visits_month': total_visits_month,

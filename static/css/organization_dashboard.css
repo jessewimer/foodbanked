@@ -1,0 +1,238 @@
+/* Organization Dashboard Styles */
+
+.dashboard-header {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.dashboard-header h1 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 400;
+}
+
+/* Statistics Cards */
+.stat-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+    height: 100%;
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 3rem;
+    height: 3rem;
+    background-color: var(--bg-accent);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.stat-icon i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.stat-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    line-height: 1;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Section Headers */
+.section-header {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-header i {
+    color: var(--primary);
+}
+
+/* Quick Action Cards */
+.quick-action-card {
+    background-color: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--transition-base);
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-action-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.quick-action-icon {
+    width: 4rem;
+    height: 4rem;
+    background-color: var(--bg-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    transition: all var(--transition-base);
+}
+
+.quick-action-card:hover .quick-action-icon {
+    background-color: var(--primary);
+}
+
+.quick-action-icon i {
+    font-size: 2rem;
+    color: var(--primary);
+    transition: all var(--transition-base);
+}
+
+.quick-action-card:hover .quick-action-icon i {
+    color: white;
+}
+
+.quick-action-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.quick-action-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Food Bank List */
+.foodbank-list {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.foodbank-item {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: all var(--transition-base);
+}
+
+.foodbank-item:last-child {
+    border-bottom: none;
+}
+
+.foodbank-item:hover {
+    background-color: var(--bg-accent);
+    border-radius: var(--radius-md);
+}
+
+.foodbank-name {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.foodbank-details {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.foodbank-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+}
+
+.badge-active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-truck {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .quick-action-card {
+        margin-bottom: 1rem;
+    }
+    
+    .foodbank-item {
+        flex-direction: column;
+    }
+    
+    .foodbank-item .text-end {
+        text-align: left !important;
+        margin-top: 1rem;
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-header {
+        padding: 2rem 1rem;
+    }
+    
+    .section-header {
+        font-size: 1.25rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}
