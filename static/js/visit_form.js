@@ -81,6 +81,32 @@
         const initialChecked = document.querySelector('input[name="visitType"]:checked');
 
 
+        
+        // Age group inputs for auto-calculation
+        const ageInputs = [age0_18Input, age19_59Input, age60PlusInput];
+
+        function updateHouseholdSize() {
+            let total = 0;
+            ageInputs.forEach(input => {
+                const value = parseInt(input.value) || 0;
+                total += value;
+            });
+            householdSizeInput.value = total;
+        }
+
+        // Add event listeners to age inputs
+        ageInputs.forEach(input => {
+            input.addEventListener('input', updateHouseholdSize);
+        });
+
+        // Calculate initial value on page load
+        updateHouseholdSize();
+
+
+
+
+
+
         if (patronId) {
             // Build patron object from URL parameters (no API call needed!)
             const patronData = {
@@ -655,44 +681,6 @@
                     e.preventDefault();
                     return false;
                 }
-                
-                // Then check food truck checkboxes if enabled
-                const foodTruckEnabled = document.getElementById('visitTypePantry') !== null;
-                
-                if (foodTruckEnabled) {
-                    const pantryChecked = document.getElementById('visitTypePantry').checked;
-                    const foodTruckChecked = document.getElementById('visitTypeFoodTruck').checked;
-                    
-                    if (!pantryChecked && !foodTruckChecked) {
-                        e.preventDefault();
-                        
-                        // Remove any existing error messages
-                        const existingError = document.querySelector('.visit-type-error');
-                        if (existingError) {
-                            existingError.remove();
-                        }
-                        
-                        // Create error message
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'alert alert-danger visit-type-error';
-                        errorDiv.setAttribute('role', 'alert');
-                        errorDiv.textContent = 'Please select at least one visit type (Pantry or Food Truck).';
-                        
-                        // Insert at top of form
-                        visitForm.insertBefore(errorDiv, visitForm.firstChild);
-                        
-                        // Scroll to error
-                        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        
-                        return false;
-                    } else {
-                        // Remove error if it exists and form is valid
-                        const existingError = document.querySelector('.visit-type-error');
-                        if (existingError) {
-                            existingError.remove();
-                        }
-                    }
-                }
             });
         }
 
@@ -871,6 +859,34 @@
                     block: 'center' 
                 });
                 errors[0].element.focus();
+            }
+
+            // Validate Food Truck vs Pantry (only if food truck is enabled)
+            const foodTruckCheckbox = document.getElementById('visitTypeFoodTruck');
+            const pantryCheckbox = document.getElementById('visitTypePantry');
+
+            if (foodTruckCheckbox && pantryCheckbox) {
+                // Food truck feature is enabled, check if at least one is selected
+                if (!foodTruckCheckbox.checked && !pantryCheckbox.checked) {
+                    const visitTypeSection = document.querySelector('.visit-type-checkboxes').parentElement;
+                    if (visitTypeSection) {
+                        isValid = false;
+                        visitTypeSection.classList.add('error-shake');
+                        
+                        // Remove any existing error message
+                        const existingError = visitTypeSection.querySelector('.error-message');
+                        if (existingError) existingError.remove();
+                        
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message';
+                        errorDiv.style.marginTop = '0.5rem';
+                        errorDiv.textContent = 'Please select at least one visit type (Pantry or Food Truck)';
+                        
+                        visitTypeSection.appendChild(errorDiv);
+                        
+                        errors.push({ element: visitTypeSection, message: errorDiv.textContent });
+                    }
+                }
             }
             
             return isValid;
