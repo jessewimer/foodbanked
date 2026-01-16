@@ -33,12 +33,12 @@ urlpatterns = [
     path('demo/analytics/', views.demo_analytics_page, name='demo_analytics'),
     path('about/', views.about_page, name='about'),
     path('pricing/', views.pricing_page, name='pricing'),
+    path('donate/', views.donate, name='donate'),
     
     # Dashboard
     # path('dashboard/', dashboard, name='dashboard'),
     
     # App URLs
-    # path('accounts/', include('accounts.urls')),
     path('accounts/', include('accounts.urls')),
     path('', include('visits.urls')),
     path('resources/', include('resources.urls')),

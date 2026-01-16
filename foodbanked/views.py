@@ -236,9 +236,11 @@ def demo_page(request):
     }
     return render(request, 'demo.html', context)
 
+
 def demo_analytics_page(request):
     """Demo statistics page showing sample data visualizations"""
     return render(request, 'demo_analytics.html')
+
 
 def about_page(request):
     """About page"""
@@ -248,3 +250,8 @@ def about_page(request):
 def pricing_page(request):
     """Pricing page"""
     return render(request, 'pricing.html')
+
+
+def donate(request):
+    """Donate page for supporting FoodBanked's mission"""
+    return render(request, 'donate.html')
