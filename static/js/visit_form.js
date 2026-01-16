@@ -449,13 +449,14 @@
                 const count = patron.visits_this_month;
                 const visitStatusText = document.getElementById('visitStatusText');
                 
-                if (count === 0) {
-                    visitStatusText.textContent = '1st visit of the month';
-                } else if (count === 1) {
-                    visitStatusText.textContent = 'Visit #2 this month';
-                } else {
-                    visitStatusText.textContent = `Visit #${count + 1} this month`;
-                }
+                visitStatusText.textContent = 'Number of visits this month: ' + count;
+                // if (count === 0) {
+                //     visitStatusText.textContent = '1st visit of the month';
+                // } else if (count === 1) {
+                //     visitStatusText.textContent = 'Visit #2 this month';
+                // } else {
+                //     visitStatusText.textContent = `Visit #${count + 1} this month`;
+                // }
                 
                 document.getElementById('lastVisitDate').textContent = formatDate(patron.last_visit_date);
                 visitCountSection.style.display = 'flex';

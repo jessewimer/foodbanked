@@ -8,6 +8,9 @@ from foodbanked.utils import get_foodbank_today
 from accounts.models import ServiceZipcode
 from .forms import PatronForm
 from django.urls import reverse
+from django.utils import timezone
+from django.db.models import Count
+import json
 
 
 @login_required
@@ -146,11 +149,6 @@ def visit_create(request):
             return redirect('visits:visit_create')
     else:
         form = VisitForm()
-
-    # Get all patrons with enhanced data for autocomplete
-    from django.utils import timezone
-    from django.db.models import Count
-    import json
     
     today = get_foodbank_today(foodbank)
     month_start = today.replace(day=1)
@@ -453,28 +451,6 @@ def patron_detail_api(request, patron_id):
         'visits_this_month': visits_this_month,
         'last_visit_date': last_visit_date,
     })
-# @login_required
-# def patron_create(request):
-#     """Create a new patron"""
-#     foodbank = request.user.foodbank
-    
-#     if request.method == 'POST':
-#         from .forms import PatronForm
-#         form = PatronForm(request.POST)
-#         if form.is_valid():
-#             patron = form.save(commit=False)
-#             patron.foodbank = foodbank
-#             patron.save()
-#             messages.success(request, 'Patron added successfully!')
-#             return redirect('visits:patron_detail', pk=patron.pk)
-#     else:
-#         from .forms import PatronForm
-#         form = PatronForm()
-    
-#     context = {
-#         'form': form,
-#     }
-#     return render(request, 'visits/patron_form.html', context)
 
 
 @login_required

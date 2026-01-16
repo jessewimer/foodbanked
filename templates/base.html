@@ -73,7 +73,7 @@
                                 <a class="nav-link" href="/analytics/">Analytics</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'accounts:settings' %}">Settings</a>
+                                <a class="nav-link" href="{% url 'accounts:account_settings' %}">Settings</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/resources/shelf-life/">Shelf Life</a>
@@ -92,9 +92,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/demo/">Demo</a>
                         </li>
-                        <li class="nav-item">
+                        {% comment %} <li class="nav-item">
                             <a class="nav-link" href="/donate/">Support Us</a>
-                        </li>
+                        </li> {% endcomment %}
                         <li class="nav-item">
                             <a class="nav-link btn-primary-nav" href="{% url 'accounts:login' %}">Login</a>
                         </li>
