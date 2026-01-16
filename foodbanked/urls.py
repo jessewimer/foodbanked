@@ -44,3 +44,5 @@ urlpatterns = [
     path('resources/', include('resources.urls')),
 
 ]
+
+handler404 = 'foodbanked.views.custom_404'

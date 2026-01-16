@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - FoodBanked{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+    
+    .error-content {
+        text-align: center;
+        max-width: 600px;
+    }
+    
+    .error-icon {
+        width: 8rem;
+        height: 8rem;
+        background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        border: 3px solid var(--primary);
+    }
+    
+    .error-icon i {
+        font-size: 4rem;
+        color: var(--primary);
+    }
+    
+    .error-code {
+        font-family: var(--font-display);
+        font-size: 6rem;
+        color: var(--primary);
+        line-height: 1;
+        margin-bottom: 1rem;
+    }
+    
+    .error-title {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+    
+    .error-message {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        font-family: var(--font-body);
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        padding: 0.75rem 1.5rem;
+        transition: all var(--transition-base);
+        border: 2px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        color: white;
+    }
+    
+    .btn-outline-primary {
+        background-color: transparent;
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+        .error-code {
+            font-size: 4rem;
+        }
+        
+        .error-title {
+            font-size: 1.5rem;
+        }
+        
+        .error-icon {
+            width: 6rem;
+            height: 6rem;
+        }
+        
+        .error-icon i {
+            font-size: 3rem;
+        }
+        
+        .error-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        
+        <div class="error-code">404</div>
+        
+        <h1 class="error-title">Page Not Found</h1>
+        
+        <p class="error-message">
+            We couldn't find the page you're looking for. It may have been moved, deleted, 
+            or the URL might be incorrect.
+        </p>
+        
+        <div class="error-actions">
+            {% if user.is_authenticated %}
+                {% if user.organizationadmin %}
+                    <a href="{% url 'accounts:organization_dashboard' user.organizationadmin.organization.slug %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Dashboard
+                    </a>
+                {% elif user.foodbank %}
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Dashboard
+                    </a>
+                {% else %}
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Home
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i>Go to Home
+                </a>
+            {% endif %}
+            
+            <button onclick="window.history.back()" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Go Back
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

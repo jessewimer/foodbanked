@@ -255,3 +255,7 @@ def pricing_page(request):
 def donate(request):
     """Donate page for supporting FoodBanked's mission"""
     return render(request, 'donate.html')
+
+def custom_404(request, exception):
+    """Custom 404 error handler"""
+    return render(request, '404.html', status=404)
