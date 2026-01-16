@@ -47,8 +47,8 @@ from .models import FoodbankOrganization, OrganizationAdmin, Foodbank, Registrat
 
 @admin.register(FoodbankOrganization)
 class FoodbankOrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'region', 'city', 'state', 'email', 'created_date')
-    search_fields = ('name', 'region', 'city')
+    list_display = ('name', 'slug', 'region', 'city', 'state', 'email', 'created_date')
+    search_fields = ('name', 'slug', 'region', 'city')
     list_filter = ('state', 'created_date')
 
 @admin.register(OrganizationAdmin)

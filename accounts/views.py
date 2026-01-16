@@ -6,11 +6,12 @@ from django.utils import timezone
 from datetime import timedelta
 from .forms import FoodbankRegistrationForm
 from django.contrib.auth import logout as auth_logout
-from .models import ServiceZipcode
+from .models import ServiceZipcode, FoodbankOrganization
 from django.http import JsonResponse
 from foodbanked.utils import get_foodbank_today
 from django.views.decorators.http import require_POST
 import json
+
 
 def logout_view(request):
     """Custom logout view that accepts GET requests"""
@@ -43,10 +44,13 @@ def register(request):
 def dashboard(request):
     """Smart dashboard that routes based on account type"""
     
-    # Check if they're an organization admin
+    # # Check if they're an organization admin
+    # if hasattr(request.user, 'organizationadmin'):
+    #     return redirect('accounts:organization_dashboard')
     if hasattr(request.user, 'organizationadmin'):
-        return redirect('accounts:organization_dashboard')
-    
+        org_slug = request.user.organizationadmin.organization.slug
+        return redirect('accounts:organization_dashboard', org_slug=org_slug)
+        
     # Check if they're a regular foodbank
     elif hasattr(request.user, 'foodbank'):
         return foodbank_dashboard(request)
@@ -109,14 +113,20 @@ def foodbank_dashboard(request):
 
 
 @login_required
-def organization_dashboard(request):
+def organization_dashboard(request, org_slug):
     """Dashboard for organization admins"""
     from visits.models import Visit, Patron
     
     # Get the organization admin and their organization
-    org_admin = request.user.organizationadmin
-    organization = org_admin.organization
+    # org_admin = request.user.organizationadmin
+    # organization = org_admin.organization
+    # Get the organization by slug
+    organization = get_object_or_404(FoodbankOrganization, slug=org_slug)
     
+    # Verify the user has access to this organization
+    if not hasattr(request.user, 'organizationadmin') or request.user.organizationadmin.organization != organization:
+        messages.error(request, 'You do not have access to this organization.')
+        return redirect('accounts:login')
     # Get all member foodbanks
     foodbanks = organization.foodbanks.all()
     
@@ -181,6 +191,37 @@ def organization_dashboard(request):
     return render(request, 'accounts/organization_dashboard.html', context)
 
 
+@login_required
+def organization_settings(request, org_slug):
+    """Settings page for organization admins"""
+    # Get the organization by slug
+    organization = get_object_or_404(FoodbankOrganization, slug=org_slug)
+    
+    # Verify the user has access to this organization
+    if not hasattr(request.user, 'organizationadmin') or request.user.organizationadmin.organization != organization:
+        messages.error(request, 'You do not have access to this organization.')
+        return redirect('accounts:login')
+    
+    # Check if we're in edit mode
+    edit_mode = request.GET.get('edit') == 'true' or request.method == 'POST'
+    
+    if request.method == 'POST':
+        from .forms import OrganizationForm  # You'll need to create this form
+        form = OrganizationForm(request.POST, instance=organization)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Organization information updated successfully!')
+            return redirect('accounts:organization_settings', org_slug=org_slug)
+    else:
+        from .forms import OrganizationForm
+        form = OrganizationForm(instance=organization) if edit_mode else None
+    
+    context = {
+        'organization': organization,
+        'form': form,
+        'edit_mode': edit_mode,
+    }
+    return render(request, 'accounts/organization_settings.html', context)
 
 
 
@@ -363,4 +404,75 @@ def toggle_anonymous(request):
         return JsonResponse({'success': True, 'enabled': enabled})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    
+
+# Add this to your accounts/views.py file
+
+@login_required
+def organization_analytics(request, org_slug):
+    """Analytics page for organization admins"""
+    from visits.models import Visit, Patron
+    from datetime import timedelta
+    
+    # Get the organization by slug
+    organization = get_object_or_404(FoodbankOrganization, slug=org_slug)
+    
+    # Verify the user has access to this organization
+    if not hasattr(request.user, 'organizationadmin') or request.user.organizationadmin.organization != organization:
+        messages.error(request, 'You do not have access to this organization.')
+        return redirect('accounts:login')
+    
+    # Get all member foodbanks
+    foodbanks = organization.foodbanks.all()
+    
+    # Calculate date ranges
+    first_foodbank = foodbanks.first()
+    if first_foodbank:
+        today = get_foodbank_today(first_foodbank)
+    else:
+        from django.utils import timezone as django_tz
+        today = django_tz.now().date()
+    
+    month_start = today.replace(day=1)
+    
+    # Aggregate statistics
+    total_foodbanks = foodbanks.count()
+    
+    total_patrons = Patron.objects.filter(
+        foodbank__organization=organization
+    ).count()
+    
+    total_visits_month = Visit.objects.filter(
+        foodbank__organization=organization,
+        visit_date__gte=month_start
+    ).count()
+    
+    total_visits_all_time = Visit.objects.filter(
+        foodbank__organization=organization
+    ).count()
+    
+    # Statistics by foodbank
+    foodbank_stats = []
+    for fb in foodbanks:
+        visits_month = Visit.objects.filter(foodbank=fb, visit_date__gte=month_start).count()
+        total_visits = Visit.objects.filter(foodbank=fb).count()
+        foodbank_stats.append({
+            'foodbank': fb,
+            'visits_month': visits_month,
+            'total_visits': total_visits,
+        })
+    
+    # Sort by most visits this month
+    foodbank_stats.sort(key=lambda x: x['visits_month'], reverse=True)
+    
+    context = {
+        'organization': organization,
+        'total_foodbanks': total_foodbanks,
+        'total_patrons': total_patrons,
+        'total_visits_month': total_visits_month,
+        'total_visits_all_time': total_visits_all_time,
+        'foodbank_stats': foodbank_stats,
+    }
+    
+    return render(request, 'accounts/organization_analytics.html', context)
     

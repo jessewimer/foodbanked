@@ -44,16 +44,16 @@
                         {% if user.organizationadmin %}
                             {# Navigation for Organization Admins #}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'accounts:organization_dashboard' %}">Dashboard</a>
+                                <a class="nav-link" href="{% url 'accounts:organization_dashboard' user.organizationadmin.organization.slug %}">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/analytics/">Analytics</a>
+                                <a class="nav-link" href="{% url 'accounts:organization_analytics' user.organizationadmin.organization.slug %}">Analytics</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/resources/shelf-life/">Shelf Life</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/accounts/settings/">Settings</a>
+                                <a class="nav-link" href="{% url 'accounts:organization_settings' user.organizationadmin.organization.slug %}">Settings</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-primary-nav" href="/accounts/logout/">Logout</a>

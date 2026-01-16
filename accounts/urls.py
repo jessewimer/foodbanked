@@ -13,11 +13,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     
-
-    # Dashboards
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('organization-dashboard/', views.organization_dashboard, name='organization_dashboard'),
-    
     # Account settings
     path('settings/', views.account_settings, name='account_settings'),
     path('settings/add-zipcode/', views.add_zipcode, name='add_zipcode'),
@@ -25,5 +20,14 @@ urlpatterns = [
     path('settings/toggle-food-truck/', views.toggle_food_truck, name='toggle_food_truck'),
     path('settings/toggle-by-name/', views.toggle_by_name, name='toggle_by_name'),
     path('settings/toggle-anonymous/', views.toggle_anonymous, name='toggle_anonymous'),
+
+
+    # Foodbank Dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
+
+    # Organization Admin URLs
+    path('<slug:org_slug>/', views.organization_dashboard, name='organization_dashboard'),
+    path('<slug:org_slug>/analytics/', views.organization_analytics, name='organization_analytics'),
+    path('<slug:org_slug>/settings/', views.organization_settings, name='organization_settings'),
 
 ]

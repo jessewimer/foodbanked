@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.conf import settings
-from .models import Foodbank, RegistrationCode, ServiceZipcode
+from .models import Foodbank, RegistrationCode, ServiceZipcode, FoodbankOrganization
 
 
 class FoodbankRegistrationForm(UserCreationForm):
@@ -134,100 +134,7 @@ class FoodbankRegistrationForm(UserCreationForm):
                     pass
         
         return user
-# class FoodbankRegistrationForm(UserCreationForm):
-#     # Registration code field
-#     registration_code = forms.CharField(
-#         max_length=50,
-#         required=True,
-#         help_text='Enter the registration code provided to you',
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'placeholder': 'Enter registration code'
-#         })
-#     )
-    
-#     # Foodbank information
-#     foodbank_name = forms.CharField(
-#         max_length=200,
-#         required=True,
-#         help_text='Name of your food bank',
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'placeholder': 'e.g., Moscow Food Bank'
-#         })
-#     )
-    
-#     # Override username and password fields to add Bootstrap classes
-#     username = forms.CharField(
-#         max_length=150,
-#         required=True,
-#         widget=forms.TextInput(attrs={
-#             'class': 'form-control',
-#             'placeholder': 'Choose a username'
-#         })
-#     )
-    
-#     password1 = forms.CharField(
-#         label='Password',
-#         widget=forms.PasswordInput(attrs={
-#             'class': 'form-control',
-#             'placeholder': 'Create a password'
-#         })
-#     )
-    
-#     password2 = forms.CharField(
-#         label='Confirm Password',
-#         widget=forms.PasswordInput(attrs={
-#             'class': 'form-control',
-#             'placeholder': 'Confirm your password'
-#         })
-#     )
-    
-#     class Meta:
-#         model = User
-#         fields = ['registration_code', 'username', 'password1', 'password2', 'foodbank_name']
-    
-#     def clean_registration_code(self):
-#         code = self.cleaned_data.get('registration_code', '').strip()
-        
-#         # In DEBUG mode, allow "foodbanked" as a valid code
-#         if settings.DEBUG and code.lower() == 'foodbanked':
-#             return code
-        
-#         # Check if code exists and is not used
-#         try:
-#             reg_code = RegistrationCode.objects.get(code=code, is_used=False)
-#             return code
-#         except RegistrationCode.DoesNotExist:
-#             raise forms.ValidationError('Invalid or already used registration code.')
-    
-#     def save(self, commit=True):
-#         user = super().save(commit=False)
-        
-#         if commit:
-#             user.save()
-            
-#             # Create associated Foodbank
-#             foodbank_name = self.cleaned_data.get('foodbank_name')
-#             Foodbank.objects.create(
-#                 user=user,
-#                 name=foodbank_name
-#             )
-            
-#             # Mark registration code as used (unless it's the DEBUG code)
-#             code = self.cleaned_data.get('registration_code')
-#             if not (settings.DEBUG and code.lower() == 'foodbanked'):
-#                 try:
-#                     from django.utils import timezone
-#                     reg_code = RegistrationCode.objects.get(code=code)
-#                     reg_code.is_used = True
-#                     reg_code.used_by = user
-#                     reg_code.used_date = timezone.now()
-#                     reg_code.save()
-#                 except RegistrationCode.DoesNotExist:
-#                     pass
-        
-#         return user
+
 
 class FoodbankForm(forms.ModelForm):
     """Form for editing foodbank information"""
@@ -298,4 +205,57 @@ class ServiceZipcodeForm(forms.ModelForm):
                 'placeholder': 'State (e.g., WA)',
                 'maxlength': 2
             }),
+        }
+
+
+# Add this to your accounts/forms.py file
+
+from django import forms
+from .models import FoodbankOrganization
+
+class OrganizationForm(forms.ModelForm):
+    class Meta:
+        model = FoodbankOrganization
+        fields = ['name', 'region', 'address', 'city', 'state', 'zipcode', 'phone', 'email', 'website']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'placeholder': 'Organization Name'
+            }),
+            'region': forms.TextInput(attrs={
+                'placeholder': 'e.g., Idaho, Eastern Washington'
+            }),
+            'address': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Street address'
+            }),
+            'city': forms.TextInput(attrs={
+                'placeholder': 'City'
+            }),
+            'state': forms.TextInput(attrs={
+                'placeholder': 'ID',
+                'maxlength': 2
+            }),
+            'zipcode': forms.TextInput(attrs={
+                'placeholder': '12345'
+            }),
+            'phone': forms.TextInput(attrs={
+                'placeholder': '(208) 555-1234'
+            }),
+            'email': forms.EmailInput(attrs={
+                'placeholder': 'contact@organization.org'
+            }),
+            'website': forms.URLInput(attrs={
+                'placeholder': 'https://www.organization.org'
+            }),
+        }
+        labels = {
+            'name': 'Organization Name',
+            'region': 'Region',
+            'address': 'Address',
+            'city': 'City',
+            'state': 'State',
+            'zipcode': 'Zip Code',
+            'phone': 'Phone',
+            'email': 'Email',
+            'website': 'Website',
         }

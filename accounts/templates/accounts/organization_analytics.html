@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics - {{ organization.name }} - FoodBanked{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/organization_analytics.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Header -->
+    <div class="analytics-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2>
+                    <i class="fas fa-chart-line me-2"></i>
+                    Analytics Dashboard
+                </h2>
+                <p class="text-muted mb-0">Insights and reports for {{ organization.name }}</p>
+            </div>
+            <a href="{% url 'accounts:organization_dashboard' organization.slug %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-value">{{ total_foodbanks }}</div>
+                <div class="stat-label">Total Locations</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">{{ total_patrons }}</div>
+                <div class="stat-label">Total Patrons</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-value">{{ total_visits_month }}</div>
+                <div class="stat-label">Visits This Month</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-value">{{ total_visits_all_time }}</div>
+                <div class="stat-label">All-Time Visits</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coming Soon Section -->
+    <div class="card analytics-placeholder">
+        <div class="card-body text-center py-5">
+            <div class="placeholder-icon">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <h3 class="placeholder-title">Advanced Analytics Coming Soon</h3>
+            <p class="placeholder-text">
+                We're building comprehensive analytics tools to help you understand your impact across all locations.
+            </p>
+            <div class="placeholder-features">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-item">
+                            <i class="fas fa-chart-line feature-icon"></i>
+                            <h5>Trend Analysis</h5>
+                            <p>Track visits and demographics over time</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-item">
+                            <i class="fas fa-map-marked-alt feature-icon"></i>
+                            <h5>Location Insights</h5>
+                            <p>Compare performance across locations</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="feature-item">
+                            <i class="fas fa-file-export feature-icon"></i>
+                            <h5>Custom Reports</h5>
+                            <p>Generate detailed reports for stakeholders</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Breakdown (Basic) -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4 class="section-title mb-4">
+                <i class="fas fa-building me-2"></i>
+                Location Breakdown
+            </h4>
+            
+            {% if foodbank_stats %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th>City, State</th>
+                                <th class="text-center">Visits This Month</th>
+                                <th class="text-center">Total Visits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in foodbank_stats %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ stat.foodbank.name }}</strong>
+                                        {% if stat.foodbank.food_truck_enabled %}
+                                            <span class="badge bg-info ms-2">
+                                                <i class="fas fa-truck me-1"></i>Food Truck
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if stat.foodbank.city and stat.foodbank.state %}
+                                            {{ stat.foodbank.city }}, {{ stat.foodbank.state }}
+                                        {% else %}
+                                            <span class="text-muted">Not set</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="stat-badge">{{ stat.visits_month }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="stat-badge">{{ stat.total_visits }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-building text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                    <p class="text-muted mt-3">No locations data available</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/organization_analytics.js' %}"></script>
+{% endblock %}
