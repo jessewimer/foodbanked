@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from foodbanked.utils import get_foodbank_today
 from django.views.decorators.http import require_POST
 import json
-
+from .decorators import organization_required, foodbank_required
 
 def logout_view(request):
     """Custom logout view that accepts GET requests"""
@@ -41,6 +41,7 @@ def register(request):
 
 
 @login_required
+# @foodbank_required
 def dashboard(request):
     """Smart dashboard that routes based on account type"""
     
@@ -62,6 +63,7 @@ def dashboard(request):
 
 
 @login_required
+@foodbank_required
 def foodbank_dashboard(request):
     """Dashboard for individual foodbanks"""
     # Import Visit and Patron models
@@ -113,6 +115,7 @@ def foodbank_dashboard(request):
 
 
 @login_required
+@organization_required
 def organization_dashboard(request, org_slug):
     """Dashboard for organization admins"""
     from visits.models import Visit, Patron
@@ -192,6 +195,7 @@ def organization_dashboard(request, org_slug):
 
 
 @login_required
+@organization_required
 def organization_settings(request, org_slug):
     """Settings page for organization admins"""
     # Get the organization by slug
@@ -223,64 +227,9 @@ def organization_settings(request, org_slug):
     }
     return render(request, 'accounts/organization_settings.html', context)
 
-
-
-
-# @login_required
-# def dashboard(request):
-#     """Main dashboard after login with real statistics"""
-#     # Import Visit and Patron models
-#     from visits.models import Visit, Patron
     
-#     # Get the foodbank
-#     foodbank = request.user.foodbank if hasattr(request.user, 'foodbank') else None
-    
-#     if not foodbank:
-#         messages.warning(request, 'No food bank associated with your account.')
-#         return render(request, 'accounts/dashboard.html', {'foodbank': None})
-    
-#     # Calculate date ranges
-#     today = get_foodbank_today(foodbank)
-#     week_start = today - timedelta(days=today.weekday())  # Monday of this week
-#     month_start = today.replace(day=1)
-    
-#     # Get statistics
-#     visits_today = Visit.objects.filter(
-#         foodbank=foodbank,
-#         visit_date=today
-#     ).count()
-    
-#     visits_this_week = Visit.objects.filter(
-#         foodbank=foodbank,
-#         visit_date__gte=week_start
-#     ).count()
-    
-#     visits_this_month = Visit.objects.filter(
-#         foodbank=foodbank,
-#         visit_date__gte=month_start
-#     ).count()
-    
-#     total_patrons = Patron.objects.filter(
-#         foodbank=foodbank
-#     ).count()
-    
-#     # Get recent visits (last 5)
-#     recent_visits = Visit.objects.filter(
-#         foodbank=foodbank
-#     ).select_related('patron').order_by('-visit_date')[:5]
-    
-#     context = {
-#         'foodbank': foodbank,
-#         'visits_today': visits_today,
-#         'visits_this_week': visits_this_week,
-#         'visits_this_month': visits_this_month,
-#         'total_patrons': total_patrons,
-#         'recent_visits': recent_visits,
-#     }
-    
-#     return render(request, 'accounts/dashboard.html', context)
-
 @login_required
+@foodbank_required
 def account_settings(request):
     """Account settings page for managing foodbank information"""
     foodbank = request.user.foodbank
@@ -312,6 +261,7 @@ def account_settings(request):
 
 
 @login_required
+@foodbank_required
 def add_zipcode(request):
     """Add a service area zip code"""
     if request.method == 'POST':
@@ -332,6 +282,7 @@ def add_zipcode(request):
 
 
 @login_required
+@foodbank_required
 def delete_zipcode(request, pk):
     """Delete a service area zip code"""
     foodbank = request.user.foodbank
@@ -346,6 +297,7 @@ def delete_zipcode(request, pk):
 
 
 @login_required
+@foodbank_required
 def toggle_food_truck(request):
     """Toggle food truck mode for the foodbank"""
     if request.method != 'POST':
@@ -374,6 +326,7 @@ def toggle_food_truck(request):
 
 
 @login_required
+@foodbank_required
 @require_POST
 def toggle_by_name(request):
     """Toggle allow_by_name setting via AJAX"""
@@ -390,6 +343,7 @@ def toggle_by_name(request):
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 @login_required
+@foodbank_required
 @require_POST
 def toggle_anonymous(request):
     """Toggle allow_anonymous setting via AJAX"""
@@ -409,6 +363,7 @@ def toggle_anonymous(request):
 # Add this to your accounts/views.py file
 
 @login_required
+@organization_required
 def organization_analytics(request, org_slug):
     """Analytics page for organization admins"""
     from visits.models import Visit, Patron

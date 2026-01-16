@@ -11,9 +11,10 @@ from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Count
 import json
-
+from accounts.decorators import foodbank_required, organization_required
 
 @login_required
+@foodbank_required
 def visit_list(request):
     """List all visits for this foodbank with filtering"""
     foodbank = request.user.foodbank
@@ -66,6 +67,7 @@ def visit_list(request):
 
 
 @login_required
+@foodbank_required
 def visit_create(request):
     """Create a new visit with enhanced patron data"""
     foodbank = request.user.foodbank
@@ -225,6 +227,7 @@ def visit_create(request):
 
 
 @login_required
+@foodbank_required
 def visit_detail(request, pk):
     """View/Edit details of a specific visit"""
     foodbank = request.user.foodbank
@@ -251,6 +254,7 @@ def visit_detail(request, pk):
 
 
 @login_required
+@foodbank_required
 def visit_edit(request, pk):
     """Edit an existing visit"""
     foodbank = request.user.foodbank
@@ -288,6 +292,7 @@ def visit_edit(request, pk):
 
 
 @login_required
+@foodbank_required
 def visit_delete(request, pk):
     """Delete a visit"""
     foodbank = request.user.foodbank
@@ -303,6 +308,7 @@ def visit_delete(request, pk):
 
 
 @login_required
+@foodbank_required
 def patron_list(request):
     """List all patrons for this foodbank with search and filtering"""
     foodbank = request.user.foodbank
@@ -339,6 +345,7 @@ def patron_list(request):
 
 
 @login_required
+@foodbank_required
 def patron_detail(request, pk):
     """View/Edit details of a specific patron"""
     foodbank = request.user.foodbank
@@ -371,6 +378,7 @@ def patron_detail(request, pk):
 
 
 @login_required
+@foodbank_required
 def patron_create(request):
     if request.method == 'POST':
         form = PatronForm(request.POST)
@@ -406,6 +414,7 @@ def patron_create(request):
 
 
 @login_required
+@foodbank_required
 def patron_detail_api(request, patron_id):
     patron = get_object_or_404(Patron, id=patron_id, foodbank=request.user.foodbank)
     
@@ -454,6 +463,7 @@ def patron_detail_api(request, patron_id):
 
 
 @login_required
+@foodbank_required
 def patron_delete(request, pk):
     """Delete a patron"""
     foodbank = request.user.foodbank
@@ -469,6 +479,7 @@ def patron_delete(request, pk):
 
 
 @login_required
+@foodbank_required
 def analytics_view(request):
     """View statistics and reports with real data"""
     foodbank = request.user.foodbank
@@ -606,6 +617,7 @@ def analytics_view(request):
 
 
 @login_required
+@foodbank_required
 def patron_edit_ajax(request, pk):
     """AJAX endpoint for editing patron details from visit form"""
     if request.method != 'POST':
