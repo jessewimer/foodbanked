@@ -354,6 +354,79 @@ def assign_foodbank_to_organization():
     input("\nPress Enter to continue...")
 
 
+
+def geocode_all_locations():
+    """Geocode all foodbanks and organizations missing coordinates"""
+    clear_screen()
+    print_header("Geocode Locations")
+    
+    print("This will automatically generate latitude/longitude coordinates")
+    print("for all foodbanks and organizations based on their addresses.\n")
+    
+    confirm = input("Continue? [Y/N]: ").strip().upper()
+    
+    if confirm != 'Y':
+        print("\nGeocoding cancelled.")
+        input("\nPress Enter to continue...")
+        return
+    
+    print("\n" + "=" * 60)
+    print("Starting geocoding process...")
+    print("=" * 60 + "\n")
+    
+    # Geocode foodbanks
+    foodbanks = Foodbank.objects.filter(latitude__isnull=True)
+    print(f"Found {foodbanks.count()} foodbanks needing geocoding...\n")
+    
+    fb_success = 0
+    fb_failed = 0
+    
+    for fb in foodbanks:
+        print(f"Geocoding: {fb.name}...")
+        fb.save()  # This triggers the geocode() method
+        
+        if fb.latitude and fb.longitude:
+            print(f"  ✓ Success: {fb.latitude}, {fb.longitude}")
+            fb_success += 1
+        else:
+            print(f"  ✗ Failed: Could not geocode (check address)")
+            fb_failed += 1
+    
+    # Geocode organizations
+    print(f"\n{'-' * 60}\n")
+    orgs = FoodbankOrganization.objects.filter(latitude__isnull=True)
+    print(f"Found {orgs.count()} organizations needing geocoding...\n")
+    
+    org_success = 0
+    org_failed = 0
+    
+    for org in orgs:
+        print(f"Geocoding: {org.name}...")
+        org.save()  # This triggers the geocode() method
+        
+        if org.latitude and org.longitude:
+            print(f"  ✓ Success: {org.latitude}, {org.longitude}")
+            org_success += 1
+        else:
+            print(f"  ✗ Failed: Could not geocode (check address)")
+            org_failed += 1
+    
+    # Summary
+    print(f"\n{'=' * 60}")
+    print("Geocoding Complete!")
+    print("=" * 60)
+    print(f"\nFoodbanks:")
+    print(f"  ✓ Successfully geocoded: {fb_success}")
+    print(f"  ✗ Failed: {fb_failed}")
+    print(f"\nOrganizations:")
+    print(f"  ✓ Successfully geocoded: {org_success}")
+    print(f"  ✗ Failed: {org_failed}")
+    print(f"\nTotal: {fb_success + org_success} locations geocoded")
+    
+    input("\nPress Enter to continue...")
+
+
+
 def main_menu():
     """Display main menu and handle selection"""
     while True:
@@ -364,6 +437,7 @@ def main_menu():
         print("  2. Edit food bank")
         print("  3. Add food bank organization")
         print("  4. Assign food bank to organization")
+        print("  5. Geocode all locations")
         print("\n  0. Exit")
         
         choice = input("\nSelect an option: ").strip()
@@ -376,6 +450,8 @@ def main_menu():
             add_foodbank_organization()
         elif choice == '4':
             assign_foodbank_to_organization()
+        elif choice == '5':
+            geocode_all_locations()
         elif choice == '0':
             clear_screen()
             print("\nGoodbye!\n")
