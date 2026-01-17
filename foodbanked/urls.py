@@ -34,9 +34,11 @@ urlpatterns = [
     path('about/', views.about_page, name='about'),
     path('pricing/', views.pricing_page, name='pricing'),
     path('donate/', views.donate, name='donate'),
+    path('locations/', views.locations, name='locations'),
+    path('locations/search/', views.location_search, name='location_search'),
+    path('locations/<str:location_type>/<int:location_id>/', views.location_detail, name='location_detail'),
     
-    # Dashboard
-    # path('dashboard/', dashboard, name='dashboard'),
+
     
     # App URLs
     path('accounts/', include('accounts.urls')),

@@ -7,6 +7,7 @@ Simple menu-driven interface for managing foodbank accounts
 import os
 import sys
 import django
+from django.db.models import Q
 
 # Setup Django environment
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -375,7 +376,8 @@ def geocode_all_locations():
     print("=" * 60 + "\n")
     
     # Geocode foodbanks
-    foodbanks = Foodbank.objects.filter(latitude__isnull=True)
+    
+    foodbanks = Foodbank.objects.filter(Q(latitude__isnull=True) | Q(longitude__isnull=True))
     print(f"Found {foodbanks.count()} foodbanks needing geocoding...\n")
     
     fb_success = 0
@@ -384,6 +386,7 @@ def geocode_all_locations():
     for fb in foodbanks:
         print(f"Geocoding: {fb.name}...")
         fb.save()  # This triggers the geocode() method
+        fb.refresh_from_db()  # <-- Add this line to reload from database
         
         if fb.latitude and fb.longitude:
             print(f"  ✓ Success: {fb.latitude}, {fb.longitude}")
@@ -403,6 +406,7 @@ def geocode_all_locations():
     for org in orgs:
         print(f"Geocoding: {org.name}...")
         org.save()  # This triggers the geocode() method
+        org.refresh_from_db()  # <-- Add this line to reload from database
         
         if org.latitude and org.longitude:
             print(f"  ✓ Success: {org.latitude}, {org.longitude}")
@@ -426,6 +430,46 @@ def geocode_all_locations():
     input("\nPress Enter to continue...")
 
 
+def set_all_locations_public():
+    """Set all foodbanks and organizations to public"""
+    clear_screen()
+    print_header("Set All Locations to Public")
+    
+    foodbanks = Foodbank.objects.all()
+    orgs = FoodbankOrganization.objects.all()
+    
+    print(f"This will set {foodbanks.count()} foodbanks and {orgs.count()} organizations to public.\n")
+    print("Public locations will appear on the public locations map at /locations/\n")
+    
+    confirm = input("Continue? [Y/N]: ").strip().upper()
+    
+    if confirm != 'Y':
+        print("\nCancelled.")
+        input("\nPress Enter to continue...")
+        return
+    
+    print("\n" + "=" * 60)
+    
+    # Update foodbanks
+    fb_updated = 0
+    for fb in foodbanks:
+        fb.is_public = True
+        fb.save()
+        fb_updated += 1
+        print(f"✓ {fb.name} set to public")
+    
+    # Update organizations
+    org_updated = 0
+    for org in orgs:
+        org.is_public = True
+        org.save()
+        org_updated += 1
+        print(f"✓ {org.name} set to public")
+    
+    print("=" * 60)
+    print(f"\n✓ Updated {fb_updated} foodbanks and {org_updated} organizations to public")
+    
+    input("\nPress Enter to continue...")
 
 def main_menu():
     """Display main menu and handle selection"""
@@ -438,6 +482,7 @@ def main_menu():
         print("  3. Add food bank organization")
         print("  4. Assign food bank to organization")
         print("  5. Geocode all locations")
+        print("  6. Set all locations to public")
         print("\n  0. Exit")
         
         choice = input("\nSelect an option: ").strip()
@@ -452,6 +497,8 @@ def main_menu():
             assign_foodbank_to_organization()
         elif choice == '5':
             geocode_all_locations()
+        elif choice == '6':
+            set_all_locations_public()
         elif choice == '0':
             clear_screen()
             print("\nGoodbye!\n")

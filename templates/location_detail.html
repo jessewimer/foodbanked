@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ location.name }} - FoodBanked{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{% static 'css/location_detail.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="location-detail-page">
+    <!-- Header -->
+    <div class="detail-header">
+        <div class="container">
+            <a href="/locations/" class="back-link">
+                <i class="fas fa-arrow-left me-2"></i>Back to Map
+            </a>
+            
+            <div class="header-content">
+                <div class="header-badges">
+                    {% if location_type == 'foodbank' %}
+                        <span class="badge badge-foodbank">
+                            <i class="fas fa-store me-1"></i>Food Bank
+                        </span>
+                        {% if location.food_truck_enabled %}
+                            <span class="badge badge-truck">
+                                <i class="fas fa-truck me-1"></i>Food Truck Enabled
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge badge-organization">
+                            <i class="fas fa-building me-1"></i>Organization
+                        </span>
+                    {% endif %}
+                </div>
+                
+                <h1 class="location-name">{{ location.name }}</h1>
+                
+                {% if location.city and location.state %}
+                    <div class="location-address">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        {% if location.address %}
+                            {{ location.address }}<br>
+                        {% endif %}
+                        {{ location.city }}, {{ location.state }} {{ location.zipcode }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="detail-content">
+        <div class="container">
+            <div class="row">
+                <!-- Left Column - Information -->
+                <div class="col-lg-7 mb-4">
+                    <!-- About Section -->
+                    {% if location.description %}
+                        <div class="info-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-info-circle me-2"></i>About
+                            </h3>
+                            <p class="description">{{ location.description }}</p>
+                        </div>
+                    {% endif %}
+
+                    <!-- Organization Connection (for foodbanks) -->
+                    {% if location_type == 'foodbank' and location.organization %}
+                        <div class="info-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-sitemap me-2"></i>Part of
+                            </h3>
+                            <div class="organization-link">
+                                <i class="fas fa-building me-2"></i>
+                                <a href="/locations/organization/{{ location.organization.id }}/">
+                                    {{ location.organization.name }}
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Member Locations (for organizations) -->
+                    {% if location_type == 'organization' %}
+                        <div class="info-card">
+                            <h3 class="card-title">
+                                <i class="fas fa-store me-2"></i>Member Food Banks
+                            </h3>
+                            {% if location.foodbanks.all %}
+                                <div class="member-list">
+                                    {% for foodbank in location.foodbanks.all %}
+                                        {% if foodbank.is_public %}
+                                            <a href="/locations/foodbank/{{ foodbank.id }}/" class="member-item">
+                                                <i class="fas fa-store me-2"></i>
+                                                {{ foodbank.name }}
+                                                {% if foodbank.city and foodbank.state %}
+                                                    <span class="member-location">{{ foodbank.city }}, {{ foodbank.state }}</span>
+                                                {% endif %}
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No public member locations listed</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Contact Information -->
+                    <div class="info-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-address-card me-2"></i>Contact Information
+                        </h3>
+                        <div class="contact-info">
+                            {% if location.phone %}
+                                <div class="contact-item">
+                                    <i class="fas fa-phone me-2"></i>
+                                    <a href="tel:{{ location.phone }}">{{ location.phone }}</a>
+                                </div>
+                            {% endif %}
+                            {% if location.email %}
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    <a href="mailto:{{ location.email }}">{{ location.email }}</a>
+                                </div>
+                            {% endif %}
+                            {% if location.website %}
+                                <div class="contact-item">
+                                    <i class="fas fa-globe me-2"></i>
+                                    <a href="{{ location.website }}" target="_blank" rel="noopener">
+                                        Visit Website
+                                        <i class="fas fa-external-link-alt ms-1" style="font-size: 0.8rem;"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if not location.phone and not location.email and not location.website %}
+                                <p class="text-muted">Contact information not available</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Map -->
+                <div class="col-lg-5 mb-4">
+                    <div class="map-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-map me-2"></i>Location
+                        </h3>
+                        <div id="detailMap"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden location data for map -->
+<script id="location-data" type="application/json">
+{
+    "latitude": {{ location.latitude|default:"null" }},
+    "longitude": {{ location.longitude|default:"null" }},
+    "name": "{{ location.name|escapejs }}",
+    "type": "{{ location_type }}"
+}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/location_detail.js' %}"></script>
+{% endblock %}

@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 import json
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from accounts.models import Foodbank, FoodbankOrganization
+from django.db.models import Q
 
 
 def landing_page(request):
@@ -259,3 +262,156 @@ def donate(request):
 def custom_404(request, exception):
     """Custom 404 error handler"""
     return render(request, '404.html', status=404)
+
+
+
+# def locations(request):
+#     """Public locations map page"""
+#     # Get all public foodbanks and organizations with coordinates
+#     foodbanks = Foodbank.objects.filter(
+#         is_public=True,
+#         latitude__isnull=False,
+#         longitude__isnull=False
+#     ).select_related('organization').values(
+#         'id', 'name', 'city', 'state', 'latitude', 'longitude', 
+#         'description', 'food_truck_enabled', 'organization__name'
+#     )
+    
+#     organizations = FoodbankOrganization.objects.filter(
+#         is_public=True,
+#         latitude__isnull=False,
+#         longitude__isnull=False
+#     ).values(
+#         'id', 'name', 'city', 'state', 'latitude', 'longitude', 'description'
+#     )
+    
+#     context = {
+#         'foodbanks_json': list(foodbanks),
+#         'organizations_json': list(organizations),
+#         'total_locations': len(foodbanks) + len(organizations),
+#     }
+    
+#     return render(request, 'locations.html', context)
+def locations(request):
+    """Public locations map page"""
+    import json
+    
+    # Get all public foodbanks and organizations with coordinates
+    foodbanks = Foodbank.objects.filter(
+        is_public=True,
+        latitude__isnull=False,
+        longitude__isnull=False
+    ).select_related('organization')
+    
+    organizations = FoodbankOrganization.objects.filter(
+        is_public=True,
+        latitude__isnull=False,
+        longitude__isnull=False
+    )
+    
+    # Convert to list of dicts manually
+    foodbanks_list = []
+    for fb in foodbanks:
+        foodbanks_list.append({
+            'id': fb.id,
+            'name': fb.name,
+            'city': fb.city,
+            'state': fb.state,
+            'latitude': float(fb.latitude) if fb.latitude else None,
+            'longitude': float(fb.longitude) if fb.longitude else None,
+            'description': fb.description,
+            'food_truck_enabled': fb.food_truck_enabled,
+            'organization__name': fb.organization.name if fb.organization else None,
+        })
+    
+    organizations_list = []
+    for org in organizations:
+        organizations_list.append({
+            'id': org.id,
+            'name': org.name,
+            'city': org.city,
+            'state': org.state,
+            'latitude': float(org.latitude) if org.latitude else None,
+            'longitude': float(org.longitude) if org.longitude else None,
+            'description': org.description,
+        })
+    
+    # Convert to JSON
+    foodbanks_json = json.dumps(foodbanks_list)
+    organizations_json = json.dumps(organizations_list)
+    
+    context = {
+        'foodbanks_json': foodbanks_json,
+        'organizations_json': organizations_json,
+        'total_locations': len(foodbanks_list) + len(organizations_list),
+    }
+    
+    return render(request, 'locations.html', context)
+
+
+def location_search(request):
+    """AJAX endpoint for searching locations"""
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'results': []})
+    
+    # Search foodbanks
+    foodbanks = Foodbank.objects.filter(
+        is_public=True,
+        name__icontains=query
+    ).values('id', 'name', 'city', 'state')[:5]
+    
+    # Search organizations
+    organizations = FoodbankOrganization.objects.filter(
+        is_public=True,
+        name__icontains=query
+    ).values('id', 'name', 'city', 'state')[:5]
+    
+    results = []
+    
+    for fb in foodbanks:
+        results.append({
+            'type': 'foodbank',
+            'id': fb['id'],
+            'name': fb['name'],
+            'location': f"{fb['city']}, {fb['state']}" if fb['city'] and fb['state'] else 'Location not set'
+        })
+    
+    for org in organizations:
+        results.append({
+            'type': 'organization',
+            'id': org['id'],
+            'name': org['name'],
+            'location': f"{org['city']}, {org['state']}" if org['city'] and org['state'] else 'Location not set'
+        })
+    
+    return JsonResponse({'results': results})
+
+def location_detail(request, location_type, location_id):
+    """Detail page for a specific location"""
+    if location_type == 'foodbank':
+        location = get_object_or_404(
+            Foodbank, 
+            id=location_id, 
+            is_public=True
+        )
+        location_kind = 'Food Bank'
+    elif location_type == 'organization':
+        location = get_object_or_404(
+            FoodbankOrganization, 
+            id=location_id, 
+            is_public=True
+        )
+        location_kind = 'Organization'
+    else:
+        from django.http import Http404
+        raise Http404("Invalid location type")
+    
+    context = {
+        'location': location,
+        'location_type': location_type,
+        'location_kind': location_kind,
+    }
+    
+    return render(request, 'location_detail.html', context)
