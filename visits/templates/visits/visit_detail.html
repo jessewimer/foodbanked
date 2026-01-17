@@ -157,8 +157,10 @@
                                         </div>
                                     {% endif %}
                                 </div>
-
-                                <div class="form-group mb-3">
+                                
+                                <!-- Hidden household_size field (auto-calculated) -->
+                                <input type="hidden" name="household_size" id="{{ form.household_size.id_for_label }}" value="{{ form.household_size.value|default:0 }}">
+                                {% comment %} <div class="form-group mb-3">
                                     <label for="{{ form.household_size.id_for_label }}" class="form-label">
                                         Household Size <span class="text-danger">*</span>
                                     </label>
@@ -168,7 +170,7 @@
                                             {{ form.household_size.errors.0 }}
                                         </div>
                                     {% endif %}
-                                </div>
+                                </div> {% endcomment %}
 
                                 <div class="form-check mb-3">
                                     {{ form.first_visit_this_month }}
@@ -213,7 +215,6 @@
                             <!-- Action Buttons -->
                             <div class="detail-actions">
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
-                                {% comment %} <a href="{% url 'visits:visit_detail' visit.pk %}" class="btn btn-outline-secondary">Cancel</a> {% endcomment %}
                                 <a href="{% url 'visits:visit_detail' visit.pk %}{% if request.GET.from %}?from={{ request.GET.from }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
@@ -250,4 +251,35 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Only run in edit mode
+    {% if edit_mode %}
+    const ageFields = [
+        document.getElementById('{{ form.age_0_18.id_for_label }}'),
+        document.getElementById('{{ form.age_19_59.id_for_label }}'),
+        document.getElementById('{{ form.age_60_plus.id_for_label }}')
+    ];
+    const householdSizeField = document.getElementById('{{ form.household_size.id_for_label }}');
+    
+    function updateHouseholdSize() {
+        const total = ageFields.reduce((sum, field) => {
+            return sum + (parseInt(field.value) || 0);
+        }, 0);
+        householdSizeField.value = total;
+    }
+    
+    // Update on any age field change
+    ageFields.forEach(field => {
+        field.addEventListener('input', updateHouseholdSize);
+    });
+    
+    // Set initial value
+    updateHouseholdSize();
+    {% endif %}
+});
+</script>
 {% endblock %}

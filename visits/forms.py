@@ -82,11 +82,11 @@ class VisitForm(forms.ModelForm):
         age_60_plus = cleaned_data.get('age_60_plus', 0)
         
         total_ages = age_0_18 + age_19_59 + age_60_plus
-        
-        if total_ages != household_size:
-            raise forms.ValidationError(
-                f'Age groups must add up to household size ({household_size}). Currently adds to {total_ages}.'
-            )
+        cleaned_data['household_size'] = total_ages
+        # if total_ages != household_size:
+        #     raise forms.ValidationError(
+        #         f'Age groups must add up to household size ({household_size}). Currently adds to {total_ages}.'
+        #     )
         
         return cleaned_data
     

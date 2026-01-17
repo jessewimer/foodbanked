@@ -32,7 +32,7 @@
                         {% endif %}
                         
                         <!-- Registration Code Field -->
-                        <div class="form-group">
+                        {% comment %} <div class="form-group">
                             <label for="{{ form.registration_code.id_for_label }}" class="form-label">
                                 Registration Code <span class="text-danger">*</span>
                             </label>
@@ -43,6 +43,22 @@
                                 </div>
                             {% else %}
                                 <small class="form-text text-muted">{{ form.registration_code.help_text }}</small>
+                            {% endif %}
+                        </div> {% endcomment %}
+
+                        <div class="form-group">
+                            <label for="{{ form.registration_code.id_for_label }}" class="form-label">
+                                Registration Code <span class="text-danger">*</span>
+                            </label>
+                            {{ form.registration_code }}
+                            {% if form.registration_code.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.registration_code.errors.0 }}
+                                </div>
+                            {% else %}
+                                <small class="form-text text-muted">
+                                    Don't have a registration code? <a href="mailto:register@foodbanked.org?subject=Registration%20Code%20Request&body=Hi,%0D%0A%0D%0AI%20would%20like%20to%20request%20a%20registration%20code%20for%20FoodBanked.%0D%0A%0D%0AFood%20Bank%20Name:%20%0D%0AContact%20Name:%20%0D%0AEmail:%20%0D%0APhone:%20%0D%0A%0D%0AThank%20you!">Contact us</a> to request one.
+                                </small>
                             {% endif %}
                         </div>
                         
