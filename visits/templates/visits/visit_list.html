@@ -79,7 +79,8 @@
             {% if visits %}
                 <div class="visits-list">
                     {% for visit in visits %}
-                    <a href="{% url 'visits:visit_detail' visit.pk %}" class="visit-list-item">
+                    {% comment %} <a href="{% url 'visits:visit_detail' visit.pk %}" class="visit-list-item"> {% endcomment %}
+                    <a href="{% url 'visits:visit_detail' visit.pk %}?from=list" class="visit-list-item">
                         <div class="visit-main-info">
                             <!-- Patron Name -->
                             <div class="visit-patron-info">

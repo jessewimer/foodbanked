@@ -105,43 +105,6 @@ function createPopupContent(location, type) {
         </div>
     `;
 }
-// function createPopupContent(location, type) {
-//     const isFoodbank = type === 'foodbank';
-//     const cityState = location.city && location.state 
-//         ? `${location.city}, ${location.state}` 
-//         : 'Location details not available';
-    
-//     let badges = `<span class="popup-badge badge-${type}">${isFoodbank ? 'Food Bank' : 'Organization'}</span>`;
-    
-//     if (isFoodbank && location.food_truck_enabled) {
-//         badges += '<span class="popup-badge badge-truck"><i class="fas fa-truck me-1"></i>Food Truck</span>';
-//     }
-    
-//     if (isFoodbank && location.organization__name) {
-//         badges += `<span class="popup-badge badge-organization">${escapeHtml(location.organization__name)}</span>`;
-//     }
-    
-//     const description = location.description 
-//         ? `<p class="popup-description">${escapeHtml(location.description)}</p>` 
-//         : '';
-    
-//     return `
-//         <div class="popup-content">
-//             <h3 class="popup-title">${escapeHtml(location.name)}</h3>
-//             <div class="popup-location">
-//                 <i class="fas fa-map-marker-alt"></i>
-//                 ${escapeHtml(cityState)}
-//             </div>
-//             <div class="popup-badges">
-//                 ${badges}
-//             </div>
-//             ${description}
-//             <a href="/locations/${type}/${location.id}/" class="popup-button">
-//                 View Details
-//             </a>
-//         </div>
-//     `;
-// }
 
 /**
  * Initialize search functionality

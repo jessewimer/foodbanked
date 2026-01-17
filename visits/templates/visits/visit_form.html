@@ -275,7 +275,7 @@
                     {% if recent_visits %}
                         <div class="recent-visits-list">
                             {% for visit in recent_visits %}
-                            <a href="{% url 'visits:visit_detail' visit.pk %}" class="recent-visit-item">
+                            <a href="{% url 'visits:visit_detail' visit.pk %}?from=form" class="recent-visit-item">
                                 <div class="visit-patron">
                                     {% if visit.patron %}
                                         <span class="patron-icon">👤</span>

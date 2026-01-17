@@ -12,8 +12,11 @@
             <div class="col-lg-8">
                 <!-- Header -->
                 <div class="detail-header">
-                    <a href="{% url 'visits:visit_create' %}" class="back-link">
+                    {% comment %} <a href="{% url 'visits:visit_create' %}" class="back-link">
                         ← Back to New Visit
+                    </a> {% endcomment %}
+                    <a href="{% if request.GET.from == 'list' %}{% url 'visits:visit_list' %}{% else %}{% url 'visits:visit_create' %}{% endif %}" class="back-link">
+                        ← Back to {% if request.GET.from == 'list' %}Visits{% else %}New Visit{% endif %}
                     </a>
                     <h1 class="detail-title">Visit Details</h1>
                 </div>
@@ -98,7 +101,7 @@
 
                             <!-- Action Buttons -->
                             <div class="detail-actions">
-                                <a href="?edit=true" class="btn btn-primary">Edit Visit</a>
+                                <a href="?edit=true{% if request.GET.from %}&from={{ request.GET.from }}{% endif %}" class="btn btn-primary">Edit Visit</a>
                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                     Delete Visit
                                 </button>
@@ -210,7 +213,8 @@
                             <!-- Action Buttons -->
                             <div class="detail-actions">
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
-                                <a href="{% url 'visits:visit_detail' visit.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                                {% comment %} <a href="{% url 'visits:visit_detail' visit.pk %}" class="btn btn-outline-secondary">Cancel</a> {% endcomment %}
+                                <a href="{% url 'visits:visit_detail' visit.pk %}{% if request.GET.from %}?from={{ request.GET.from }}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
                     {% endif %}
