@@ -23,7 +23,46 @@
 .pricing-subtitle {
     font-size: 1.25rem;
     color: #6b7280;
+    max-width: 700px;
+    margin: 0 auto 1.5rem;
+}
+
+.launch-notice {
+    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
     max-width: 600px;
+    margin: 0 auto;
+    border-left: 4px solid #d97706;
+}
+
+.launch-notice p {
+    margin: 0;
+    color: #92400e;
+    font-weight: 500;
+}
+
+/* Pricing Categories */
+.pricing-category {
+    margin-bottom: 4rem;
+}
+
+.category-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.category-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.category-description {
+    color: #6b7280;
+    font-size: 1rem;
+    max-width: 700px;
     margin: 0 auto;
 }
 
@@ -31,8 +70,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
-    max-width: 1000px;
-    margin: 0 auto 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .pricing-card {
@@ -42,6 +81,8 @@
     border: 2px solid #e5e7eb;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 .pricing-card:hover {
@@ -79,32 +120,28 @@
     color: #6b7280;
     font-size: 0.95rem;
     margin-bottom: 1.5rem;
+    min-height: 40px;
 }
 
 .plan-price {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-}
-
-.plan-price span {
-    font-size: 1.25rem;
-    color: #6b7280;
-    font-weight: 400;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #d97706;
+    margin-bottom: 1.5rem;
 }
 
 .plan-features {
     list-style: none;
     padding: 0;
-    margin: 2rem 0;
+    margin: 0 0 2rem 0;
+    flex-grow: 1;
 }
 
 .plan-features li {
     padding: 0.75rem 0;
     color: #4b5563;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.5rem;
 }
 
@@ -113,43 +150,183 @@
     color: #10b981;
     font-weight: 700;
     font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
 }
 
 .plan-cta {
     width: 100%;
+    margin-top: auto;
 }
 
-.faq-section {
-    max-width: 800px;
-    margin: 4rem auto 0;
+/* Organization Section */
+.organization-section {
+    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+    padding: 3rem;
+    border-radius: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.faq-title {
+.org-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.org-info h2 {
     font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
+    font-size: 2.25rem;
     color: #1f2937;
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.faq-item {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid #e5e7eb;
     margin-bottom: 1rem;
 }
 
-.faq-question {
+.org-info p {
+    color: #4b5563;
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.org-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+}
+
+.org-features li {
+    padding: 0.5rem 0;
+    color: #1f2937;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.org-features li::before {
+    content: "✓";
+    color: #d97706;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.org-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.org-card .plan-name {
+    font-size: 2rem;
+}
+
+.org-card .plan-price {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Contact CTA Section */
+.contact-cta-section {
+    background: white;
+    padding: 3rem;
+    border-radius: 1rem;
+    max-width: 800px;
+    margin: 4rem auto 0;
+    text-align: center;
+    border: 2px solid #e5e7eb;
+}
+
+.contact-cta-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.contact-cta-section p {
+    color: #6b7280;
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.contact-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.contact-method {
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    transition: all 0.3s;
+}
+
+.contact-method:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+}
+
+.contact-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.contact-method h3 {
+    font-size: 1rem;
     font-weight: 600;
     color: #1f2937;
     margin-bottom: 0.5rem;
 }
 
-.faq-answer {
+.contact-method a {
+    color: #d97706;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-method a:hover {
+    text-decoration: underline;
+}
+
+/* Value Props Section */
+.value-props {
+    max-width: 1000px;
+    margin: 4rem auto;
+}
+
+.value-props-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.value-prop {
+    text-align: center;
+    padding: 2rem;
+}
+
+.value-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.value-prop h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.value-prop p {
     color: #6b7280;
     line-height: 1.6;
-    margin: 0;
 }
 
 @media (max-width: 768px) {
@@ -165,8 +342,16 @@
         padding: 1.5rem;
     }
     
-    .plan-price {
-        font-size: 2.5rem;
+    .org-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .organization-section {
+        padding: 2rem;
+    }
+    
+    .contact-methods {
+        grid-template-columns: 1fr;
     }
 }
 </style>
@@ -177,111 +362,158 @@
     <div class="container">
         <!-- Hero Section -->
         <div class="pricing-hero">
-            <h1 class="pricing-title">Simple, Transparent Pricing</h1>
+            <h1 class="pricing-title">Affordable Plans for Every Food Bank</h1>
             <p class="pricing-subtitle">
-                Choose the plan that works best for your food bank. No hidden fees, no surprises.
+                We're designing flexible pricing tiers to fit food banks of all sizes—from small community pantries to large regional organizations.
             </p>
-        </div>
-
-        <!-- Pricing Cards -->
-        <div class="pricing-cards">
-            <!-- Starter Plan -->
-            <div class="pricing-card">
-                <h2 class="plan-name">Starter</h2>
-                <p class="plan-description">Perfect for small food banks just getting started</p>
-                <div class="plan-price">
-                    Free
-                </div>
-                <ul class="plan-features">
-                    <li>Up to 100 visits per month</li>
-                    <li>Patron management</li>
-                    <li>Basic statistics and reports</li>
-                    <li>Email support</li>
-                </ul>
-                <a href="/accounts/register/" class="btn btn-outline-primary plan-cta">Get Started</a>
-            </div>
-
-            <!-- Professional Plan -->
-            <div class="pricing-card featured">
-                <span class="featured-badge">Most Popular</span>
-                <h2 class="plan-name">Professional</h2>
-                <p class="plan-description">For established food banks with regular operations</p>
-                <div class="plan-price">
-                    $10<span>/month</span>
-                </div>
-                <ul class="plan-features">
-                    <li>Unlimited visits</li>
-                    <li>Patron management</li>
-                    <li>Advanced statistics & automatic reports</li>
-                    <li>Food truck visit tracking</li>
-                    <li>Custom training</li>
-                    <li>Priority email support</li>
-                    <li>Phone support</li>
-                </ul>
-                <a href="/accounts/register/" class="btn btn-primary plan-cta">Start Free Trial</a>
-            </div>
-
-            <!-- Enterprise Plan -->
-            <div class="pricing-card">
-                <h2 class="plan-name">Enterprise</h2>
-                <p class="plan-description">For large organizations with multiple locations</p>
-                <div class="plan-price">
-                    Custom
-                </div>
-                <ul class="plan-features">
-                    <li>Everything in Professional</li>
-                    <li>Multiple food bank accounts</li>
-                    <li>Custom integrations</li>
-                    <li>Dedicated account manager</li>
-                    {% comment %} <li>Custom training</li> {% endcomment %}
-                    <li>Priority phone support</li>
-                </ul>
-                <a href="mailto:hello@foodbanked.org" class="btn btn-outline-primary plan-cta">Contact Us</a>
+            <div class="launch-notice">
+                <p>💡 We're finalizing our pricing structure. Reach out to discuss options tailored to your needs!</p>
             </div>
         </div>
 
-        <!-- FAQ Section -->
-        <div class="faq-section">
-            <h2 class="faq-title">Frequently Asked Questions</h2>
+        <!-- Individual Pantries Section -->
+        <div class="pricing-category">
+            <div class="category-header">
+                <h2 class="category-title">For Individual Food Pantries</h2>
+                <p class="category-description">
+                    Three tiers designed to scale with your pantry as you grow
+                </p>
+            </div>
+
+            <div class="pricing-cards">
+                <!-- Starter Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Starter</h3>
+                    <p class="plan-description">Perfect for small pantries just getting started</p>
+                    <div class="plan-price">Free Option Available</div>
+                    
+                    <ul class="plan-features">
+                        <li>Visit tracking and patron management</li>
+                        <li>Basic statistics and reports</li>
+                        <li>Essential features for small operations</li>
+                        <li>Email support</li>
+                    </ul>
+                    <a href="mailto:hello@foodbanked.org?subject=Starter%20Plan%20Inquiry&body=Hi,%0D%0A%0D%0AI'm%20interested%20in%20learning%20more%20about%20the%20Starter%20plan.%0D%0A%0D%0AFood%20Bank%20Name:%20%0D%0AContact%20Name:%20%0D%0AEmail:%20%0D%0APhone:%20%0D%0A%0D%0AThank%20you!" class="btn btn-outline-primary plan-cta">Learn More</a>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="pricing-card featured">
+                    <span class="featured-badge">Most Popular</span>
+                    <h3 class="plan-name">Professional</h3>
+                    <p class="plan-description">For established pantries with regular operations</p>
+                    <div class="plan-price">Affordable Monthly Rate</div>
+                    
+                    <ul class="plan-features">
+                        <li>Higher visit capacity for busy pantries</li>
+                        <li>Advanced statistics & automated reports</li>
+                        <li>Food truck visit tracking</li>
+                        <li>Priority email support</li>
+                        <li>Annual payment discount available</li>
+                    </ul>
+                    <a href="mailto:hello@foodbanked.org?subject=Professional%20Plan%20Inquiry&body=Hi,%0D%0A%0D%0AI'm%20interested%20in%20learning%20more%20about%20the%20Professional%20plan.%0D%0A%0D%0AFood%20Bank%20Name:%20%0D%0AContact%20Name:%20%0D%0AEmail:%20%0D%0APhone:%20%0D%0A%0D%0AThank%20you!" class="btn btn-primary plan-cta">Learn More</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Enterprise</h3>
+                    <p class="plan-description">For large pantries with multiple locations</p>
+                    <div class="plan-price">Custom Pricing</div>
+                    
+                    <ul class="plan-features">
+                        <li>Unlimited visits for high-volume operations</li>
+                        <li>Multi-location management</li>
+                        <li>Custom integrations available</li>
+                        <li>Dedicated account manager</li>
+                        <li>Priority phone support</li>
+                        <li>Flexible payment terms</li>
+                    </ul>
+                    <a href="mailto:hello@foodbanked.org?subject=Enterprise%20Plan%20Inquiry&body=Hi,%0D%0A%0D%0AI'm%20interested%20in%20learning%20more%20about%20the%20Enterprise%20plan.%0D%0A%0D%0AFood%20Bank%20Name:%20%0D%0AContact%20Name:%20%0D%0AEmail:%20%0D%0APhone:%20%0D%0A%0D%0AThank%20you!" class="btn btn-outline-primary plan-cta">Learn More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Food Bank Organizations Section -->
+        <div class="pricing-category">
+            <div class="organization-section">
+                <div class="org-content">
+                    <div class="org-info">
+                        <h2>For Food Bank Organizations</h2>
+                        <p>
+                            Powerful network management tools designed for regional food bank organizations and state-level networks overseeing multiple member pantries.
+                        </p>
+                        <ul class="org-features">
+                            <li>Real-time visibility across all member pantries</li>
+                            <li>Consolidated reporting & analytics</li>
+                            <li>Automated data collection from member locations</li>
+                            <li>Compare performance across your network</li>
+                            <li>Bulk member management tools</li>
+                            <li>Custom integrations with your existing systems</li>
+                            <li>No extra cost for member pantries to participate</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="org-card">
+                        <h3 class="plan-name">Network Plan</h3>
+                        <p class="plan-description">Tailored solutions for food bank organizations</p>
+                        <div class="plan-price">Let's Talk</div>
+                        <ul class="plan-features">
+                            <li>Custom pricing based on network size</li>
+                            <li>Network-wide dashboard and analytics</li>
+                            <li>Automated monthly reports</li>
+                            <li>Dedicated account manager</li>
+                            <li>Priority support for your team</li>
+                            <li>Custom training and onboarding</li>
+                        </ul>
+                        <a href="mailto:hello@foodbanked.org?subject=Network%20Plan%20Inquiry&body=Hi,%0D%0A%0D%0AI'm%20interested%20in%20learning%20more%20about%20the%20Network%20Plan%20for%20food%20bank%20organizations.%0D%0A%0D%0AOrganization%20Name:%20%0D%0ANumber%20of%20Member%20Pantries:%20%0D%0AContact%20Name:%20%0D%0AEmail:%20%0D%0APhone:%20%0D%0A%0D%0AThank%20you!" class="btn btn-primary plan-cta">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Value Props -->
+        <div class="value-props">
+            <div class="value-props-grid">
+                <div class="value-prop">
+                    <div class="value-icon">💰</div>
+                    <h3>Budget-Friendly</h3>
+                    <p>Pricing designed specifically for non-profit budgets with no hidden fees</p>
+                </div>
+                <div class="value-prop">
+                    <div class="value-icon">📈</div>
+                    <h3>Scales With You</h3>
+                    <p>Start free and upgrade as your operations grow—change plans anytime</p>
+                </div>
+                <div class="value-prop">
+                    <div class="value-icon">🤝</div>
+                    <h3>Flexible Terms</h3>
+                    <p>Monthly or annual billing options with special arrangements for larger organizations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact CTA -->
+        <div class="contact-cta-section">
+            <h2>Ready to Learn More?</h2>
+            <p>
+                We're happy to discuss which plan would work best for your food bank and answer any questions you have about features, pricing, or implementation.
+            </p>
             
-            <div class="faq-item">
-                <h3 class="faq-question">Can I switch plans later?</h3>
-                <p class="faq-answer">
-                    Yes! You can upgrade or downgrade your plan at any time. Changes take effect 
-                    immediately, and we'll prorate any charges.
-                </p>
-            </div>
-
-            <div class="faq-item">
-                <h3 class="faq-question">Is there a free trial?</h3>
-                <p class="faq-answer">
-                    Yes, the Professional plan comes with a 30-day free trial. No credit card required. 
-                    The Starter plan is free forever.
-                </p>
-            </div>
-
-            <div class="faq-item">
-                <h3 class="faq-question">What payment methods do you accept?</h3>
-                <p class="faq-answer">
-                    We accept all major credit cards (Visa, Mastercard, American Express, Discover) 
-                    and can arrange invoicing for Enterprise customers.
-                </p>
-            </div>
-
-            <div class="faq-item">
-                <h3 class="faq-question">Can I get a discount for non-profits?</h3>
-                <p class="faq-answer">
-                    Our pricing is already designed with non-profit budgets in mind. For additional 
-                    discounts or special circumstances, please contact us directly.
-                </p>
-            </div>
-
-            <div class="faq-item">
-                <h3 class="faq-question">What happens to my data if I cancel?</h3>
-                <p class="faq-answer">
-                    Your data is always yours. You can export all your data at any time, and we'll 
-                    retain it for 90 days after cancellation in case you want to come back.
-                </p>
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="contact-icon">📧</div>
+                    <h3>Email Us</h3>
+                    <a href="mailto:hello@foodbanked.org">hello@foodbanked.org</a>
+                </div>
+                <div class="contact-method">
+                    <div class="contact-icon">📅</div>
+                    <h3>Schedule a Demo</h3>
+                    <a href="mailto:hello@foodbanked.org?subject=Demo%20Request">Request a demo</a>
+                </div>
+                <div class="contact-method">
+                    <div class="contact-icon">💬</div>
+                    <h3>General Inquiry</h3>
+                    <a href="mailto:hello@foodbanked.org?subject=Pricing%20Question">Ask a question</a>
+                </div>
             </div>
         </div>
     </div>

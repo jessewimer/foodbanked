@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Support Our Mission - FoodBanked{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/donate.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <!-- Hero Section -->
+    <div class="donate-hero">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="hero-title">Help Us Serve Food Banks Better</h1>
+                <p class="hero-subtitle">
+                    There are many ways to support our mission of empowering food banks with simple, affordable technology that serves communities in need.
+                </p>
+                <div class="hero-stats">
+                    {% comment %} <div class="stat-item">
+                        <i class="fas fa-building"></i>
+                        <span class="stat-number">Growing</span>
+                        <span class="stat-label">Food Banks Served</span>
+                    </div> {% endcomment %}
+                    <div class="stat-item">
+                        <i class="fas fa-building"></i>
+                        <span class="stat-number">Purpose-Built</span>
+                        <span class="stat-label">For Food Banks</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-heart"></i>
+                        <span class="stat-number">Mission-Driven</span>
+                        <span class="stat-label">100% Impact Focused</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="impact-card">
+                    <div class="impact-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Your Impact</h3>
+                    <p>
+                        Every bit of support helps us keep costs low for food banks and develop features 
+                        that make their critical work easier. Together, we're helping communities fight hunger.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% comment %}
+    <!-- Donation Options - TEMPORARILY DISABLED -->
+    <div class="donation-section">
+        <!-- Full donation section commented out -->
+    </div>
+    {% endcomment %}
+
+    <!-- Impact Stories -->
+    <div class="impact-section">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Our Focus Areas</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="impact-item">
+                    <div class="impact-number">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h4>Platform Development</h4>
+                    <p>
+                        Build new features and improve existing tools to better serve food banks
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="impact-item">
+                    <div class="impact-number">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <h4>Affordable Access</h4>
+                    <p>
+                        Keep costs low for small pantries and provide free access to those who need it most
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="impact-item">
+                    <div class="impact-number">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h4>Support & Training</h4>
+                    <p>
+                        Provide excellent support and training resources for food bank staff
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ways to Help -->
+    <div class="alternatives-section">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <h2 class="section-title mb-4">Ways You Can Help</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <i class="fas fa-bullhorn alt-icon"></i>
+                        <h5>Spread the Word</h5>
+                        <p class="text-muted">Tell food banks in your community about FoodBanked</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <i class="fas fa-comments alt-icon"></i>
+                        <h5>Share Feedback</h5>
+                        <p class="text-muted">Help us improve by sharing your ideas and suggestions</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <i class="fas fa-hands-helping alt-icon"></i>
+                        <h5>Volunteer Locally</h5>
+                        <p class="text-muted">Support your local food bank directly</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="contact-section text-center">
+        <h4>Want to learn more or get involved?</h4>
+        <p>
+            We'd love to hear from you. Reach out at 
+            <a href="mailto:contact@foodbanked.org">contact@foodbanked.org</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/donate.js' %}"></script>
+{% endblock %}

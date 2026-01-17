@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* Pricing Page Specific Styles */
+.pricing-section {
+    padding: 4rem 0;
+}
+
+.pricing-hero {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.pricing-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.pricing-subtitle {
+    font-size: 1.25rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.pricing-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto 3rem;
+}
+
+.pricing-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.pricing-card:hover {
+    border-color: #d97706;
+    box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.2);
+    transform: translateY(-5px);
+}
+
+.pricing-card.featured {
+    border-color: #d97706;
+    position: relative;
+}
+
+.featured-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: #d97706;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.plan-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.75rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.plan-description {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.plan-price {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.plan-price span {
+    font-size: 1.25rem;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.plan-features li {
+    padding: 0.75rem 0;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.plan-features li::before {
+    content: "✓";
+    color: #10b981;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.plan-cta {
+    width: 100%;
+}
+
+.faq-section {
+    max-width: 800px;
+    margin: 4rem auto 0;
+}
+
+.faq-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.faq-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+}
+
+.faq-question {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.faq-answer {
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .pricing-title {
+        font-size: 2rem;
+    }
+    
+    .pricing-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-card {
+        padding: 1.5rem;
+    }
+    
+    .plan-price {
+        font-size: 2.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="pricing-section">
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="pricing-hero">
+            <h1 class="pricing-title">Simple, Transparent Pricing</h1>
+            <p class="pricing-subtitle">
+                Choose the plan that works best for your food bank. No hidden fees, no surprises.
+            </p>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="pricing-cards">
+            <!-- Starter Plan -->
+            <div class="pricing-card">
+                <h2 class="plan-name">Starter</h2>
+                <p class="plan-description">Perfect for small food banks just getting started</p>
+                <div class="plan-price">
+                    Free
+                </div>
+                <ul class="plan-features">
+                    <li>Up to 100 visits per month</li>
+                    <li>Patron management</li>
+                    <li>Basic statistics and reports</li>
+                    <li>Email support</li>
+                </ul>
+                <a href="/accounts/register/" class="btn btn-outline-primary plan-cta">Get Started</a>
+            </div>
+
+            <!-- Professional Plan -->
+            <div class="pricing-card featured">
+                <span class="featured-badge">Most Popular</span>
+                <h2 class="plan-name">Professional</h2>
+                <p class="plan-description">For established food banks with regular operations</p>
+                <div class="plan-price">
+                    $10<span>/month</span>
+                </div>
+                <ul class="plan-features">
+                    <li>Unlimited visits</li>
+                    <li>Patron management</li>
+                    <li>Advanced statistics & automatic reports</li>
+                    <li>Food truck visit tracking</li>
+                    <li>Custom training</li>
+                    <li>Priority email support</li>
+                    <li>Phone support</li>
+                </ul>
+                <a href="/accounts/register/" class="btn btn-primary plan-cta">Start Free Trial</a>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="pricing-card">
+                <h2 class="plan-name">Enterprise</h2>
+                <p class="plan-description">For large organizations with multiple locations</p>
+                <div class="plan-price">
+                    Custom
+                </div>
+                <ul class="plan-features">
+                    <li>Everything in Professional</li>
+                    <li>Multiple food bank accounts</li>
+                    <li>Custom integrations</li>
+                    <li>Dedicated account manager</li>
+                    {% comment %} <li>Custom training</li> {% endcomment %}
+                    <li>Priority phone support</li>
+                </ul>
+                <a href="mailto:hello@foodbanked.org" class="btn btn-outline-primary plan-cta">Contact Us</a>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <h3 class="faq-question">Can I switch plans later?</h3>
+                <p class="faq-answer">
+                    Yes! You can upgrade or downgrade your plan at any time. Changes take effect 
+                    immediately, and we'll prorate any charges.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3 class="faq-question">Is there a free trial?</h3>
+                <p class="faq-answer">
+                    Yes, the Professional plan comes with a 30-day free trial. No credit card required. 
+                    The Starter plan is free forever.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3 class="faq-question">What payment methods do you accept?</h3>
+                <p class="faq-answer">
+                    We accept all major credit cards (Visa, Mastercard, American Express, Discover) 
+                    and can arrange invoicing for Enterprise customers.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3 class="faq-question">Can I get a discount for non-profits?</h3>
+                <p class="faq-answer">
+                    Our pricing is already designed with non-profit budgets in mind. For additional 
+                    discounts or special circumstances, please contact us directly.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3 class="faq-question">What happens to my data if I cancel?</h3>
+                <p class="faq-answer">
+                    Your data is always yours. You can export all your data at any time, and we'll 
+                    retain it for 90 days after cancellation in case you want to come back.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
