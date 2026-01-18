@@ -213,6 +213,14 @@ def visit_create(request):
         is_food_truck=False 
     ).count()
     
+
+    print("=" * 60)
+    print("SERVICE ZIPCODES DEBUG")
+    print(f"Number of service zipcodes: {len(service_zipcodes_list)}")
+    print(f"First few zipcodes: {service_zipcodes_list[:3]}")
+    print(f"JSON output: {json.dumps(service_zipcodes_list)[:200]}")
+    print("=" * 60)
+    
     context = {
         'form': form,
         'patrons': json.dumps(patrons),
