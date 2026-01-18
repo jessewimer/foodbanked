@@ -52,12 +52,8 @@
         const patronInfoCommentsRow = document.getElementById('patronInfoCommentsRow');
         const editPatronBtn = document.getElementById('editPatronBtn');
         
-        // Modal elements - only initialize if elements exist
-        let editPatronModal = null;
-        const editPatronModalElement = document.getElementById('editPatronModal');
-        if (editPatronModalElement && typeof bootstrap !== 'undefined') {
-            editPatronModal = new bootstrap.Modal(editPatronModalElement);
-        }
+        // Modal elements
+        const editPatronModal = new bootstrap.Modal(document.getElementById('editPatronModal'));
         const savePatronBtn = document.getElementById('savePatronBtn');
     
         // Form fields
@@ -111,7 +107,7 @@
 
 
 
-        if (patronId && allowByName) {
+        if (patronId) {
             // Build patron object from URL parameters (no API call needed!)
             const patronData = {
                 id: parseInt(patronId),
@@ -137,7 +133,13 @@
 
 
         if (allowByName && allowAnonymous) {
-            // Both enabled - normal behavior
+            // // Both enabled - normal behavior
+            // if (initialChecked && initialChecked.value === 'anonymous') {
+            //     patronSearchSection.style.display = 'none';
+            //     patronInfoCard.style.display = 'none';
+            //     visitCountSection.style.display = 'none';
+            //     firstVisitSection.style.display = 'block';
+                // Both enabled - normal behavior
             if (initialChecked && initialChecked.value === 'anonymous') {
                 if (patronSearchSection) patronSearchSection.style.display = 'none';
                 if (patronInfoCard) patronInfoCard.style.display = 'none';
@@ -159,16 +161,19 @@
             // Radio button change handlers (only needed when both are enabled)
             visitTypeRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
-                    clearErrorMessages();
+                    clearErrorMessages(); // ADD THIS LINE
                     if (this.value === 'anonymous') {
                         isSwitchingMode = true;
                         // Hide patron-related sections
+                        // patronSearchSection.style.display = 'none';
+                        // patronInfoCard.style.display = 'none';
+                        // visitCountSection.style.display = 'none';
                         if (patronSearchSection) patronSearchSection.style.display = 'none';
                         if (patronInfoCard) patronInfoCard.style.display = 'none';
                         if (visitCountSection) visitCountSection.style.display = 'none';
                         
                         // Show anonymous-specific sections
-                        if (firstVisitSection) firstVisitSection.style.display = 'block';
+                        firstVisitSection.style.display = 'block';
                         
                         // Show the zip/city/state row for manual entry
                         const addressRow = document.getElementById('addressRow');
@@ -177,9 +182,9 @@
                         }
                         
                         // Clear patron selection
-                        if (patronSearch) patronSearch.value = '';
-                        if (selectedPatronId) selectedPatronId.value = '';
-                        if (patronResults) patronResults.style.display = 'none';
+                        patronSearch.value = '';
+                        selectedPatronId.value = '';
+                        patronResults.classList.remove('show');
                         currentPatron = null;
                         
                         // Clear all form fields
@@ -188,12 +193,12 @@
                         
                     } else {
                         // Show patron search section
-                        if (patronSearchSection) patronSearchSection.style.display = 'block';
+                        patronSearchSection.style.display = 'block';
                         
                         // Hide anonymous-specific sections
-                        if (firstVisitSection) firstVisitSection.style.display = 'none';
-                        if (patronInfoCard) patronInfoCard.style.display = 'none';
-                        if (visitCountSection) visitCountSection.style.display = 'none';
+                        firstVisitSection.style.display = 'none';
+                        patronInfoCard.style.display = 'none';
+                        visitCountSection.style.display = 'none';
 
                         // Hide the zip/city/state row (address comes from patron profile)
                         const addressRow = document.getElementById('addressRow');
@@ -255,339 +260,144 @@
             if (patronInfoCard) patronInfoCard.style.display = 'none';
             if (visitCountSection) visitCountSection.style.display = 'none';
             if (firstVisitSection) firstVisitSection.style.display = 'block';
+            // patronSearchSection.style.display = 'none';
+            // patronInfoCard.style.display = 'none';
+            // visitCountSection.style.display = 'none';
+            // firstVisitSection.style.display = 'block';
         }
 
         
-        // ========================================
-        // PATRON SEARCH AND MANAGEMENT
-        // Only run if by-name visits are enabled
-        // ========================================
+        searchTypeSelect.addEventListener('change', function() {
+            const value = this.value;
+            
+            // Update hidden field
+            document.getElementById('searchTypeHidden').value = value;
+            
+            if (value === 'anonymous') {
+                patronSearchSection.style.display = 'none';
+                clearPatronSelection();
+                // Clear all form fields
+                clearFormFields();
+            } else {
+                patronSearchSection.style.display = 'block';
+                updateSearchPlaceholder();
+                clearPatronSelection();
+                // Clear all form fields
+                clearFormFields();
+                patronSearch.focus();
+            }
+            
+            patronResults.style.display = 'none';
+            patronSearch.value = '';
+            selectedIndex = -1;
+        });
 
+                
+        // Autocomplete search functionality with smart matching
         let selectedIndex = -1;
-
-        if (allowByName && searchTypeSelect) {
-            searchTypeSelect.addEventListener('change', function() {
-                const value = this.value;
-                
-                // Update hidden field
-                const searchTypeHidden = document.getElementById('searchTypeHidden');
-                if (searchTypeHidden) searchTypeHidden.value = value;
-                
-                if (value === 'anonymous') {
-                    if (patronSearchSection) patronSearchSection.style.display = 'none';
-                    clearPatronSelection();
-                    // Clear all form fields
-                    clearFormFields();
-                } else {
-                    if (patronSearchSection) patronSearchSection.style.display = 'block';
-                    updateSearchPlaceholder();
-                    clearPatronSelection();
-                    // Clear all form fields
-                    clearFormFields();
-                    if (patronSearch) patronSearch.focus();
-                }
-                
-                if (patronResults) patronResults.style.display = 'none';
-                if (patronSearch) patronSearch.value = '';
-                // selectedIndex = -1;
-            });
-        }
-
-        // Only set up patron search functionality if elements exist        
-        if (allowByName && patronSearch && patronResults && selectedPatronId) {
-            // Autocomplete search functionality with smart matching
-            let selectedIndex = -1;
+        
+        patronSearch.addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            const searchType = searchTypeSelect.value;
             
-            patronSearch.addEventListener('input', function() {
-                const searchTerm = this.value.trim();
-                const searchType = searchTypeSelect ? searchTypeSelect.value : 'last_name';
-                
-                console.log('Search input:', searchTerm, 'Type:', searchType);
-                
-                if (searchTerm.length === 0) {
-                    patronResults.style.display = 'none';
-                    selectedPatronId.value = '';
-                    if (patronInfoCard) patronInfoCard.style.display = 'none';
-                    if (visitCountSection) visitCountSection.style.display = 'none';
-                    currentPatron = null;
-                    return;
-                }
-                
-                // Filter patrons based on search type and logic
-                const matches = filterPatrons(searchTerm, searchType);
-                console.log('Matches found:', matches.length);
-                
-                if (matches.length > 0) {
-                    displayResults(matches);
-                    selectedIndex = -1;
-                } else {
-                    displayNoResults();
-                }
-            });
+            console.log('Search input:', searchTerm, 'Type:', searchType);
             
-            // Smart filtering function
-            function filterPatrons(searchTerm, searchType) {
-                const lowerSearchTerm = searchTerm.toLowerCase();
-                
-                if (searchType === 'last_name') {
-                    // Check if starts with * for partial match
-                    if (lowerSearchTerm.startsWith('*')) {
-                        const partialTerm = lowerSearchTerm.substring(1);
-                        return patrons.filter(patron => 
-                            patron.last_name.toLowerCase().includes(partialTerm)
-                        );
-                    } else {
-                        // Default: starts with search term
-                        return patrons.filter(patron => 
-                            patron.last_name.toLowerCase().startsWith(lowerSearchTerm)
-                        );
-                    }
-                } else if (searchType === 'first_name') {
-                    // Partial match for first name
+            if (searchTerm.length === 0) {
+                patronResults.classList.remove('show');
+                selectedPatronId.value = '';
+                patronInfoCard.style.display = 'none';
+                visitCountSection.style.display = 'none';
+                currentPatron = null;
+                return;
+            }
+            
+            // Filter patrons based on search type and logic
+            const matches = filterPatrons(searchTerm, searchType);
+            console.log('Matches found:', matches.length);
+            
+            if (matches.length > 0) {
+                displayResults(matches);
+                selectedIndex = -1;
+            } else {
+                displayNoResults();
+            }
+        });
+        
+        // Smart filtering function
+        function filterPatrons(searchTerm, searchType) {
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            
+            if (searchType === 'last_name') {
+                // Check if starts with * for partial match
+                if (lowerSearchTerm.startsWith('*')) {
+                    const partialTerm = lowerSearchTerm.substring(1);
                     return patrons.filter(patron => 
-                        patron.first_name.toLowerCase().includes(lowerSearchTerm)
+                        patron.last_name.toLowerCase().includes(partialTerm)
                     );
-                } else if (searchType === 'address') {
-                    // Partial match for address
+                } else {
+                    // Default: starts with search term
                     return patrons.filter(patron => 
-                        patron.address && patron.address.toLowerCase().includes(lowerSearchTerm)
+                        patron.last_name.toLowerCase().startsWith(lowerSearchTerm)
                     );
                 }
-                
-                return [];
+            } else if (searchType === 'first_name') {
+                // Partial match for first name
+                return patrons.filter(patron => 
+                    patron.first_name.toLowerCase().includes(lowerSearchTerm)
+                );
+            } else if (searchType === 'address') {
+                // Partial match for address
+                return patrons.filter(patron => 
+                    patron.address && patron.address.toLowerCase().includes(lowerSearchTerm)
+                );
             }
             
-            // Display search results
-            function displayResults(matches) {
-
-                console.log('displayResults called with', matches.length, 'matches');
-                console.log('patronResults element:', patronResults);
-
-                patronResults.innerHTML = '';
-                
-                matches.forEach((patron, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.dataset.index = index;
-                    item.dataset.patronId = patron.id;
-                    
-                    item.innerHTML = `
-                        <div class="autocomplete-item-name">${patron.last_name}, ${patron.first_name}</div>
-                        <div class="autocomplete-item-details">${patron.address || 'No address'} • ${patron.zipcode}</div>
-                    `;
-                    
-                    item.addEventListener('click', function() {
-                        selectPatron(patron);
-                        patronResults.style.display = 'none'; 
-                    });
-                    
-                    patronResults.appendChild(item);
-                });
-                
-                patronResults.style.display = 'block';
-            }
-            
-            // Display no results message
-            function displayNoResults() {
-                patronResults.innerHTML = '<div class="autocomplete-no-results">No matching patrons found</div>';
-                patronResults.style.display = 'block';
-            }
-            
-            // Keyboard navigation for autocomplete
-            patronSearch.addEventListener('keydown', function(e) {
-                const items = patronResults.querySelectorAll('.autocomplete-item');
-                
-                if (items.length === 0) return;
-                
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    selectedIndex = (selectedIndex + 1) % items.length;
-                    updateSelection(items);
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    selectedIndex = selectedIndex <= 0 ? items.length - 1 : selectedIndex - 1;
-                    updateSelection(items);
-                } else if (e.key === 'Enter' && selectedIndex >= 0) {
-                    e.preventDefault();
-                    const selectedItem = items[selectedIndex];
-                    const patronIdValue = selectedItem.dataset.patronId;
-                    const patron = patrons.find(p => p.id == patronIdValue);
-                    if (patron) {
-                        selectPatron(patron);
-                    }
-                } else if (e.key === 'Escape') {
-                    patronResults.style.display = 'none';
-                    selectedIndex = -1;
-                }
-            });
-            
-            // Update visual selection in results
-            function updateSelection(items) {
-                items.forEach((item, index) => {
-                    if (index === selectedIndex) {
-                        item.classList.add('selected');
-                        item.scrollIntoView({ block: 'nearest' });
-                    } else {
-                        item.classList.remove('selected');
-                    }
-                });
-            }
-            
-            // Close results when clicking outside
-            document.addEventListener('click', function(e) {
-                if (patronSearchSection && !patronSearchSection.contains(e.target)) {
-                    patronResults.style.display = 'none';
-                    selectedIndex = -1;
-                }
-            });
-            
-            // Restore patron selection if form had errors
-            const preselectedPatronId = selectedPatronId.value;
-            if (preselectedPatronId) {
-                const patron = patrons.find(p => p.id == preselectedPatronId);
-                if (patron) {
-                    // Show patron info and search, but DON'T auto-populate form fields
-                    patronSearch.value = `${patron.last_name}, ${patron.first_name}`;
-                    displayPatronInfo(patron);
-                    displayVisitCount(patron);
-                    // Don't call selectPatron() because that would overwrite the form values
-                }
-            }
-          
-            // RESTORE STATE AFTER VALIDATION ERROR
-            const formStateElement = document.getElementById('formStateData');
-            if (formStateElement) {
-                const formState = JSON.parse(formStateElement.textContent);
-                const selectedPatronIdFromServer = formState.selected_patron_id;
-                const searchTypeFromServer = formState.search_type;
-
-                // ONLY restore if search_type exists (means validation error occurred)
-                if (searchTypeFromServer) {
-                    if (searchTypeFromServer === 'anonymous') {
-                        // Restore anonymous mode
-                        if (searchTypeSelect) searchTypeSelect.value = 'anonymous';
-                        if (patronSearchSection) patronSearchSection.style.display = 'none';
-                        const searchTypeHidden = document.getElementById('searchTypeHidden');
-                        if (searchTypeHidden) searchTypeHidden.value = 'anonymous';
-                    } else {
-                        // Restore "By Name" mode
-                        const dropdownValue = searchTypeFromServer === 'name' ? 'last_name' : searchTypeFromServer;
-                        if (searchTypeSelect) searchTypeSelect.value = dropdownValue;
-                        if (patronSearchSection) patronSearchSection.style.display = 'block';
-                        updateSearchPlaceholder();
-                        const searchTypeHidden = document.getElementById('searchTypeHidden');
-                        if (searchTypeHidden) searchTypeHidden.value = searchTypeFromServer;
-                        
-                        // Restore patron if one was selected
-                        if (selectedPatronIdFromServer) {
-                            const patron = patrons.find(p => p.id === parseInt(selectedPatronIdFromServer));
-                            if (patron) {
-                                selectPatron(patron);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Edit patron button - only if element exists
-        if (allowByName && editPatronBtn) {
-            editPatronBtn.addEventListener('click', function() {
-                if (currentPatron && editPatronModal) {
-                    populateEditModal(currentPatron);
-                    editPatronModal.show();
-                }
-            });
+            return [];
         }
         
-        // Save patron button - only if element exists
-        if (allowByName && savePatronBtn) {
-            savePatronBtn.addEventListener('click', function() {
-                const patronIdField = document.getElementById('editPatronId');
-                if (!patronIdField) return;
+        // Display search results
+        function displayResults(matches) {
+            patronResults.innerHTML = '';
+            
+            matches.forEach((patron, index) => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.dataset.index = index;
+                item.dataset.patronId = patron.id;
                 
-                const patronIdValue = patronIdField.value;
-                const formData = {
-                    first_name: document.getElementById('editFirstName')?.value || '',
-                    last_name: document.getElementById('editLastName')?.value || '',
-                    address: document.getElementById('editAddress')?.value || '',
-                    city: document.getElementById('editCity')?.value || '',
-                    state: document.getElementById('editState')?.value || '',
-                    zipcode: document.getElementById('editZipcode')?.value || '',
-                    phone: document.getElementById('editPhone')?.value || '',
-                    comments: document.getElementById('editComments')?.value || ''
-                };
+                item.innerHTML = `
+                    <div class="autocomplete-item-name">${patron.last_name}, ${patron.first_name}</div>
+                    <div class="autocomplete-item-details">${patron.address || 'No address'} • ${patron.zipcode}</div>
+                `;
                 
-                // Get CSRF token
-                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-                if (!csrftoken) return;
-                
-                // Send AJAX request
-                fetch(`/patron/${patronIdValue}/edit-ajax/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: JSON.stringify(formData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-
-                        // Update current patron object
-                        currentPatron = { ...currentPatron, ...formData };
-                        
-                        // Update patron in patrons array
-                        const index = patrons.findIndex(p => p.id == patronIdValue);
-                        if (index !== -1) {
-                            patrons[index] = { ...patrons[index], ...formData };
-                        }
-                        
-                        // Refresh patron info card
-                        displayPatronInfo(currentPatron);
-                        
-                        // Update the hidden form fields with new address data
-                        if (zipcodeInput) zipcodeInput.value = currentPatron.zipcode || '';
-                        if (cityInput) cityInput.value = currentPatron.city || '';
-                        if (stateInput) stateInput.value = currentPatron.state || '';
-                        
-                        // Update search display
-                        if (patronSearch) patronSearch.value = `${formData.last_name}, ${formData.first_name}`;
-
-                        // Close modal
-                        if (editPatronModal) editPatronModal.hide();
-                        
-                        // Show success message
-                        showToast('Patron updated successfully!', 'success');
-                    } else {
-                        showToast('Error updating patron. Please try again.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('Error updating patron. Please try again.', 'error');
+                item.addEventListener('click', function() {
+                    selectPatron(patron);
                 });
+                
+                patronResults.appendChild(item);
             });
+            
+            patronResults.classList.add('show');
         }
         
-        // Select a patron and auto-populate - only if by-name is enabled
+        // Display no results message
+        function displayNoResults() {
+            patronResults.innerHTML = '<div class="autocomplete-no-results">No matching patrons found</div>';
+            patronResults.classList.add('show');
+        }
+        
+        // Select a patron and auto-populate
         function selectPatron(patron) {
-            if (!allowByName) return;
             
             currentPatron = patron; // Store for editing
-            if (selectedPatronId) selectedPatronId.value = patron.id;
-            
+            selectedPatronId.value = patron.id;
             // Update patron info card
-            if (patronInfoName) patronInfoName.textContent = `${patron.first_name} ${patron.last_name}`;
-            if (patronInfoAddress) patronInfoAddress.textContent = patron.address || 'Not provided';
-            if (patronInfoCityState) {
-                patronInfoCityState.textContent = patron.city && patron.state 
-                    ? `${patron.city}, ${patron.state}` 
-                    : 'Not provided';
-            }
-            if (patronInfoZip) patronInfoZip.textContent = patron.zipcode || 'Not provided';
-            
+            patronInfoName.textContent = `${patron.first_name} ${patron.last_name}`;
+            patronInfoAddress.textContent = patron.address || 'Not provided';
+            patronInfoCityState.textContent = patron.city && patron.state 
+                ? `${patron.city}, ${patron.state}` 
+                : 'Not provided';
+            patronInfoZip.textContent = patron.zipcode || 'Not provided';
             // Auto-populate hidden address fields
             if (zipcodeInput) zipcodeInput.value = patron.zipcode || '';
             if (cityInput) cityInput.value = patron.city || '';
@@ -599,20 +409,20 @@
                 addressRow.style.display = 'none';
             }
 
-            if (patronResults) patronResults.style.display = 'none';
+            patronResults.classList.remove('show');
             
             // Display patron info card
             displayPatronInfo(patron);
             
             // Auto-populate from last visit if available
             if (patron.last_visit) {
-                if (householdSizeInput) householdSizeInput.value = patron.last_visit.household_size;
-                if (age0_18Input) age0_18Input.value = patron.last_visit.age_0_18;
-                if (age19_59Input) age19_59Input.value = patron.last_visit.age_19_59;
-                if (age60PlusInput) age60PlusInput.value = patron.last_visit.age_60_plus;
+                householdSizeInput.value = patron.last_visit.household_size;
+                age0_18Input.value = patron.last_visit.age_0_18;
+                age19_59Input.value = patron.last_visit.age_19_59;
+                age60PlusInput.value = patron.last_visit.age_60_plus;
             } else {
                 // Just populate zipcode if no last visit
-                if (zipcodeInput) zipcodeInput.value = patron.zipcode;
+                zipcodeInput.value = patron.zipcode;
             }
             
             // Display visit count and last visit date
@@ -622,59 +432,55 @@
         
         // Display patron information card
         function displayPatronInfo(patron) {
-            if (!allowByName) return;
-            
-            if (patronInfoName) patronInfoName.textContent = `${patron.last_name}, ${patron.first_name}`;
-            if (patronInfoAddress) patronInfoAddress.textContent = patron.address || 'Not provided';
+            patronInfoName.textContent = `${patron.last_name}, ${patron.first_name}`;
+            patronInfoAddress.textContent = patron.address || 'Not provided';
             
             // City and State
             const cityState = [];
             if (patron.city) cityState.push(patron.city);
             if (patron.state) cityState.push(patron.state);
-            if (patronInfoCityState) {
-                patronInfoCityState.textContent = cityState.length > 0 ? cityState.join(', ') : 'Not provided';
-            }
+            patronInfoCityState.textContent = cityState.length > 0 ? cityState.join(', ') : 'Not provided';
             
-            if (patronInfoZip) patronInfoZip.textContent = patron.zipcode;
+            patronInfoZip.textContent = patron.zipcode;
             
             // Comments (only show if exists)
             if (patron.comments) {
-                if (patronInfoComments) patronInfoComments.textContent = patron.comments;
-                if (patronInfoCommentsRow) patronInfoCommentsRow.style.display = 'flex';
+                patronInfoComments.textContent = patron.comments;
+                patronInfoCommentsRow.style.display = 'flex';
             } else {
-                if (patronInfoCommentsRow) patronInfoCommentsRow.style.display = 'none';
+                patronInfoCommentsRow.style.display = 'none';
             }
             
-            if (patronInfoCard) patronInfoCard.style.display = 'block';
+            patronInfoCard.style.display = 'block';
         }
         
         // Display visit count for selected patron
         function displayVisitCount(patron) {
-            if (!allowByName) return;
-            
             console.log('Displaying visit count:', patron.visits_this_month);
-            
-            const visitStatusText = document.getElementById('visitStatusText');
-            const lastVisitDate = document.getElementById('lastVisitDate');
             
             if (patron.visits_this_month !== undefined && patron.last_visit_date) {
                 const count = patron.visits_this_month;
+                const visitStatusText = document.getElementById('visitStatusText');
                 
-                if (visitStatusText) {
-                    visitStatusText.textContent = 'Number of visits this month: ' + count;
-                }
+                visitStatusText.textContent = 'Number of visits this month: ' + count;
+                // if (count === 0) {
+                //     visitStatusText.textContent = '1st visit of the month';
+                // } else if (count === 1) {
+                //     visitStatusText.textContent = 'Visit #2 this month';
+                // } else {
+                //     visitStatusText.textContent = `Visit #${count + 1} this month`;
+                // }
                 
-                if (lastVisitDate) {
-                    lastVisitDate.textContent = formatDate(patron.last_visit_date);
-                }
-                if (visitCountSection) visitCountSection.style.display = 'flex';
+                document.getElementById('lastVisitDate').textContent = formatDate(patron.last_visit_date);
+                visitCountSection.style.display = 'flex';
             } else if (patron.visits_this_month === 0) {
                 // First visit ever
-                if (visitStatusText) visitStatusText.textContent = '1st visit of the month';
-                if (lastVisitDate) lastVisitDate.textContent = 'Never';
-                if (visitCountSection) visitCountSection.style.display = 'flex';
+                const visitStatusText = document.getElementById('visitStatusText');
+                visitStatusText.textContent = '1st visit of the month';
+                document.getElementById('lastVisitDate').textContent = 'Never';
+                visitCountSection.style.display = 'flex';
             } else {
-                if (visitCountSection) visitCountSection.style.display = 'none';
+                visitCountSection.style.display = 'none';
             }
         }
         
@@ -687,28 +493,91 @@
             return date.toLocaleDateString('en-US', options);
         }
         
+        // Edit patron button click
+        editPatronBtn.addEventListener('click', function() {
+            if (currentPatron) {
+                populateEditModal(currentPatron);
+                editPatronModal.show();
+            }
+        });
+        
         // Populate edit modal with patron data
         function populateEditModal(patron) {
-            const editPatronId = document.getElementById('editPatronId');
-            const editFirstName = document.getElementById('editFirstName');
-            const editLastName = document.getElementById('editLastName');
-            const editAddress = document.getElementById('editAddress');
-            const editCity = document.getElementById('editCity');
-            const editState = document.getElementById('editState');
-            const editZipcode = document.getElementById('editZipcode');
-            const editPhone = document.getElementById('editPhone');
-            const editComments = document.getElementById('editComments');
-            
-            if (editPatronId) editPatronId.value = patron.id;
-            if (editFirstName) editFirstName.value = patron.first_name;
-            if (editLastName) editLastName.value = patron.last_name;
-            if (editAddress) editAddress.value = patron.address || '';
-            if (editCity) editCity.value = patron.city || '';
-            if (editState) editState.value = patron.state || '';
-            if (editZipcode) editZipcode.value = patron.zipcode;
-            if (editPhone) editPhone.value = patron.phone || '';
-            if (editComments) editComments.value = patron.comments || '';
+            document.getElementById('editPatronId').value = patron.id;
+            document.getElementById('editFirstName').value = patron.first_name;
+            document.getElementById('editLastName').value = patron.last_name;
+            document.getElementById('editAddress').value = patron.address || '';
+            document.getElementById('editCity').value = patron.city || '';
+            document.getElementById('editState').value = patron.state || '';
+            document.getElementById('editZipcode').value = patron.zipcode;
+            document.getElementById('editPhone').value = patron.phone || '';
+            document.getElementById('editComments').value = patron.comments || '';
         }
+        
+        // Save patron changes via AJAX
+        savePatronBtn.addEventListener('click', function() {
+            const patronId = document.getElementById('editPatronId').value;
+            const formData = {
+                first_name: document.getElementById('editFirstName').value,
+                last_name: document.getElementById('editLastName').value,
+                address: document.getElementById('editAddress').value,
+                city: document.getElementById('editCity').value,
+                state: document.getElementById('editState').value,
+                zipcode: document.getElementById('editZipcode').value,
+                phone: document.getElementById('editPhone').value,
+                comments: document.getElementById('editComments').value
+            };
+            
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Send AJAX request
+            fetch(`/patron/${patronId}/edit-ajax/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+
+                    // Update current patron object
+                    currentPatron = { ...currentPatron, ...formData };
+                    
+                    // Update patron in patrons array
+                    const index = patrons.findIndex(p => p.id == patronId);
+                    if (index !== -1) {
+                        patrons[index] = { ...patrons[index], ...formData };
+                    }
+                    
+                    // Refresh patron info card
+                    displayPatronInfo(currentPatron);
+                    
+                    // Update the hidden form fields with new address data
+                    if (zipcodeInput) zipcodeInput.value = currentPatron.zipcode || '';
+                    if (cityInput) cityInput.value = currentPatron.city || '';
+                    if (stateInput) stateInput.value = currentPatron.state || '';
+                    
+                    // Update search display
+                    patronSearch.value = `${formData.last_name}, ${formData.first_name}`;
+
+                    // Close modal
+                    editPatronModal.hide();
+                    
+                    // Show success message
+                    showToast('Patron updated successfully!', 'success');
+                } else {
+                    showToast('Error updating patron. Please try again.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error updating patron. Please try again.', 'error');
+            });
+        });
         
         // Simple toast notification
         function showToast(message, type) {
@@ -723,23 +592,97 @@
             }, 3000);
         }
         
-        function clearPatronSelection() {
-            if (selectedPatronId) selectedPatronId.value = '';
-            if (patronInfoCard) patronInfoCard.style.display = 'none';
-            if (visitCountSection) visitCountSection.style.display = 'none';
-            currentPatron = null;
+        // Keyboard navigation for autocomplete
+        patronSearch.addEventListener('keydown', function(e) {
+            const items = patronResults.querySelectorAll('.autocomplete-item');
+            
+            if (items.length === 0) return;
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % items.length;
+                updateSelection(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = selectedIndex <= 0 ? items.length - 1 : selectedIndex - 1;
+                updateSelection(items);
+            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                e.preventDefault();
+                const selectedItem = items[selectedIndex];
+                const patronId = selectedItem.dataset.patronId;
+                const patron = patrons.find(p => p.id == patronId);
+                if (patron) {
+                    selectPatron(patron);
+                }
+            } else if (e.key === 'Escape') {
+                patronResults.classList.remove('show');
+                selectedIndex = -1;
+            }
+        });
+        
+        // Update visual selection in results
+        function updateSelection(items) {
+            items.forEach((item, index) => {
+                if (index === selectedIndex) {
+                    item.classList.add('selected');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
         }
         
-        function updateSearchPlaceholder() {
-            if (!patronSearch || !searchTypeSelect) return;
-            
-            const searchType = searchTypeSelect.value;
-            if (searchType === 'last_name') {
-                patronSearch.placeholder = 'Search by last name...';
-            } else if (searchType === 'first_name') {
-                patronSearch.placeholder = 'Search by first name...';
-            } else if (searchType === 'address') {
-                patronSearch.placeholder = 'Search by address...';
+        // Close results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (patronSearchSection && !patronSearchSection.contains(e.target)) {
+                patronResults.classList.remove('show');
+                selectedIndex = -1;
+            }
+        });
+        
+        // Restore patron selection if form had errors
+        const preselectedPatronId = selectedPatronId.value;
+        if (preselectedPatronId) {
+            const patron = patrons.find(p => p.id == preselectedPatronId);
+            if (patron) {
+                // Show patron info and search, but DON'T auto-populate form fields
+                patronSearch.value = `${patron.last_name}, ${patron.first_name}`;
+                displayPatronInfo(patron);
+                displayVisitCount(patron);
+                // Don't call selectPatron() because that would overwrite the form values
+            }
+        }
+      
+        // RESTORE STATE AFTER VALIDATION ERROR
+        const formStateElement = document.getElementById('formStateData');
+        if (formStateElement) {
+            const formState = JSON.parse(formStateElement.textContent);
+            const selectedPatronIdFromServer = formState.selected_patron_id;
+            const searchTypeFromServer = formState.search_type;
+
+            // ONLY restore if search_type exists (means validation error occurred)
+            if (searchTypeFromServer) {
+                if (searchTypeFromServer === 'anonymous') {
+                    // Restore anonymous mode
+                    searchTypeSelect.value = 'anonymous';
+                    patronSearchSection.style.display = 'none';
+                    document.getElementById('searchTypeHidden').value = 'anonymous';
+                } else {
+                    // Restore "By Name" mode
+                    const dropdownValue = searchTypeFromServer === 'name' ? 'last_name' : searchTypeFromServer;
+                    searchTypeSelect.value = dropdownValue;
+                    patronSearchSection.style.display = 'block';
+                    updateSearchPlaceholder();
+                    document.getElementById('searchTypeHidden').value = searchTypeFromServer;
+                    
+                    // Restore patron if one was selected
+                    if (selectedPatronIdFromServer) {
+                        const patron = patrons.find(p => p.id === parseInt(selectedPatronIdFromServer));
+                        if (patron) {
+                            selectPatron(patron);
+                        }
+                    }
+                }
             }
         }
 
@@ -809,6 +752,7 @@
                 }
             });
         }
+
 
         function validateForm() {
             let isValid = true;
@@ -960,118 +904,11 @@
             return isValid;
         }
 
-        // function validateForm() {
-        //     let isValid = true;
-        //     const errors = [];
-        //     const patronCardErrors = [];
-            
-        //     // Clear previous errors
-        //     document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error', 'error-shake'));
-        //     clearErrorMessages();
-            
-        //     // Get the current search type
-        //     const searchType = searchTypeSelect ? searchTypeSelect.value : null;
-        //     const isByName = searchType !== 'anonymous' && allowByName;
-            
-        //     // Validate patron selection (only for by-name mode)
-        //     if (isByName && selectedPatronId && !selectedPatronId.value) {
-        //         errors.push('Please select a patron from the list');
-        //         patronCardErrors.push('Please select a patron before submitting');
-        //         isValid = false;
-        //     }
-            
-        //     // Validate zipcode
-        //     const zipValue = zipcodeInput ? zipcodeInput.value.trim() : '';
-        //     if (!zipValue) {
-        //         errors.push('Zip code is required');
-        //         addFieldError(zipcodeInput, 'Zip code is required');
-        //         isValid = false;
-        //     } else if (!/^\d{5}$/.test(zipValue)) {
-        //         errors.push('Please enter a valid 5-digit zip code');
-        //         addFieldError(zipcodeInput, 'Please enter a valid 5-digit zip code');
-        //         isValid = false;
-        //     }
-            
-        //     // Validate household size (only check if greater than 0)
-        //     const householdValue = householdSizeInput ? parseInt(householdSizeInput.value) : 0;
-        //     if (householdValue <= 0) {
-        //         errors.push('Household size must be at least 1');
-        //         addFieldError(householdSizeInput, 'Must be at least 1');
-        //         isValid = false;
-        //     }
-            
-        //     // Validate age groups sum to household size
-        //     const age0_18 = age0_18Input ? parseInt(age0_18Input.value) || 0 : 0;
-        //     const age19_59 = age19_59Input ? parseInt(age19_59Input.value) || 0 : 0;
-        //     const age60Plus = age60PlusInput ? parseInt(age60PlusInput.value) || 0 : 0;
-        //     const totalAges = age0_18 + age19_59 + age60Plus;
-            
-        //     if (totalAges !== householdValue) {
-        //         errors.push(`Age groups must add up to household size (${householdValue}). Currently adds to ${totalAges}.`);
-        //         addFieldError(age0_18Input, '');
-        //         addFieldError(age19_59Input, '');
-        //         addFieldError(age60PlusInput, '');
-        //         isValid = false;
-        //     }
-            
-        //     // Check food truck visit type if enabled
-        //     const foodTruckEnabled = form.dataset.foodTruckEnabled === 'true';
-        //     if (foodTruckEnabled) {
-        //         const pantryCheckbox = document.getElementById('visit_type_pantry');
-        //         const foodTruckCheckbox = document.getElementById('visit_type_food_truck');
-        //         const pantryChecked = pantryCheckbox ? pantryCheckbox.checked : false;
-        //         const foodTruckChecked = foodTruckCheckbox ? foodTruckCheckbox.checked : false;
-                
-        //         if (!pantryChecked && !foodTruckChecked) {
-        //             errors.push('Please select at least one visit type');
-        //             isValid = false;
-        //         }
-        //     }
-            
-        //     // Display patron card errors if any
-        //     if (patronCardErrors.length > 0 && patronInfoCard) {
-        //         const errorDiv = document.createElement('div');
-        //         errorDiv.id = 'patron-card-error';
-        //         errorDiv.className = 'alert alert-danger mt-2 error-shake';
-        //         errorDiv.innerHTML = patronCardErrors.join('<br>');
-                
-        //         // Remove any existing error
-        //         const existingError = document.getElementById('patron-card-error');
-        //         if (existingError) {
-        //             existingError.remove();
-        //         }
-                
-        //         patronInfoCard.appendChild(errorDiv);
-        //     }
-            
-        //     return isValid;
-        // }
-
-        function addFieldError(field, message) {
-            if (!field) return;
-            
-            field.classList.add('field-error', 'error-shake');
-            
-            if (message) {
-                const errorSpan = document.createElement('span');
-                errorSpan.className = 'error-message';
-                errorSpan.textContent = message;
-                errorSpan.style.color = 'red';
-                errorSpan.style.fontSize = '0.875rem';
-                errorSpan.style.marginTop = '0.25rem';
-                errorSpan.style.display = 'block';
-                
-                // Insert after the field
-                if (field.parentNode) {
-                    field.parentNode.insertBefore(errorSpan, field.nextSibling);
-                }
-            }
-        }
 
         function clearErrorMessages() {
-            // Remove field error classes
-            document.querySelectorAll('.field-error').forEach(el => {
-                el.classList.remove('field-error', 'error-shake');
+            // Remove error styling from all fields
+            document.querySelectorAll('.field-error').forEach(field => {
+                field.classList.remove('field-error');
             });
             
             // Remove all error message text
@@ -1244,52 +1081,6 @@
                     selected.click();
                 } else if (e.key === 'Escape') {
                     cityStateResults.style.display = 'none';
-                }
-            });
-        }
-
-        function displayZipcodeResults(zipcodes) {
-            if (!zipcodeResults) return;
-            
-            zipcodeResults.innerHTML = '';
-            
-            if (zipcodes.length === 0) {
-                zipcodeResults.style.display = 'none';
-                return;
-            }
-            
-            zipcodes.forEach((z, index) => {
-                const item = document.createElement('div');
-                item.className = 'autocomplete-item';
-                item.dataset.index = index;
-                
-                item.innerHTML = `
-                    <div class="autocomplete-item-name">${z.zipcode}</div>
-                    <div class="autocomplete-item-details">${z.city}, ${z.state}</div>
-                `;
-                
-                item.addEventListener('click', function() {
-                    if (zipcodeInput) zipcodeInput.value = z.zipcode;
-                    if (cityInput) cityInput.value = z.city;
-                    if (stateInput) stateInput.value = z.state;
-                    zipcodeResults.style.display = 'none';
-                    selectedZipcodeIndex = -1;
-                });
-                
-                zipcodeResults.appendChild(item);
-            });
-            
-            zipcodeResults.style.display = 'block';
-            selectedZipcodeIndex = -1;
-        }
-
-        function updateZipcodeSelection(items) {
-            items.forEach((item, index) => {
-                if (index === selectedZipcodeIndex) {
-                    item.classList.add('selected');
-                    item.scrollIntoView({ block: 'nearest' });
-                } else {
-                    item.classList.remove('selected');
                 }
             });
         }
