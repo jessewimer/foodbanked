@@ -26,7 +26,7 @@ class Patron(models.Model):
 class Visit(models.Model):
     foodbank = models.ForeignKey(Foodbank, on_delete=models.CASCADE)
     patron = models.ForeignKey(Patron, on_delete=models.SET_NULL, null=True, blank=True)
-    visit_date = models.DateField(auto_now_add=True)
+    visit_date = models.DateField()
     
     # Snapshot of patron info at time of visit
     patron_first_name = models.CharField(max_length=100, blank=True, null=True)
